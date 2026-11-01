@@ -1,0 +1,371 @@
+See discussions, stats, and author profiles for this publication at: https://www.researchgate.net/publication/311489101
+
+
+
+Multimodal Graph-based Event Detection and Summarization in Social Media
+Streams
+
+Conference Paper · October 2015
+DOI: 10.1145/2733373.2809933
+
+
+
+
+CITATIONS                                                                                                 READS
+15                                                                                                        168
+
+
+5 authors, including:
+
+            Manos Schinas                                                                                            Symeon Papadopoulos
+            Information Technologies Institute (ITI)                                                                 The Centre for Research and Technology, Hellas
+            8 PUBLICATIONS 51 CITATIONS                                                                              170 PUBLICATIONS 1,985 CITATIONS
+
+               SEE PROFILE                                                                                                SEE PROFILE
+
+
+
+            Georgios Petkos                                                                                          Ioannis (Yiannis) Kompatsiaris
+            Information Technologies Institute (ITI)                                                                 The Centre for Research and Technology, Hellas
+            24 PUBLICATIONS 423 CITATIONS                                                                            755 PUBLICATIONS 6,959 CITATIONS
+
+               SEE PROFILE                                                                                                SEE PROFILE
+
+
+
+
+Some of the authors of this publication are also working on these related projects:
+
+
+              InVID - In Video Veritas View project
+
+
+
+              Dem@Care EU-FP7 View project
+
+
+
+
+ All content following this page was uploaded by Symeon Papadopoulos on 15 February 2017.
+
+ The user has requested enhancement of the downloaded file.
+                      Multimodal Graph-based Event Detection and
+                        Summarization in Social Media Streams
+
+                        Manos Schinas                                    Symeon Papadopoulos                                 Georgios Petkos
+                          CERTH-ITI                                                CERTH-ITI                                     CERTH-ITI
+                      Thessaloniki, Greece                                     Thessaloniki, Greece                          Thessaloniki, Greece
+                       manosetro@iti.gr                                          papadop@iti.gr                                 gpetkos@iti.gr
+                                               Yiannis Kompatsiaris                                        Pericles A. Mitkas
+                                                       CERTH-ITI                                           Aristotle University of
+                                                   Thessaloniki, Greece                                    Thessaloniki, Greece
+                                                       ikom@iti.gr                                         mitkas@eng.auth.gr
+
+ABSTRACT                                                                                                 Event detection in social media is a challenging task due
+The paper describes a multimodal graph-based system for                                               to the nature and characteristics of social multimedia: There
+addressing the Yahoo-Flickr Event Summarization Challenge                                             is a large number of multimedia items that are of personal
+of ACM Multimedia 2015. The objective is to automatically                                             nature and/or not relevant with respect to an event. Also,
+uncover structure within a collection of 100 million pho-                                             many items have missing fields, e.g., title or taken date, that
+tos/videos in the form of detecting and identifying events,                                           make difficult their linking to an already known event. Ad-
+and summarizing them succinctly for consumer consump-                                                 ditionally, the order of magnitude of available media content
+tion. The presented system uses a sliding window over the                                             creates excessive computational costs and calls for scalable
+stream of multimedia items to build and maintain a mul-                                               and efficient solutions. Furthermore, the presentation of de-
+timodal same-event image graph and applies a graph clus-                                              tected events poses additional challenges as the volume of
+tering algorithm to detect events. In addition, it makes use                                          images for large scale events e.g., the Olympic Games, could
+of a graph-based diversity-oriented ranking approach and a                                            be massive. Not every image is of the same importance for
+versatile event retrieval mechanism to access summarized in-                                          an event and long-running events can be quite complex con-
+stances of the events of interest. A demo of the system is                                            taining many aspects and numerous sub-events. Thus, there
+online at http://mklab.iti.gr/acmmm2015-gc/.                                                          is a need for event-based summarization methods that can
+                                                                                                      produce concise visual summaries for any time interval of
+Categories and Subject Descriptors                                                                    the event, covering its main aspects.
+                                                                                                         In this paper, we describe a prototype system addressing
+H.4 [Information Systems Applications]: Miscellaneous                                                 the Yahoo-Flickr Event Summarization Challenge of ACM
+                                                                                                      Multimedia 2015. We detect events from a set of about
+General Terms                                                                                         100 million images [12] and then summarize each detected
+Experimentation, Algorithms                                                                           event by presenting only a representative and diverse sub-
+                                                                                                      set of images. Although the system uses Flickr images, it
+Keywords                                                                                              could be applied to any multimedia collection with a sim-
+Event Detection, Clustering, Event Summarization                                                      ilar set of metadata. To handle the massive scale of the
+                                                                                                      dataset, the system uses a sliding time-window that enables
+                                                                                                      the discovery of new events or their merging into previously
+1.      INTRODUCTION                                                                                  detected events. During the procedure, an image graph is
+   As a result of the widespread use of media capturing de-                                           constructed and updated on the fly, and a graph-based clus-
+vices and social media sharing platforms, a growing amount                                            tering algorithm is applied periodically to detect dense sub-
+of diverse multimedia content is available online. Hence,                                             graphs that correspond to events. In order to keep track of
+there is a profound need for information systems that can                                             evolving or periodic events, a graph of events is also gener-
+effectively organize such content. As real-world events are                                           ated incrementally. To perform summarization, the system
+a key part of social life, the detection of events and the or-                                        takes advantage of the image graph and applies per event a
+ganization of content around them is an effective way for                                             graph-based ranking algorithm that produces a diverse set
+navigating and searching large multimedia collections.                                                of images, ranked by their importance.
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full citation
+on the first page. Copyrights for components of this work owned by others than the
+                                                                                                      2.    RELATED WORK
+author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or                   Numerous approaches have recently appeared in the liter-
+republish, to post on servers or to redistribute to lists, requires prior specific permission         ature on the problems of event detection tracking and sum-
+and/or a fee. Request permissions from Permissions@acm.org.                                           marization in social media content. There are two general
+MM’15, October 26–30, 2015, Brisbane, Australia.
+                                                                                                      event detection and tracking approaches: document-pivot [1,
+Copyright is held by the owner/author(s). Publication rights licensed to ACM.
+ACM 978-1-4503-3459-4/15/10 ...$15.00.
+                                                                                                      9] and feature-pivot methods [4]. The former aim to cluster
+DOI: http://dx.doi.org/10.1145/2733373.2809933 .                                                      items related to the same event. The latter aim to first iden-
+
+
+
+
+                                                                                                189
+tify the representative features (e.g., tags) of the underlying         that are even marginally similar to each other. An alterna-
+events in the collection (typically by detecting bursty fre-            tive is to sample negative pairs so that the chosen pairs of
+quency patterns along time or space) and then detect events             items are similar according to some modality. Empirically,
+by leveraging these representative features.                            we observed that by doing this, although training accuracy
+   The core idea of the majority of works in event summa-               dropped test accuracy increased because the model was more
+rization is the segmentation of items set into coherent topics          effective on difficult (borderline) cases compared to a model
+or sub-events and the selection of the most representative              that would have been trained on purely randomly selected
+documents in each segment. For event segmentation sev-                  data. To be more specific, the models that were eventu-
+eral approaches have been proposed, ranging from Hidden                 ally used were trained with 80% randomly selected data and
+Markov Models [3] to LDA extensions [2]. Regarding selec-               20% non-randomly selected data. Each data point that was
+tion of representative documents, either centroid-based [10]            not randomly selected involved the examination of a single
+or graph-based ranking approaches [5] have been considered.             modality at a time, and all used modalities were equally con-
+                                                                        sidered for sampling the 20% of non-randomly selected data.
+3.    SYSTEM OVERVIEW                                                   The single-modality similarities were based on the following
+                                                                        features:
+   The proposed system consists of three main components:
+event detection and tracking, event summarization, and event                 • Taken time: Four similarity scores are extracted.
+retrieval and presentation. The event detection and tracking                   The first is the absolute difference in days between the
+component identifies events per timeslot and keeps track of                    two image timestamps. The other three are binary in-
+their evolution from timeslot to timeslot. The summariza-                      dicators signifying whether the difference between the
+tion component calculates a score for each image per event                     time each of the images was taken is smaller than 3
+by applying a graph-based ranking algorithm. Finally, event                    hours, 12 hours and 24 hours respectively.
+retrieval and presentation is the online component of the sys-
+tem, used to present the detected events to end users.                       • Text: Three text metadata fields are used, namely ti-
+                                                                               tle, description, and tags. For each field, we compute
+3.1     Event Detection and Tracking                                           a tf · idf vector and the corresponding cosine similar-
+   The system utilizes a sliding time-window to detect and                     ity. Additionally, we extract named entities from these
+keep track of events. As the window moves along the time-                      fields by using Stanford NLP library1 and include three
+line, new images are inserted into the window while others                     additional similarity measures based on the number of
+are removed. As days are a meaningful unit of time for                         common locations, organizations and names of people.
+events, we set the step of the time-window to one day and
+its length to three days. In other words, there is a signifi-                • Image: We used SURF+VLAD using the implemen-
+cant overlap of two days between successive timeslots. We                      tation of [13]. In particular, we extract SURF features
+use this overlap to keep track of evolving and long-running                    from the raw image content and aggregated them us-
+events as will be described in the next sections.                              ing the VLAD scheme. We then used the L2 distance
+   For images within a given timeslot we use what is termed                    between VLAD vectors to compute similarities.
+the Same Event Model (SEM) [7]. The SEM takes as input
+                                                                        The third variation that we explored for building the SEMs
+the set of per modality similarities between two images and
+                                                                        was to tune the classification threshold. Intuitively, for each
+predicts how likely it is that these two images belong to the
+                                                                        image, the SEM will be evaluated against far more images
+same event. A graph of images GI is constructed, in which
+                                                                        than the average event size. In a typical scenario, the “real
+the existence of an edge between a pair of images denotes
+                                                                        negative” evaluations of the SEM are expected to be much
+the positive prediction of the SEM. Subsequently, a graph-
+                                                                        more than the “real positive” ones. Therefore, in order to
+based clustering algorithm is applied on GI to obtain a full
+                                                                        produce a “clean” graph with not too many spurious edges,
+clustering. Finally, the method either merges these clusters
+                                                                        it is useful to increase the true negatives rate. This can be
+into events from previous timeslots or creates new events.
+                                                                        achieved by increasing the classification threshold for posi-
+3.1.1    Same Event Model                                               tive predictions, at the cost of a lower true positives rate.
+                                                                        According to our experiments, this significantly improves
+   To implement the SEM, a Support Vector Machine (SVM)
+                                                                        the clustering performance. The test accuracy of the model
+with a linear kernel is utilized. An independent training
+                                                                        when the threshold is not tuned is 98.65% for positives and
+dataset from the 2014 MediaEval Social Event Detection
+                                                                        98.81% for negatives (average 98.73%). When the threshold
+task (SED 2014) [8] was used for building the model. The
+                                                                        for positive classification is set to 0.9, test accuracy for posi-
+SED 2014 dataset contains 362,578 Flickr images that are
+                                                                        tives drops to 95.12%, while accuracy on negatives increases
+associated with 17,834 events. Several variations were con-
+                                                                        to 99.87% (average accuracy is 97.49%).
+sidered for building the models, including: a) different ways
+of sampling the training and test data, b) different sets of            3.1.2      Generation of Image Graph
+features and feature similarities, and c) different values of
+                                                                           As the time-window moves forward, new images are in-
+the classification threshold.
+                                                                        serted into the image graph GI . At the same time, the out-
+   According to [9], sampling of the training and testing data
+                                                                        of-window images and the corresponding edges are removed
+was found to be a critical factor for the usefulness of the
+                                                                        from the graph. For the newly inserted images, edges be-
+learned SEM. The problem arises because in reality, there
+                                                                        tween them and images already in the graph are calculated
+are pairs of images that have some similarity, according to
+                                                                        based on the SEM as described in section 3.1.1. To limit the
+at least some modalities, e.g., time, but do not actually rep-
+                                                                        number of SEM evaluations and make the approach more
+resent the same event. However, it is rather unlikely that
+                                                                        1
+random sampling of negative instances, picks pairs of items                 http://nlp.stanford.edu/software/CRF-NER.shtml
+
+
+
+
+                                                                  190
+scalable, we apply a candidate neighbor selection step [9].
+For each image, we utilize appropriate indices to obtain the
+most similar images according to each modality and eval-
+uate the SEM only for them. More specifically, for each
+image we retrieve all the nearest images in terms of textual
+and visual content provided that they exceed a predefined
+threshold and are within the current timeslot. Then, we cal-
+culate the same event score only for the union of these two
+sets. For text we used an indexing scheme based on Locality
+Sensitive Hashing, while for visual content, we used Product             Figure 1: Event tracking in successive timeslots.
+Quantization on top of the SURF+VLAD representation.
+   To detect the events in a time window we opted for a
+graph clustering algorithm, namely the Structural Cluster-              average radius >500km are defined as global. Also, events
+ing Algorithm for Networks (SCAN) [14]. We apply SCAN                   with images from a single user are tagged as personal. Fi-
+on GI to identify dense sub-graphs of images. These sub-                nally, we calculate the significance scores of images as will be
+graphs represent the events in the set of images of this time           described in the next section, and we store and index them
+window, i.e. each event e ∈ E is represented as a set Ge                in MongoDB and Solr respectively.
+of highly connected images on the graph. However, a sub-
+stantial amount of images is kept outside of the detected               3.2    Event Summarization
+clusters. These images are divided into two categories, hubs               Our goal is to generate a concise summary of a selected
+and outliers. Hubs are bridges to more than one clusters,               event e for an arbitrary time-frame. A summary is a set
+while outliers are images that may be connected to images of            of representative images depicting the key aspects of the
+a cluster but do not belong to any of them. We add hubs to              selected time interval. To support this at retrieval time, we
+the clusters to which they are connected under the condition            calculate a significance score for each event image according
+that the number of edges exceed a predefined threshold (10              to its position on the sub-graph Ge . This calculation is based
+edges). Note that after this step hubs may belong to more               on the MGraph summarization method [11], which first finds
+than one clusters. Once the set of events E are detected,               sub-events within the event and uses these sub-events to
+we use images associated with each eventi ∈ E to calculate              calculate a prior score for each image. Then, to incorporate
+an aggregated representation of the event. Namely, for each             diversity into image scoring, it uses DivRank [6], a variant
+event, we compute the minimum, maximum and average                      of PageRank that aims at diversity. In our case, instead of
+taken time of the images and calculate three merged tf · idf            finding sub-events within an event by clustering its images,
+vectors that describe the aggregated textual content of ti-             we perform time-based segmentation. Namely, we create
+tle, description and tags. As named entities are expected               segments/clusters corresponding to one-day timeslots, and
+to be particularly relevant for each event, we also aggregate           apply scoring in the same way as done in [11]. At the end
+persons, locations and organizations.                                   of this process, for an event lasting D days, we have a rank
+                                                                        of the images within each time-slot ti , i = 1...D.
+3.1.3    Event Tracking
+   As new events are detected, the system tries to link them            3.3    Event Retrieval and Presentation
+with detected events from earlier timeslots. To identify                   At retrieval time, there are two main tasks: The first is
+that two clusters are referring to the same event we use the            to obtain a set of events that match a specific query q. The
+structural similarity between the underlying sub-graphs, ex-            second is to use the calculated DivRank scores to generate
+pressed as the Jaccard coefficient of their edges. If this sim-         a summary of arbitrary length.
+ilarity exceeds a certain threshold (0.6), we merge the two                Regarding retrieval, the initial query q is usually short,
+clusters into a single event. Intuitively in our case, if two           e.g., olympic games, and although this usually yields re-
+sub-graphs of successive timeslots share a significant amount           sults of high relevance, it cannot fully capture the underly-
+of edges, the later sub-graph is arising from the previous one.         ing information need of the user. To improve the expressive
+Note that the overlap of edges is feasible due to the content           power of q and increase recall, query expansion is applied:
+overlap (of two days) between successive timeslots. When                q → qext . For this purpose we use the tags and named en-
+such a similarity is detected, the new event is merged into             tities of the retrieved events to expand the query with new
+the older. Namely, the images of the new event are added to             terms. As single tags and named entities could yield noisy
+the previous event and its aggregated representation is up-             results, we combine them in pairs. The final query is the
+dated accordingly. Furthermore, we also check for inactive              logical OR between the aforementioned pairs.
+events. As inactive, we define the events that have no new                 For each retrieved event e with associated images I, the
+inserted images for the last three days. As the length of the           user can select to see a summary of length L for a specific
+timeslot is also three days, it is unlikely that these events           time-frame F. To this end, we use the scores described in
+will have any overlap with events in the following windows.             section 3.2. To achieve this, we keep images IF within F and
+We remove those from the set of active events and discard               iterate over the timeslots of F to form a summary follow-
+events with less than 10 images. For the rest, we calculate             ing a greedy approach. We first calculate the compression
+whether they are local, regional or global. More specifically,          rate CR = L/|IF |, needed to achieve a summary of length
+for each event we find a median point and an average radius             L. Then, for each timeslot tj ∈ F, we get the correspond-
+based on the latitude and longitude of its images. Events               ing images Ij and find the number of images that need to
+with radius <100km are considered to be local. Between 100              be selected to meet the budget of L messages. Namely, the
+and 500km they are classified as regional, while events with            local target for timeslot tj , is Lj = CR · |Ij | messages.
+
+
+
+
+                                                                  191
+                                                                                         5.   ACKNOWLEDGMENTS
+                         Table 1: Details of predefined events
+      Event                              #events   #items      i/ev   u/ev                  This work was supported by the REVEAL project, par-
+      Occupy Movement                      120      9,814       81    3.45               tially funded by the European Commission, under contract
+      Batkid                                2        624        312     2                number FP7-610928.
+      Olympic Games                        117     11,535       98     5.2
+      Eyjafjallajokull Eruption            12        588        49     1.7
+      Holi, festival of colors              2        52         26      1
+                                                                                         6.   REFERENCES
+      Byron Bay Bluesfest                   9        707        78     2.4                [1] H. Becker, M. Naaman, and L. Gravano. Learning
+      Hanami                               16       3106        194    6.6                    similarity metrics for event identification in social media. In
+                                                                                              Proceedings of the Third ACM International Conference on
+                                                                                              Web Search and Data Mining, WSDM ’10, pages 291–300,
+  Table 2: Basic Statistics of event detection process                                        New York, NY, USA, 2010. ACM.
+                                                                                          [2] J. Bian, Y. Yang, and T.-S. Chua. Multimedia
+  between 1/1/2009 and 1/1/2014
+                                                                                              summarization for trending topics in microblogs. In
+                  Statistics              Personal    Social    Total                         Proceedings of the 22nd ACM international conference on
+                  Events                   23,184     45,729    68,913                        Conference on Information and Knowledge Management,
+                  Avg. items/event           39         47        44                          CIKM ’13, pages 1807–1812, NY, USA, 2013. ACM.
+                  Avg. users/event           1         5.25      3.82                     [3] D. Chakrabarti and K. Punera. Event summarization using
+                  Local                    17,334     24,453    41,787                        tweets. ICWSM, 11:66–73, 2011.
+                  Regional                  765       11,196    11,961                    [4] L. Chen and A. Roy. Event detection from flickr data
+                  Global                    171        7,929    8,100                         through wavelet-based spatial analysis. In Proceedings of
+                  Avg duration (hours)     19.11       42.9     34.84                         the 18th ACM Conference on Information and Knowledge
+                  Max duration (days)       9.83       19.25    19.25                         Management, CIKM ’09, pages 523–532, New York, NY,
+                                                                                              USA, 2009. ACM.
+                                                                                          [5] G. Erkan and D. R. Radev. Lexrank: Graph-based lexical
+  The algorithm iterates through the images in Ij sorted by                                   centrality as salience in text summarization. J. Artif. Int.
+  their DivRank score and selects the top Lj images provided                                  Res., 22(1):457–479, Dec. 2004.
+  that the value of Equation 1 is below a predefined thresh-                              [6] Q. Mei, J. Guo, and D. Radev. Divrank: The interplay of
+                                                       √                                      prestige and diversity in information networks. In
+             √ the maximum possible L2 distance is 2 we
+  old Rth . As
+                                                                                              Proceedings of the 16th ACM SIGKDD International
+  set Rth = 2/2 ≃ 0.7. In case that the length of a local                                     Conference on Knowledge Discovery and Data Mining,
+  summary is still below than the desired one, we re-calculate                                KDD ’10, pages 1009–1018, NY, USA, 2010. ACM.
+  the compression rate to select more images from the next                                [7] G. Petkos, S. Papadopoulos, and Y. Kompatsiaris. Social
+  timeslots.                                                                                  event detection using multimodal clustering and integrating
+                                                                                              supervisory signals. In Proceedings of the 2nd ACM
+                                                                                              International Conference on Multimedia Retrieval, ICMR
+                           Redundancy(im) = min
+                                             0
+                                                L2 (im, im0 )                (1)              ’12, pages 23:1–23:8, New York, NY, USA, 2012. ACM.
+                                              im ∈S
+                                                                                          [8] G. Petkos, S. Papadopoulos, V. Mezaris, and
+  The score of Equation 1 measures the redundancy intro-                                      Y. Kompatsiaris. Social event detection at mediaeval 2014:
+  duced by an image im with respect to the set of already se-                                 Challenges, datasets, and evaluation. In Working Notes
+  lected images. To this end, we compute its minimum visual                                   Proceedings of the MediaEval 2014 Workshop, Barcelona,
+                                                                                              Catalunya, Spain, October 16-17, 2014.
+  distance, based on L2 , to the already selected images. Fil-
+                                                                                          [9] G. Petkos, S. Papadopoulos, E. Schinas, and
+  tering based on redundancy during image selection ensures                                   Y. Kompatsiaris. Graph-based multimodal clustering for
+  that no visual duplicates are including in the summary.                                     social event detection in large collections of images. In
+                                                                                              Proceedings of the 20th Anniversary International
+  4.          RESULTS                                                                         Conference on MultiMedia Modeling - Volume 8325, MMM
+                                                                                              2014, pages 146–158, New York, NY, USA, 2014.
+     Table 1 presents some statistics for the set of seven pre-                               Springer-Verlag New York, Inc.
+  defined events. The number of sub-events in each event and                             [10] D. R. Radev, H. Jing, M. Styś, and D. Tam. Centroid-based
+  the number of associated items exhibits high variance. Large                                summarization of multiple documents. Information
+  scale real-world events, such as the Occupy Movement and                                    Processing & Management, 40(6):919–938, 2004.
+  the Olympic Games, consist of several sub-events and the                               [11] M. Schinas, S. Papadopoulos, Y. Kompatsiaris, and
+  number of items per event is high. Also, the average num-                                   P. Mitkas A. Visual event summarization on social media
+                                                                                              using topic modelling and graph-based ranking algorithms.
+  ber of users per event is higher as more users are engaged                                  In Proceedings of the ACM International Conference on
+  in these events. On the other hand, single day events, such                                 Multimedia Retrieval, ICMR 2015, 2015.
+  as the batkid case, consist of a small number of sub-events                            [12] B. Thomee, D. A. Shamma, G. Friedland, B. Elizalde,
+  with many associated items.                                                                 K. Ni, D. Poland, D. Borth, and L.-J. Li. The new data
+     Table 2 presents some basic statistics for all the events de-                            and new challenges in multimedia research. arXiv preprint
+  tected in the YFCC dataset between 1/1/2009 and 1/1/2014.                                   arXiv:1503.01817, 2015.
+  In total, there are 68,913 events, of which 45,729 are social                          [13] E. S. Xioufis, S. Papadopoulos, Y. Kompatsiaris,
+                                                                                              G. Tsoumakas, and I. P. Vlahavas. A comprehensive study
+  events, i.e. the multimedia content for the same event comes
+                                                                                              over VLAD and product quantization in large-scale image
+  from more than two users. Regarding the characteristics of                                  retrieval. IEEE Transactions on Multimedia,
+  personal and social events, a marked difference is the follow-                              16(6):1713–1728, 2014.
+  ing: personal events are typically tagged as local, since it is                        [14] X. Xu, N. Yuruk, Z. Feng, and T. A. J. Schweiger. Scan: A
+  unlikely that the same user can post content for the same                                   structural clustering algorithm for networks. In Proceedings
+  event from different locations. At the same time, the ratio of                              of the 13th ACM SIGKDD International Conference on
+  events tagged as regional and global is considerably higher                                 Knowledge Discovery and Data Mining, KDD ’07, pages
+                                                                                              824–833, New York, NY, USA, 2007. ACM.
+  for social events.
+
+
+
+
+                                                                                   192
+
+
+
+
+View publication stats
+

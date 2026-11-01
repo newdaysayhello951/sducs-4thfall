@@ -1,0 +1,265 @@
+===================================================
+RepLab 2013 Corpus README - v1.1 - April 22th, 2013
+===================================================
+
+
+This package contains the corpus used in RepLab 2013 (Second evaluation campaign on Online Reputation Management).
+
+This README file contains: 
+
+1) A brief description of the corpus
+2) Instructions to download the tweets annotated in the corpus
+3) A description of the contents of each directory in this package, including instructions to format the output of systems and to evaluate them using the script provided in the evaluation package.
+
+Note that this package does NOT include baseline outputs for the different subtasks in RepLab 2013 (filtering, topic detection, polarity for reputation, priority). These are distributed in an independent package. 
+
+==========================
+1. The RepLab 2013 Corpus
+==========================
+
+RepLab 2013 uses Twitter data in English and Spanish. The balance between both languages depends on the availability of data for each of the entities included in the dataset.
+
+The corpus consists of a collection of tweets referring to a selected set of 61 entities from four domains: automotive, banking, universities and music/artists. 
+
+- Crawling was performed during the period from the 1st June 2012 till the 31st Dec 2012 using the entity’s canonical name as query. For each entity, at least 2,200 tweets are collected: the first 700 are used as training set, and the rest as test set. The corpus also comprises additional background tweets for each entity (up to 50,000, with a large variability across entities). 
+
+Note that the final amount of available tweets in these sets may be lower, since some posts may have been deleted by the users: in order to respect Twitter’s terms of service, the organizers do not provide the contents of the tweets. The tweet identifiers can be used to retrieve the texts of the posts similarly to the mechanism used in the TREC Microblog Track in 2011 and 2012.
+
+We do provide the content of the URLs mentioned in the tweets, in order to guarantee that every copy of this corpus is identical (URLs content may vary along time). See Section 3 of this README file.
+
+The training and test data sets are manually labelled by annotators who are trained and guided by experts in online reputation management. Each tweet in the training and test sets is annotated as follows:
+RELATED/UNRELATED: the tweet is/is not about the entity.
+POSITIVE/NEUTRAL/NEGATIVE: the information contained in the tweet has positive/neutral/negative implications for the entity's reputation.
+Identifier of the topic (cluster) the tweet belongs to. 
+ALERT/MILDLY_IMPORTANT/UNIMPORTANT: the priority of the topic (cluster) the tweet belongs to.
+
+The description of RepLab tasks and the guidelines are available at the RepLab 2013 homepage:
+
+http://www.limosine-project.eu/events/replab2013
+
+===========================================
+2. How to download the tweets in the corpus
+===========================================
+
+Since Twitter's TOS do not allow redistribution of tweets, only Tweets Ids and usernames are provided. The .dat files in the tweet_info dirs are in a similar format as the TREC Microblog Corpus.
+
+Tweet texts can be downloaded by using any of the following tools:
+
+1.- TREC Microblog Track
+https://github.com/lintool/twitter-tools
+
+2.- SemEval-2013 Task 2 Download script
+http://www.cs.york.ac.uk/semeval-2013/task2/index.php?id=data
+
+3.- A java tool provided by RepLab organization:
+
+http://nlp.uned.es/replab2013/replab2013_twitter_texts_downloader_v0.7.tar.gz
+
+ 
+More information about the tool can be found in the README file provided in the tool’s package.
+
+==============================================
+3. Description of the contents of this package
+==============================================
+
+./entities:
+-----------
+./entities/replab2013_entities.tsv: 
+-----------------------------------
+
+   Tab-separated and quoted values file that includes information associated to the entities of the dataset. The columns corresponds to:
+
+     - “entity_id”: Id of the entity (e.g. RL2013D01E001)
+     - “query”: Query used to retrieve the tweets (e.g. BMW)
+     - “entity_name”: Complete name of the entity (e.g. Bayerische Motoren Werke AG)
+     - “domain”: Domain which the entity belongs to (in this case, automotive).
+     - “homepage”: URL of the entity's homepage (e.g. http://www.bmw.com).
+     - “wikipedia_page_en”: URL of the entity's English Wikipedia page (e.g. http://en.wikipedia.org/wiki/BMW)
+     - “wikipedia_page_es”: URL of the entity's Spanish Wikipedia page (e.g. http://es.wikipedia.org/wiki/BMW)
+     - “md5_homepage”:  md5 hash of the homepage URL. This field can be used to get the content of the URL from the ./training/downloaded_entities_urls local directory.
+     - “md5_wikipedia_page_en”: md5 hash of the entity's English Wikipedia page URL. This field can be used to get the content of the URL from the ../entities/downloaded_entities_urls local directory (compressed).
+     - “md5_wikipedia_page_es”: md5 hash of the entity's Spanish Wikipedia page URL. This field can be used to get the content of the URL from the ../entities/downloaded_entities_urls local directory.
+
+
+./entities/downloaded_entities_urls (compressed with tar.gz): 
+-------------------------------------------------------------
+     This directory includes the content of the homepages and Wikipedia pages --both in English and Spanish-- of the entities in the dataset. Each subdirectory caches the content of one URL, and its name is the md5 hash of the URL.
+
+./training:
+-----------
+
+    ./training/tweet_info:
+    ----------------------
+    This directory includes the information needed to crawl the annotated tweets in the training set. Each .dat file corresponds to an entity and includes the following information, separated by tabs and quoted:
+
+     -”tweet_id”: Id of the tweet.
+     -”author”: Twitter username of the tweet's author. 
+-”entity_id”: The Id of the entity which the tweet is associated to.
+     -”tweet_url”: The complete URL of the tweet.
+	-”language”: The language filter used in the query to retrieve the tweet.
+	-”timestamp”: UNIX time when the tweet was published.
+    	-”urls”: List of external links (separated by comma) included in the content of the tweet.
+     -”extended_urls”: List of original (extended) URLs (separated by comma) in the tweet.
+     -”md5_extended_urls”: md5 hash of the extended URLs (separated by comma). This field can be used to get the content of the URL from the ./training/downloaded_external_links local directory (compressed). This directory includes the content of the external links mentioned in the tweets. Each subdirectory caches the content of one URL. The directory's name is the md5 hash of the URL.
+	- “is_near_duplicate_of”: either the id of the similar tweet using a jaccard similarity --if any-- or “-1” otherwise. Tweets with similarity above 0.95 are considered near duplicates. Tweets with similarity between 0.8 and 0.95 are analyzed and if the differences are just urls, @usernames or retweet symbols (“RT”, “MT” and “via”), both tweets are considered near duplicates.
+
+     ./training/downloaded_external_links (compressed with tar.gz):
+     --------------------------------------------------------------
+
+     This directory includes the content of the external links mentioned in the tweets. Each subdirectory caches the content of one URL, and its name is the md5 hash of the URL.
+
+
+    ./training/labeled:
+    -------------------
+    This directory contains the annotations of each tweet. Each .dat file corresponds to an entity and includes the following information, separated by tabs and quoted:
+
+	-”tweet_id”: Id of the tweet.
+	-”author”: Twitter username of the tweet's author. 
+	-”filtering”: ‘RELATED’ if the tweet is related to the entity, ‘UNRELATED’ otherwise.
+	-”polarity”: Polarity for reputation: ‘POSITIVE’/’NEGATIVE’ if the content of the tweet has positive/negative implications for the reputation of the entity, ‘NEUTRAL’ otherwise. Note that this is not the same as polarity in sentiment analysis. Note that only related tweets of identified clusters have been annotated for polarity.
+	-”topic_detection”: Label of the cluster (topic) which the tweet belongs to.
+	-”topic_priority”: Priority of the cluster (topic) for reputation monitoring purposes. “ALERT” - highest priority; “MILDLY_IMPORTANT” - related, average priority; “UNIMPORTANT” - related but with little relevance.
+
+	
+
+    ./training/goldstandard:
+    ------------------------
+    This directory contains the manual annotations of the corpus in the output format required for systems for each of the subtasks (i.e. filtering, polarity, topic detection and topic priority). Systems are required to use this format to be evaluated by the software package provided by the RepLab organization.
+
+    One file per system and subtask (filtering, polarity, etc.). Each file contains the output for all entities. 
+
+        
+    ./training/goldstandard/goldstandard_filtering.dat:
+    ---------------------
+    Three double-quoted columns, separated by tabs, with the following information:
+    -“entity_id”: The Id of the entity which the tweet is associated to.
+    -“tweet_id”: Id of the tweet.
+    -”filtering”: ‘RELATED’ if the tweet is related to the entity, ‘UNRELATED’ otherwise.
+
+    Example:
+    --------
+    "entity_id"     "tweet_id"      "filtering"
+    "RL2013D01E001" "187281022927384576"    "UNRELATED"
+    "RL2013D01E001" "202580416773898240"    "UNRELATED"
+    "RL2013D01E001" "204639473366073344"    "RELATED"
+
+
+
+
+    ./training/goldstandard/goldstandard_polarity.dat:
+    ---------------------
+    Three double-quoted columns, separated by tabs, with the following information:
+    -“entity_id”:The Id of the entity which the tweet is associated to.
+    -“tweet_id”: Id of the tweet.
+    -”polarity”: Polarity for reputation: ‘POSITIVE’/’NEGATIVE’ if the content of the tweet has positive/negative implications for the reputation of the entity, ‘NEUTRAL’ otherwise. Note that this is not the same as polarity in sentiment analysis. Note that only related tweets of identified clusters have been annotated for polarity.
+
+    Example:
+    --------
+    "entity_id"     "tweet_id"      "polarity"
+    "RL2013D01E001" "204639473366073344"    "NEGATIVE"
+    "RL2013D01E001" "205888692580126720"    "NEUTRAL"
+    "RL2013D01E001" "207430942028079104"    "POSITIVE"
+
+
+    ./training/goldstandard/goldstandard_topic_detection.dat:
+    ---------------------
+    Three double-quoted columns, separated by tabs, with the following information:
+    -“entity_id”:The Id of the entity which the tweet is associated to.
+    -“tweet_id”: Id of the tweet.
+    -”topic_detection”: Label of the cluster (topic) which the tweet belongs to.
+
+    Example:
+    --------
+    "entity_id"     "tweet_id"      "topic"
+    "RL2013D01E001" "204639473366073344"    "other topics"
+    "RL2013D01E001" "207430942028079104"    "Euro NCAP crash test"
+    "RL2013D01E001" "208204757779759104"    "BMW official partner of the olympics"
+
+
+
+
+    ./training/goldstandard/goldstandard_topic_priority.dat:
+    ---------------------
+    Three double-quoted columns, separated by tabs, with the following information:
+    “entity_id”:The Id of the entity which the tweet is associated to.
+
+    “tweet_id”: Id of the tweet.
+
+    -”topic_priority”: Priority of the cluster (topic) for reputation monitoring purposes. “ALERT” - highest priority; “MIDLY_IMPORTANT” - related, average priority; “UNIMPORTANT” - related but with little relevance.
+
+    Example:
+    --------
+    "entity_id"     "tweet_id"      "topic_priority"
+    "RL2013D01E001" "204639473366073344"    "UNIMPORTANT"
+    "RL2013D01E001" "207430942028079104"    "MILDLY_IMPORTANT"
+    "RL2013D01E001" "208204757779759104"    "ALERT"
+
+
+
+./test:
+-------
+
+   ./test/goldstandard:
+   -------------------
+   This directory contains the manual annotations of the test dataset in the output format required for systems for each of the subtasks (i.e. filtering, polarity, topic detection and topic priority).
+
+
+   ./test/goldstandard_official_replab2013:
+   ---------------------------------------
+   The final amount of the tweets available at the RepLab submission deadline (June 4, 2013) is lower than the annotated dataset, since some posts may have been deleted by the users. This directory contains the final goldstandard used to evaluate RepLab systems. In order to compare new systems to the official RepLab runs, please use this goldstandard.
+
+
+   ./test/tweet_info:
+   ------------------
+   This directory includes the information needed to crawl the tweets in the test dataset. Each .dat file corresponds to an entity and includes the same information as described for ./training/tweet_info dir (see above).
+ 
+   ./test/downloaded_external_links (compressed):
+   --------------------------------------------
+     This directory includes the content of the external links mentioned within the tweets in the test dataset. Each subdirectory caches the content of one URL, and its name is the md5 hash of the URL.
+
+
+./background:
+-------------------
+   ./background/tweet_info:
+   ------------------------
+   This directory includes the information needed to crawl the background tweets. Each .dat file corresponds to an entity and includes the same information as described for ./training/tweet_info dir (see above).
+
+ 
+   ./background/downloaded_external_links (compressed):
+   --------------------------------------------
+     This directory includes the content of the external links mentioned in the background tweets. Each subdirectory caches the content of one URL, and its name is the md5 hash of the URL.
+
+
+-------------
+./evaluation:
+-------------
+
+The ./evaluation folder contains the evaluation scripts in Perl used in RepLab 2013 (Second evaluation campaign on Online Reputation Management).
+
+All the scripts receive two parameters: (i) the goldstandard file and (ii) the system output file
+
+For instance:
+-------------
+perl evaluation/EVAL_POLARITY_ACC.pl evaluation/examples/polarity.GOLD.dat evaluation/examples/polarity.SYS.dat
+
+
+
+./evaluation/EVAL_POLARITY_ACC.pl:
+---------------------------------
+This script computes the accuracy of the polarity system outputs. Only the related tweets included in the gold-standard file will se considered for the accuracy computation. The format consists of three columns splitted by tabs containing the entity identifier, the tweet identifier and the polarity tag (POSITIVE/NEGATIVE/NEUTRAL).
+
+
+
+./evaluation/EVAL_FILTERING_RS.pl:
+----------------------------------
+This script computes the Reliability and Sensitivity measures for the  filtering subtask. it requires the gold-standard and system output files as the first and second parameters. These measures compute the recall and precision of organizational relationships between documents (i.e, filtering, priority or clustering). In this case, the measure considers that there exists a relationship between each of related and unrelated document pair. Only the tweets included in the gold-standard are considered for the Reliability and Sensitivity computation. The format consists of three columns splitted by tabs containing the entity identifier, the tweet identifier and the filtering tag (RELATED/UNRELATED).
+
+
+
+./evaluation/EVAL_PRIORITY_RS.pl:
+--------------------------------
+This script computes the Reliability and Sensitivity for the priority relationships between related tweets. Only the related tweets appearing in the gold-standard file are considered for the computation. The script considers three priority levels: ALARM, MILDLY_IMPORTANT and UNIMPORTANT. Correct priority relationships between tweet pairs are those that the relative priority corresponds with the gold-standard. The format consists of three columns splitted by tabs containing the entity identifier, the tweet identifier and the priority level.
+
+./evaluation/EVAL_TOPICDETECTION_RS.pl:
+--------------------------------------
+This script computes the Reliability and Sensitivity for the topic relationships. Two tweets are correctly related if in both the gold-standard and the system output share a topic. The format consists of three columns splitted by tabs containing the entity identifier, the tweet identifier and the topic identifier. Of course, the topic name does not need to match with the name in the gold-standard. Only the related tweets appearing in the gold-standard are considered for the computation.

@@ -1,0 +1,15 @@
+[
+  {
+    "name": "flixster_socialfalcon_https",
+    "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)>"
+  },
+  {
+    "name": "flixster_socialfalcon_http",
+    "error": "HTTP Error 502: Bad Gateway"
+  },
+  {
+    "name": "flixster_socialfalcon_archive",
+    "bytes": 265,
+    "text": "[[\"urlkey\",\"timestamp\",\"original\",\"mimetype\",\"statuscode\",\"digest\",\"length\"],\n[\"gr,aegean,fme,labs)/ideal/socialfalcon-datasets\",\"20150509110635\",\"http://labs.fme.aegean.gr/ideal/socialfalcon-datasets/\",\"text/html\",\"200\",\"6S2KOWNUGYRO5NF4U2VU4RY7LEXAZ7MK\",\"6239\"]]\n"
+  }
+]

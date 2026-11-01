@@ -1,0 +1,42 @@
+{
+  "paper": "Spina, Gonzalo, Amigo. Learning Similarity Functions for Topic Detection in Online Reputation Monitoring. SIGIR 2014.",
+  "text_coverage": 0.0,
+  "features_used": [
+    "author",
+    "urls",
+    "time_millis",
+    "time_hours",
+    "time_days"
+  ],
+  "features_missing": [
+    "hashtags",
+    "namedusers",
+    "semantic_jaccard",
+    "semantic_lin_cf",
+    "semantic_lin_tfidf",
+    "terms_jaccard",
+    "terms_lin_cf",
+    "terms_lin_tfidf"
+  ],
+  "n_train_tweets": 33952,
+  "n_test_tweets": 72056,
+  "n_train_topics": 3756,
+  "n_test_topics": 5700,
+  "n_pairs_sampled": 80000,
+  "topic_detection": {
+    "auc": 0.2151,
+    "mar": 0.5559,
+    "max_f1": 0.3344,
+    "best_cut": 18.0,
+    "best_f1": 0.2987,
+    "best_reliability": 0.3098,
+    "best_sensitivity": 0.3241,
+    "mean_n_clusters_at_best": 250.5082
+  },
+  "paper_reported": {
+    "table2_all_features_accuracy": 0.63,
+    "table3_svm_all_auc": 0.41,
+    "table3_svm_all_mar": 0.61,
+    "table3_max_f1": 0.47
+  }
+}

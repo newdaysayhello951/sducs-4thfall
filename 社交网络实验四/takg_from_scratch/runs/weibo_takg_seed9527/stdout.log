@@ -1,0 +1,398 @@
+{
+  "dataset": "Weibo",
+  "records": {
+    "train": 37036,
+    "valid": 4630,
+    "test": 4630
+  },
+  "training_pairs": 39188,
+  "word_vocabulary": 50000,
+  "bow_vocabulary": 10000,
+  "files": {
+    "test_src.txt": "c720288b8aa9fa2ab7ef9fd8e9d9d836c156ba36262af85d7793bb124bbead07",
+    "test_trg.txt": "e06f5d343ddb6288f2eff392479f24d4d6d96b3d095e9038ce00961211bb692d",
+    "train_src.txt": "2b592f9f9b070205d2422a4891d72e7ae6d13f6569ceed04bda86c19a5e914ba",
+    "train_trg.txt": "6ee1d6c495a1c3e02ff101a529ddb962e970316bc1da6dee73914a7cead7543b",
+    "valid_src.txt": "70901d55d6c8d33790e56425fe5e268425424ed4bc21d69d3731d7d9a12f95be",
+    "valid_trg.txt": "ddbfede5fcf2ad162dfea8cfc2dde7131c9bd23d91bd88dcf0bf3e48e220f4ef"
+  }
+}
+topic batch 100/613 loss=125.5480
+topic batch 200/613 loss=126.7718
+topic batch 300/613 loss=126.3223
+topic batch 400/613 loss=126.6253
+topic batch 500/613 loss=126.7980
+topic batch 600/613 loss=126.6310
+{"phase": "topic_pretraining", "epoch": 67, "loss": 126.64849182546315, "seconds": 41.906000000000006}
+topic batch 100/613 loss=127.2864
+topic batch 200/613 loss=127.2945
+topic batch 300/613 loss=126.8559
+topic batch 400/613 loss=127.0331
+topic batch 500/613 loss=126.6487
+topic batch 600/613 loss=126.5653
+{"phase": "topic_pretraining", "epoch": 68, "loss": 126.6138031155379, "seconds": 44.14100000000002}
+topic batch 100/613 loss=128.0227
+topic batch 200/613 loss=126.6813
+topic batch 300/613 loss=126.7775
+topic batch 400/613 loss=126.3707
+topic batch 500/613 loss=126.4468
+topic batch 600/613 loss=126.4651
+{"phase": "topic_pretraining", "epoch": 69, "loss": 126.56624421122318, "seconds": 42.17199999999997}
+topic batch 100/613 loss=125.4167
+topic batch 200/613 loss=126.1809
+topic batch 300/613 loss=126.9548
+topic batch 400/613 loss=126.7427
+topic batch 500/613 loss=126.6417
+topic batch 600/613 loss=126.5716
+{"phase": "topic_pretraining", "epoch": 70, "loss": 126.51922586239928, "seconds": 41.85900000000004}
+topic batch 100/613 loss=125.1881
+topic batch 200/613 loss=126.2977
+topic batch 300/613 loss=126.4628
+topic batch 400/613 loss=126.6091
+topic batch 500/613 loss=126.9128
+topic batch 600/613 loss=126.5193
+{"phase": "topic_pretraining", "epoch": 71, "loss": 126.47623152896873, "seconds": 41.639999999999986}
+topic batch 100/613 loss=127.3573
+topic batch 200/613 loss=126.7970
+topic batch 300/613 loss=126.8736
+topic batch 400/613 loss=126.6940
+topic batch 500/613 loss=126.7636
+topic batch 600/613 loss=126.4750
+{"phase": "topic_pretraining", "epoch": 72, "loss": 126.4491739719878, "seconds": 40.03199999999998}
+topic batch 100/613 loss=126.0927
+topic batch 200/613 loss=125.9552
+topic batch 300/613 loss=126.0781
+topic batch 400/613 loss=126.5297
+topic batch 500/613 loss=126.6794
+topic batch 600/613 loss=126.4892
+{"phase": "topic_pretraining", "epoch": 73, "loss": 126.40708193419307, "seconds": 38.71899999999994}
+topic batch 100/613 loss=127.3969
+topic batch 200/613 loss=126.6607
+topic batch 300/613 loss=126.5819
+topic batch 400/613 loss=126.7092
+topic batch 500/613 loss=126.3910
+topic batch 600/613 loss=126.4419
+{"phase": "topic_pretraining", "epoch": 74, "loss": 126.37655617376244, "seconds": 38.75}
+topic batch 100/613 loss=126.4352
+topic batch 200/613 loss=126.5085
+topic batch 300/613 loss=126.7645
+topic batch 400/613 loss=126.3584
+topic batch 500/613 loss=126.2900
+topic batch 600/613 loss=126.3647
+{"phase": "topic_pretraining", "epoch": 75, "loss": 126.32971885426501, "seconds": 43.06299999999999}
+topic batch 100/613 loss=127.9082
+topic batch 200/613 loss=126.1083
+topic batch 300/613 loss=126.6713
+topic batch 400/613 loss=126.6816
+topic batch 500/613 loss=126.2648
+topic batch 600/613 loss=126.3167
+{"phase": "topic_pretraining", "epoch": 76, "loss": 126.30275254241299, "seconds": 46.952999999999975}
+topic batch 100/613 loss=127.4430
+topic batch 200/613 loss=126.4604
+topic batch 300/613 loss=126.8052
+topic batch 400/613 loss=126.2556
+topic batch 500/613 loss=126.2417
+topic batch 600/613 loss=126.1727
+{"phase": "topic_pretraining", "epoch": 77, "loss": 126.25904511796999, "seconds": 40.98400000000004}
+topic batch 100/613 loss=127.7603
+topic batch 200/613 loss=127.1908
+topic batch 300/613 loss=127.2342
+topic batch 400/613 loss=126.6648
+topic batch 500/613 loss=126.3947
+topic batch 600/613 loss=126.2479
+{"phase": "topic_pretraining", "epoch": 78, "loss": 126.22216275736812, "seconds": 39.297000000000025}
+topic batch 100/613 loss=125.9564
+topic batch 200/613 loss=125.0673
+topic batch 300/613 loss=125.6405
+topic batch 400/613 loss=125.7181
+topic batch 500/613 loss=126.1257
+topic batch 600/613 loss=126.2127
+{"phase": "topic_pretraining", "epoch": 79, "loss": 126.18709440933169, "seconds": 39.56200000000001}
+topic batch 100/613 loss=127.0896
+topic batch 200/613 loss=126.5352
+topic batch 300/613 loss=126.5727
+topic batch 400/613 loss=126.5439
+topic batch 500/613 loss=126.1620
+topic batch 600/613 loss=126.1083
+{"phase": "topic_pretraining", "epoch": 80, "loss": 126.15010054447072, "seconds": 39.21799999999996}
+topic batch 100/613 loss=126.8777
+topic batch 200/613 loss=126.3489
+topic batch 300/613 loss=126.1583
+topic batch 400/613 loss=126.1720
+topic batch 500/613 loss=126.3171
+topic batch 600/613 loss=126.1349
+{"phase": "topic_pretraining", "epoch": 81, "loss": 126.11656783149597, "seconds": 39.31200000000001}
+topic batch 100/613 loss=126.9696
+topic batch 200/613 loss=127.1711
+topic batch 300/613 loss=126.6083
+topic batch 400/613 loss=126.5052
+topic batch 500/613 loss=126.2919
+topic batch 600/613 loss=126.1212
+{"phase": "topic_pretraining", "epoch": 82, "loss": 126.0765667080429, "seconds": 45.78100000000006}
+topic batch 100/613 loss=125.5690
+topic batch 200/613 loss=125.6243
+topic batch 300/613 loss=125.4178
+topic batch 400/613 loss=125.6922
+topic batch 500/613 loss=125.9428
+topic batch 600/613 loss=126.0994
+{"phase": "topic_pretraining", "epoch": 83, "loss": 126.04884025789444, "seconds": 47.922000000000025}
+topic batch 100/613 loss=126.0192
+topic batch 200/613 loss=125.6419
+topic batch 300/613 loss=125.4200
+topic batch 400/613 loss=125.5466
+topic batch 500/613 loss=125.7078
+topic batch 600/613 loss=126.0511
+{"phase": "topic_pretraining", "epoch": 84, "loss": 126.02048934059653, "seconds": 48.843000000000075}
+topic batch 100/613 loss=125.0878
+topic batch 200/613 loss=125.9181
+topic batch 300/613 loss=126.0108
+topic batch 400/613 loss=126.0637
+topic batch 500/613 loss=125.9306
+topic batch 600/613 loss=125.9796
+{"phase": "topic_pretraining", "epoch": 85, "loss": 125.97742931665395, "seconds": 45.65599999999995}
+topic batch 100/613 loss=125.6647
+topic batch 200/613 loss=125.9433
+topic batch 300/613 loss=126.2287
+topic batch 400/613 loss=126.0397
+topic batch 500/613 loss=126.0036
+topic batch 600/613 loss=125.9216
+{"phase": "topic_pretraining", "epoch": 86, "loss": 125.94948333120351, "seconds": 42.75}
+topic batch 100/613 loss=126.5177
+topic batch 200/613 loss=126.0857
+topic batch 300/613 loss=126.4130
+topic batch 400/613 loss=126.4720
+topic batch 500/613 loss=125.9816
+topic batch 600/613 loss=125.8053
+{"phase": "topic_pretraining", "epoch": 87, "loss": 125.90782550851873, "seconds": 41.46900000000005}
+topic batch 100/613 loss=125.5877
+topic batch 200/613 loss=126.2061
+topic batch 300/613 loss=126.4531
+topic batch 400/613 loss=126.0545
+topic batch 500/613 loss=126.0148
+topic batch 600/613 loss=125.9285
+{"phase": "topic_pretraining", "epoch": 88, "loss": 125.88507878917862, "seconds": 44.26599999999985}
+topic batch 100/613 loss=124.4363
+topic batch 200/613 loss=124.9558
+topic batch 300/613 loss=125.7513
+topic batch 400/613 loss=125.5782
+topic batch 500/613 loss=125.7641
+topic batch 600/613 loss=125.7454
+{"phase": "topic_pretraining", "epoch": 89, "loss": 125.84707440373069, "seconds": 51.343999999999824}
+topic batch 100/613 loss=126.6051
+topic batch 200/613 loss=125.6330
+topic batch 300/613 loss=125.8488
+topic batch 400/613 loss=125.5187
+topic batch 500/613 loss=125.6618
+topic batch 600/613 loss=125.8581
+{"phase": "topic_pretraining", "epoch": 90, "loss": 125.80798644178483, "seconds": 52.531999999999925}
+topic batch 100/613 loss=126.5709
+topic batch 200/613 loss=126.3037
+topic batch 300/613 loss=126.2086
+topic batch 400/613 loss=126.3196
+topic batch 500/613 loss=126.0664
+topic batch 600/613 loss=125.8167
+{"phase": "topic_pretraining", "epoch": 91, "loss": 125.79058380454028, "seconds": 45.968000000000075}
+topic batch 100/613 loss=125.7297
+topic batch 200/613 loss=125.7359
+topic batch 300/613 loss=125.7495
+topic batch 400/613 loss=125.3412
+topic batch 500/613 loss=125.4368
+topic batch 600/613 loss=125.7306
+{"phase": "topic_pretraining", "epoch": 92, "loss": 125.74468778661043, "seconds": 44.7969999999998}
+topic batch 100/613 loss=125.1690
+topic batch 200/613 loss=125.2330
+topic batch 300/613 loss=125.8936
+topic batch 400/613 loss=125.5669
+topic batch 500/613 loss=125.8576
+topic batch 600/613 loss=125.7435
+{"phase": "topic_pretraining", "epoch": 93, "loss": 125.72106991844103, "seconds": 64.06299999999987}
+topic batch 100/613 loss=126.0579
+topic batch 200/613 loss=126.3114
+topic batch 300/613 loss=125.9451
+topic batch 400/613 loss=126.0858
+topic batch 500/613 loss=125.9373
+topic batch 600/613 loss=125.6980
+{"phase": "topic_pretraining", "epoch": 94, "loss": 125.68354345689418, "seconds": 61.0150000000001}
+topic batch 100/613 loss=126.0827
+topic batch 200/613 loss=125.2294
+topic batch 300/613 loss=125.0041
+topic batch 400/613 loss=125.3394
+topic batch 500/613 loss=125.6050
+topic batch 600/613 loss=125.5762
+{"phase": "topic_pretraining", "epoch": 95, "loss": 125.64648416162304, "seconds": 54.6099999999999}
+topic batch 100/613 loss=126.7320
+topic batch 200/613 loss=126.2316
+topic batch 300/613 loss=125.5663
+topic batch 400/613 loss=125.6363
+topic batch 500/613 loss=125.6397
+topic batch 600/613 loss=125.6268
+{"phase": "topic_pretraining", "epoch": 96, "loss": 125.60659444586433, "seconds": 58.125}
+topic batch 100/613 loss=126.2709
+topic batch 200/613 loss=125.2462
+topic batch 300/613 loss=125.4791
+topic batch 400/613 loss=125.2426
+topic batch 500/613 loss=125.6180
+topic batch 600/613 loss=125.6722
+{"phase": "topic_pretraining", "epoch": 97, "loss": 125.59389803688708, "seconds": 76.23399999999992}
+topic batch 100/613 loss=126.0445
+topic batch 200/613 loss=125.9797
+topic batch 300/613 loss=125.7311
+topic batch 400/613 loss=125.5141
+topic batch 500/613 loss=125.6391
+topic batch 600/613 loss=125.5172
+{"phase": "topic_pretraining", "epoch": 98, "loss": 125.55200510238207, "seconds": 66.06299999999987}
+topic batch 100/613 loss=124.9696
+topic batch 200/613 loss=125.5420
+topic batch 300/613 loss=125.5376
+topic batch 400/613 loss=125.4228
+topic batch 500/613 loss=125.4804
+topic batch 600/613 loss=125.4780
+{"phase": "topic_pretraining", "epoch": 99, "loss": 125.52090890200463, "seconds": 115.79700000000003}
+topic batch 100/613 loss=125.0103
+topic batch 200/613 loss=125.7071
+topic batch 300/613 loss=125.7368
+topic batch 400/613 loss=125.6317
+topic batch 500/613 loss=125.6555
+topic batch 600/613 loss=125.4597
+{"phase": "topic_pretraining", "epoch": 100, "loss": 125.4874121889942, "seconds": 64.375}
+generation batch 100/613 nll=5.5630
+generation batch 200/613 nll=4.9103
+generation batch 300/613 nll=4.4657
+generation batch 400/613 nll=4.0916
+generation batch 500/613 nll=3.7669
+generation batch 600/613 nll=3.5097
+{"phase": "generator_pretraining", "epoch": 1, "generation_nll": 3.482390903453693, "topic_loss": 0.0, "validation": {"generation_nll": 2.045837319281081, "perplexity": 7.735633021606946, "topic_loss": 123.09590152669504}, "seconds": 1280.2649999999999}
+generation batch 100/613 nll=1.9908
+generation batch 200/613 nll=1.9295
+generation batch 300/613 nll=1.8755
+generation batch 400/613 nll=1.8170
+generation batch 500/613 nll=1.7703
+generation batch 600/613 nll=1.7245
+{"phase": "joint_training", "epoch": 1, "generation_nll": 1.719394647148888, "topic_loss": 125.49271878605292, "validation": {"generation_nll": 1.5249767546469286, "perplexity": 4.595036754813481, "topic_loss": 123.11489597992087}, "best": true, "seconds": 1283.8750000000005}
+generation batch 100/613 nll=1.2754
+generation batch 200/613 nll=1.2752
+generation batch 300/613 nll=1.2680
+generation batch 400/613 nll=1.2549
+generation batch 500/613 nll=1.2519
+generation batch 600/613 nll=1.2436
+{"phase": "joint_training", "epoch": 2, "generation_nll": 1.2414152474586655, "topic_loss": 125.44222037500418, "validation": {"generation_nll": 1.3594320865867038, "perplexity": 3.893981229550534, "topic_loss": 123.15817133767598}, "best": true, "seconds": 1237.6400000000003}
+generation batch 100/613 nll=0.9710
+generation batch 200/613 nll=0.9700
+generation batch 300/613 nll=0.9712
+generation batch 400/613 nll=0.9681
+generation batch 500/613 nll=0.9726
+generation batch 600/613 nll=0.9727
+{"phase": "joint_training", "epoch": 3, "generation_nll": 0.9721203476027663, "topic_loss": 125.39506573203487, "validation": {"generation_nll": 1.3123271147741442, "perplexity": 3.7148084469240326, "topic_loss": 123.06117927708817}, "best": true, "seconds": 1195.4219999999996}
+generation batch 100/613 nll=0.7057
+generation batch 200/613 nll=0.7170
+generation batch 300/613 nll=0.7181
+generation batch 400/613 nll=0.7257
+generation batch 500/613 nll=0.7328
+generation batch 600/613 nll=0.7365
+{"phase": "joint_training", "epoch": 4, "generation_nll": 0.736877431021536, "topic_loss": 125.37134669904407, "validation": {"generation_nll": 1.3306863726027618, "perplexity": 3.7836394830023314, "topic_loss": 123.05286586077466}, "best": false, "seconds": 1221.7660000000005}
+generation batch 100/613 nll=0.4987
+generation batch 200/613 nll=0.5013
+generation batch 300/613 nll=0.5095
+generation batch 400/613 nll=0.5166
+generation batch 500/613 nll=0.5239
+generation batch 600/613 nll=0.5317
+{"phase": "joint_training", "epoch": 5, "generation_nll": 0.5336593324991963, "topic_loss": 125.33693231479653, "validation": {"generation_nll": 1.3853588996729918, "perplexity": 3.9962599038430286, "topic_loss": 123.04327416912321}, "best": false, "seconds": 1200.219000000001}
+generation batch 100/613 nll=0.3381
+generation batch 200/613 nll=0.3419
+generation batch 300/613 nll=0.3503
+generation batch 400/613 nll=0.3542
+generation batch 500/613 nll=0.3628
+generation batch 600/613 nll=0.3705
+{"phase": "joint_training", "epoch": 6, "generation_nll": 0.3713962115074613, "topic_loss": 125.3138440248856, "validation": {"generation_nll": 1.4557574875022847, "perplexity": 4.2877301377826145, "topic_loss": 123.02499207453941}, "best": false, "seconds": 1194.1720000000005}
+decoded 100/4630
+decoded 200/4630
+decoded 300/4630
+decoded 400/4630
+decoded 500/4630
+decoded 600/4630
+decoded 700/4630
+decoded 800/4630
+decoded 900/4630
+decoded 1000/4630
+decoded 1100/4630
+decoded 1200/4630
+decoded 1300/4630
+decoded 1400/4630
+decoded 1500/4630
+decoded 1600/4630
+decoded 1700/4630
+decoded 1800/4630
+decoded 1900/4630
+decoded 2000/4630
+decoded 2100/4630
+decoded 2200/4630
+decoded 2300/4630
+decoded 2400/4630
+decoded 2500/4630
+decoded 2600/4630
+decoded 2700/4630
+decoded 2800/4630
+decoded 2900/4630
+decoded 3000/4630
+decoded 3100/4630
+decoded 3200/4630
+decoded 3300/4630
+decoded 3400/4630
+decoded 3500/4630
+decoded 3600/4630
+decoded 3700/4630
+decoded 3800/4630
+decoded 3900/4630
+decoded 4000/4630
+decoded 4100/4630
+decoded 4200/4630
+decoded 4300/4630
+decoded 4400/4630
+decoded 4500/4630
+decoded 4600/4630
+{
+  "dataset": "Weibo",
+  "run_name": "weibo_takg_seed9527",
+  "smoke": false,
+  "metrics": {
+    "all": {
+      "count": 4630,
+      "P@1": 0.33563714902807773,
+      "R@1": 0.3203275737940965,
+      "P@3": 0.15903527717782576,
+      "R@3": 0.44726061915046794,
+      "P@5": 0.10570194384449244,
+      "R@5": 0.4950719942404608,
+      "F1@1": 0.3278037061528923,
+      "F1@3": 0.23463862106962188,
+      "F1@5": 0.17420886232513721,
+      "MAP@5": 0.39307175425965923
+    },
+    "present": {
+      "count": 1123,
+      "P@1": 0.8459483526268923,
+      "R@1": 0.809839715048976,
+      "P@3": 0.4798159691303058,
+      "R@3": 0.9490798456515286,
+      "P@5": 0.4255268625704957,
+      "R@5": 0.9565301276343129,
+      "F1@1": 0.8275003138525124,
+      "F1@3": 0.6373923993791777,
+      "F1@5": 0.5890195079525148,
+      "MAP@5": 0.8923988324923321
+    },
+    "absent": {
+      "count": 3548,
+      "P@1": 0.22688838782412626,
+      "R@1": 0.2209695603156708,
+      "P@3": 0.1134911687335588,
+      "R@3": 0.32962232243517475,
+      "P@5": 0.07750845546786922,
+      "R@5": 0.3742953776775648,
+      "F1@1": 0.22388986287490872,
+      "F1@3": 0.16884713898089307,
+      "F1@5": 0.12842324249698106,
+      "MAP@5": 0.281043310785419
+    }
+  }
+}

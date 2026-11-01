@@ -1,0 +1,44 @@
+[
+  {
+    "file": "ciao_informs.mat",
+    "sha256": "488e9aa5f60e6a52a972795b6402f922fc0d9d273152f4d124a5c5bdefb86a71",
+    "arrays": {
+      "rating": {
+        "shape": [
+          284086,
+          6
+        ],
+        "users": 7375,
+        "items": 105114
+      }
+    }
+  },
+  {
+    "file": "ciao_rest.mat",
+    "sha256": "488e9aa5f60e6a52a972795b6402f922fc0d9d273152f4d124a5c5bdefb86a71",
+    "arrays": {
+      "rating": {
+        "shape": [
+          284086,
+          6
+        ],
+        "users": 7375,
+        "items": 105114
+      }
+    }
+  },
+  {
+    "file": "ciao_informs_trust.mat",
+    "sha256": "97c8617b015a29e8a2d53dadec1279b575551c0a0949951e84affc0e598e7a1a",
+    "arrays": {
+      "trust": {
+        "shape": [
+          57544,
+          2
+        ],
+        "users": 2190,
+        "items": 2325
+      }
+    }
+  }
+]

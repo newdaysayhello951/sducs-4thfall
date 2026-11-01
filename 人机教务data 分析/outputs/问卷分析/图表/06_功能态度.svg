@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="475" height="183" preserveAspectRatio="xMinYMin meet" viewBox="0 0 475 183" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="475" height="183"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-183)" style="clip-path: url(#clip)">
+		<g transform="">
+			<text x="0" y="170" style="font-family: SimHei; font-size: 11px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,340) scale(1,-1)">图6 对整合、占用信息和情境路线的态度</text>
+			<text x="45.499999999999986" y="142" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,284) scale(1,-1)">减少平台切换 n=11</text>
+			<rect x="130.0" y="139" width="81.81818181818181" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(78%,80%,83%); fill-rule: evenodd;"/>
+			<text x="168.6590909090909" y="143" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,286) scale(1,-1)">3</text>
+			<rect x="211.8181818181818" y="139" width="109.09090909090907" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(49%,67%,79%); fill-rule: evenodd;"/>
+			<text x="264.1136363636364" y="143" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,286) scale(1,-1)">4</text>
+			<rect x="320.9090909090909" y="139" width="109.09090909090912" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="373.20454545454544" y="143" style="font-family: SimSun; font-size: 9px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,286) scale(1,-1)">4</text>
+			<text x="45.499999999999986" y="107" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,214) scale(1,-1)">占用影响去向 n=11</text>
+			<rect x="130.0" y="104" width="190.90909090909088" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(49%,67%,79%); fill-rule: evenodd;"/>
+			<text x="223.20454545454544" y="108" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,216) scale(1,-1)">7</text>
+			<rect x="320.9090909090909" y="104" width="109.09090909090912" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="373.20454545454544" y="108" style="font-family: SimSun; font-size: 9px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,216) scale(1,-1)">4</text>
+			<text x="36.499999999999986" y="72" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,144) scale(1,-1)">日程路线有帮助 n=11</text>
+			<rect x="130.0" y="69" width="163.63636363636363" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(49%,67%,79%); fill-rule: evenodd;"/>
+			<text x="209.5681818181818" y="73" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,146) scale(1,-1)">6</text>
+			<rect x="293.6363636363636" y="69" width="136.36363636363637" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="359.5681818181818" y="73" style="font-family: SimSun; font-size: 9px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,146) scale(1,-1)">5</text>
+			<rect x="0" y="9" width="9" height="9" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(68%,31%,24%); fill-rule: evenodd;"/>
+			<text x="12" y="9" style="font-family: SimSun; font-size: 8px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,18) scale(1,-1)">非常不同意</text>
+			<rect x="95" y="9" width="9" height="9" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(83%,54%,42%); fill-rule: evenodd;"/>
+			<text x="107" y="9" style="font-family: SimSun; font-size: 8px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,18) scale(1,-1)">不同意</text>
+			<rect x="190" y="9" width="9" height="9" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(78%,80%,83%); fill-rule: evenodd;"/>
+			<text x="202" y="9" style="font-family: SimSun; font-size: 8px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,18) scale(1,-1)">中立</text>
+			<rect x="285" y="9" width="9" height="9" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(49%,67%,79%); fill-rule: evenodd;"/>
+			<text x="297" y="9" style="font-family: SimSun; font-size: 8px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,18) scale(1,-1)">同意</text>
+			<rect x="380" y="9" width="9" height="9" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="392" y="9" style="font-family: SimSun; font-size: 8px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,18) scale(1,-1)">非常同意</text>
+		</g>
+	</g>
+</svg>

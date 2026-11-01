@@ -1,0 +1,65 @@
+[
+  {
+    "name": "filmtrust_author",
+    "url": "https://guoguibing.github.io/librec/datasets/filmtrust.zip",
+    "final_url": "https://guoguibing.github.io/librec/datasets/filmtrust.zip",
+    "status": 200,
+    "bytes": 94378,
+    "type": "application/x-zip-compressed"
+  },
+  {
+    "name": "filmtrust_librec",
+    "url": "https://www.librec.net/datasets/filmtrust.zip",
+    "final_url": "https://www.librec.net/datasets/filmtrust.zip",
+    "status": 200,
+    "bytes": 114,
+    "type": "text/html"
+  },
+  {
+    "name": "filmtrust_cornac",
+    "url": "https://static.preferred.ai/cornac/datasets/filmtrust/filmtrust.zip",
+    "final_url": "https://static.preferred.ai/cornac/datasets/filmtrust/filmtrust.zip",
+    "status": 200,
+    "bytes": 110985,
+    "type": "application/x-zip-compressed"
+  },
+  {
+    "name": "librec_datasets",
+    "url": "https://guoguibing.github.io/librec/datasets.html",
+    "final_url": "https://guoguibing.github.io/librec/datasets.html",
+    "status": 200,
+    "bytes": 12899,
+    "type": "text/html; charset=utf-8"
+  },
+  {
+    "name": "epinions_trustlet",
+    "url": "https://www.trustlet.org/downloaded_epinions.html",
+    "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1010)>"
+  },
+  {
+    "name": "epinions_alchemy",
+    "url": "https://alchemy.cs.washington.edu/data/epinions/",
+    "final_url": "https://alchemy.cs.washington.edu/data/epinions/",
+    "status": 200,
+    "bytes": 610,
+    "type": "text/html; charset=UTF-8"
+  },
+  {
+    "name": "ciao_author",
+    "url": "https://www.cse.msu.edu/~tangjili/datasetcode/truststudy.htm",
+    "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)>"
+  },
+  {
+    "name": "flixster_old",
+    "url": "https://www.cs.sfu.ca/~sja25/personal/datasets/",
+    "error": "The read operation timed out"
+  },
+  {
+    "name": "flixster_author",
+    "url": "https://sites.google.com/view/mohsenjamali/home",
+    "final_url": "https://sites.google.com/view/mohsenjamali/home",
+    "status": 200,
+    "bytes": 109576,
+    "type": "text/html; charset=utf-8"
+  }
+]

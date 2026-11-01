@@ -1,0 +1,114 @@
+{
+  "checked_fits": 185,
+  "errors": [],
+  "missing_tasks": [
+    [
+      "epinions",
+      "SVD++",
+      5,
+      0
+    ],
+    [
+      "epinions",
+      "SVD++",
+      5,
+      1
+    ],
+    [
+      "epinions",
+      "SVD++",
+      5,
+      2
+    ],
+    [
+      "epinions",
+      "SVD++",
+      5,
+      3
+    ],
+    [
+      "epinions",
+      "SVD++",
+      5,
+      4
+    ],
+    [
+      "epinions",
+      "SVD++",
+      10,
+      0
+    ],
+    [
+      "epinions",
+      "SVD++",
+      10,
+      1
+    ],
+    [
+      "epinions",
+      "SVD++",
+      10,
+      2
+    ],
+    [
+      "epinions",
+      "SVD++",
+      10,
+      3
+    ],
+    [
+      "epinions",
+      "SVD++",
+      10,
+      4
+    ],
+    [
+      "epinions",
+      "TrustMF",
+      10,
+      0
+    ],
+    [
+      "epinions",
+      "TrustMF",
+      10,
+      1
+    ],
+    [
+      "epinions",
+      "TrustMF",
+      10,
+      2
+    ],
+    [
+      "epinions",
+      "TrustMF",
+      10,
+      3
+    ],
+    [
+      "epinions",
+      "TrustMF",
+      10,
+      4
+    ]
+  ],
+  "unexpected_tasks": [],
+  "complete_for_available": false,
+  "complete_for_entire_paper": false,
+  "versions": {
+    "numpy": "1.26.4",
+    "scipy": "1.13.1",
+    "numba": "0.60.0"
+  },
+  "source_sha256": {
+    "trustsvd_repro\\audit.py": "7bca341db002b22a8b0f2cc4cb83e98bf2c3c943d791264e480c76978c461fcf",
+    "trustsvd_repro\\data.py": "9af72c8606f5d6fbfeb01eeaad5d350d44b3d6973eca14e00ec2cb652c538d90",
+    "trustsvd_repro\\experiment.py": "11fc6fd7a37631de6182423d8d007b4fc93dbec3b6beb73ee1697eae07c43dfc",
+    "trustsvd_repro\\objectives.py": "8bc8bc428621cbe1e6d6135560d96be40caa008d5eb7e58db1ddd98c71642fd9",
+    "trustsvd_repro\\optimizers.py": "c0ab9188823c55a224f1b74075beea0b89181dc0443aab56f4d3aee10bb05e2c",
+    "trustsvd_repro\\paper_reference.py": "862c4a3abc178a21436982313321a77a331bda4fa1d57e28d31e18b4baa7de50",
+    "trustsvd_repro\\report.py": "3e05dd06d5ca645679be3c25b3129195fd5815f39765306b057f52996f981322",
+    "trustsvd_repro\\__init__.py": "f343aa5d5841afc082d6309aaa1c8776f7abd80e38494b927a30a7fb1a53ad9c"
+  }
+}

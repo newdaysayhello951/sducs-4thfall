@@ -1,0 +1,19 @@
+{
+  "dataset": "Weibo",
+  "records": {
+    "train": 256,
+    "valid": 32,
+    "test": 16
+  },
+  "training_pairs": 265,
+  "word_vocabulary": 2000,
+  "bow_vocabulary": 500,
+  "files": {
+    "test_src.txt": "c720288b8aa9fa2ab7ef9fd8e9d9d836c156ba36262af85d7793bb124bbead07",
+    "test_trg.txt": "e06f5d343ddb6288f2eff392479f24d4d6d96b3d095e9038ce00961211bb692d",
+    "train_src.txt": "2b592f9f9b070205d2422a4891d72e7ae6d13f6569ceed04bda86c19a5e914ba",
+    "train_trg.txt": "6ee1d6c495a1c3e02ff101a529ddb962e970316bc1da6dee73914a7cead7543b",
+    "valid_src.txt": "70901d55d6c8d33790e56425fe5e268425424ed4bc21d69d3731d7d9a12f95be",
+    "valid_trg.txt": "ddbfede5fcf2ad162dfea8cfc2dde7131c9bd23d91bd88dcf0bf3e48e220f4ef"
+  }
+}

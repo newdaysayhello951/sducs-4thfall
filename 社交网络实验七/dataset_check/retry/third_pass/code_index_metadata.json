@@ -1,0 +1,14 @@
+[
+  {
+    "query": "Flixter_ratings.csv",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "query": "409803",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "query": "280391",
+    "error": "HTTP Error 429: Too Many Requests"
+  }
+]

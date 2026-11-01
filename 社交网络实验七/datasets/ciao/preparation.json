@@ -1,0 +1,15 @@
+{
+  "source": "https://web.archive.org/web/20220714012422id_/https://www.cse.msu.edu/~tangjili/datasetcode/ciao.zip",
+  "raw_ratings": 284086,
+  "excluded_out_of_range": 34,
+  "retained_ratings": 284052,
+  "trust_edges": 111781,
+  "rule": "Keep ratings within declared range 1..5; retain all duplicates and all observed trust edges. No sampling.",
+  "user_authorization": "2026-10-26: use downloaded Ciao; omit Flixster",
+  "sha256": {
+    "rating.mat": "aa793568686285a93286ba9e56954fcce347370ad2e58c785760362ab12d2c2c",
+    "trustnetwork.mat": "0a8963ed22e6b534ce8d14e478f54ce0af6f5a3440a67ed5a35e62486580ce3a",
+    "ratings.txt": "9c4cc9f27bb96cbbaa6ec9d8c64034d17a289cf1b8f67925e04a5302bb934c42",
+    "trust.txt": "355fd5875658d519a59d3f7db9c46554c3b5c1c597550f200ab6477887fbcb89"
+  }
+}

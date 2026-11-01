@@ -1,0 +1,887 @@
+                                         Social Context Summarization                                                                                       web
+
+
+
+                     Zi Yang⋆ , Keke Cai† , Jie Tang⋆ , Li Zhang† , Zhong Su† and Juanzi Li⋆
+                            ⋆
+                                Department of Computer Science and Technology, Tsinghua University, China
+                                                      †
+                                                        IBM, China Research Lab
+                            {yangzi, tangjie, ljz}@keg.cs.tsinghua.edu.cn, {caikeke, lizhang, suzhong}@cn.ibm.com
+
+
+
+
+ABSTRACT                                                                                   extract the most informative sentences from standard (Web) docu-
+We study a novel problem of social context summarization for Web                           ments. However, these methods only consider the document’s con-
+documents. Traditional summarization research has focused on ex-                           tent information, but ignore how users (readers) think about the
+tracting informative sentences from standard documents. With the                           document. With the rapid growth of online social networks, users
+rapid growth of online social networks, abundant user generated                            can freely express what they are thinking about any Web document.
+content (e.g., comments) associated with the standard documents is                         For example, many news websites allow the users to directly add
+available. Which parts in a document are social users really caring                        comments to each news document. On Twitter1 , many users post
+about? How can we generate summaries for standard documents                                the URL address of a news document onto their microblogs, fol-
+by considering both the informativeness of sentences and interests                         lowed by some personal comments. The comments imply the im-
+of social users? This paper explores such an approach by model-                            portance of different sentences and can be used to help improve the
+ing Web documents and social contexts into a unified framework.                            quality of document summarization. More importantly, the users’
+We propose a dual wing factor graph (DWFG) model, which uti-                               comments essentially reflect which part of the document that they
+lizes the mutual reinforcement between Web documents and their                             are interested in.
+associated social contexts to generate summaries. An efficient al-                            In this work, we present a novel problem of social context sum-
+gorithm is designed to learn the proposed factor graph model. Ex-                          marization. The question we intend to answer is: how to generate
+perimental results on a Twitter data set validate the effectiveness of                     a summary for Web documents by considering both the informa-
+the proposed model. By leveraging the social context information,                          tiveness of sentences and interests of social users? The concept of
+our approach obtains significant improvement (averagely +5.0%-                             “context” for summarization has been previously studied and vari-
+17.3%) over several alternative methods (CRF, SVM, LR, PR, and                             ous approaches have been proposed based on different kinds of con-
+DocLead) on the performance of summarization.                                              text, such as hyperlinks [1, 9], click-through data [29], comments
+                                                                                           [13, 19], or opinionated text [26, 11, 15]. Most of these methods
+                                                                                           directly integrate the context information into the target webpage
+Categories and Subject Descriptors                                                         to help estimate the informativeness of sentences. However, in this
+H.3.1 [Information Storage and Retrieval]: Content Analysis                                way, the context information is only considered as textual informa-
+and Indexing; H.2.8 [Database Management]: Data Mining; J.4                                tion. Many important information has been ignored. For example,
+[Computer Applications]: Social and Behavioral Sciences                                    if a user is an opinion leader, his comments should be more im-
+                                                                                           portant than others. From a comment’s perspective, if a comment
+                                                                                           has been forwarded or replied by many other users, the comment
+General Terms                                                                              should be more important than others. One goal of this work is to
+Algorithms, Experimentation                                                                consider the social influence and the information propagation for
+                                                                                           document summarization. The problem is referred to as social con-
+Keywords                                                                                   text summarization. The problem is clearly different from existing
+                                                                                           research and poses a set of unique challenges:
+Document summarization, Social context, Factor graph, Twitter
+                                                                                                 • First, social context is becoming more and more compli-
+1.     INTRODUCTION                                                                                cated. There are users, user generated contents, social net-
+  Web document summarization has been widely studied for many                                      works, and implicit networks (such as the forward/reply net-
+years. Existing methods mainly use statistical or linguistic infor-                                work). How to formally define the social context is a non-
+mation such as term distribution, sentence position, and topics to                                 trivial problem.
+
+                                                                                                 • Second, in the social environment, the quality of summaries
+                                                                                                   strongly depends on the social context information (such as
+Permission to make digital or hard copies of all or part of this work for                          the social influence between users). How to formalize the
+personal or classroom use is granted without fee provided that copies are                          problem in a principled framework is a challenging problem.
+not made or distributed for profit or commercial advantage and that copies
+bear this notice and the full citation on the first page. To copy otherwise, to
+                                                                                                 • Third, the social context contains inevitable noise. How to
+republish, to post on servers or to redistribute to lists, requires prior specific
+permission and/or a fee.                                                                           qualitatively analyze the problem and quantitatively validate
+SIGIR’11, July 24–28, 2011, Beijing, China.                                                1
+Copyright 2011 ACM 978-1-4503-0757-4/11/07 ...$10.00.                                          http://www.twitter.com, a microblogging system.
+
+
+
+
+                                                                                     255
+                                                                                              In the context of Web 2.0, Web documents, e.g. news or blogs,
+                                   Training Web              Social
+                                   Set      Document         Context
+                                                                                           are freely discussed and commented by users. These comments
+                                                                                           again spread (e.g., by forwarding between friends) in the social
+                                                                                           network. The users’ activities implicitly reflect the importance of
+                                                               Social                      different parts (e.g., sentences) in the document from the user’s per-
+                                             Documentt
+                                                              Context
+                                              Modeling
+                                                              Modeling
+                                                                                           spective. We believe that the social context, thus, integrating the
+                                                                                           document content information and the social context information
+                       Test Set
+                                                                                           can disclose a more thorough view of the document. In this paper,
+                                         Sentence & Social Context Scoring
+                        Web                                                                we employ Twitter as the basis for our study. Specifically, given a
+                        Document                                                           Web document2 d and its associated social context (tweets Md con-
+                        Social           Sentence & Social Context Selection               taining the URL address of document d and users Ud who posted
+                        Context                                                            those tweets), we give the following definition of social context
+                                            Summary for Social Context                     augmented network.
+
+                      Figure 1: Overview of the proposed approach                             Definition 2 (Social Context Augmented Network, SCAN).
+                                                                                           Social Context Augmented Network Gd = (Sd , Cd , Ed ) is defined
+                                                                                           as a network that is built upon the sentence set Sd of document d
+                    the proposed approach on a real-world data set is also a chal-         and its social context Cd , where the edge set Ed contains three
+                    lenging problem.                                                       types of edges: Eds , Edm , and Edu . Eds = {(si , sj )|si , sj ∈ Sd }
+                                                                                           represents the relationships between document sentences, Edm =
+                In this paper, we try to systematically investigate the problem            {(mi , mj )|mi , mj ∈ Md } represents the relationships between
+             of social context summarization for Web documents. We formu-                  messages, and Edu = {(ui , uj )|ui , uj ∈ Ud } represents the rela-
+             late the problem of social context summarization and propose a                tionships between users.
+             dual-wing factor graph (DWFG) model. The DWFG model incor-                       Compared with traditional contexts that are defined based on
+             porates the summarization task and the social network analysis into           textual information, social context need incorporate various dy-
+             a unified framework. In this way, the two tasks can be mutually re-           namic social relationships, such as the follower-followee relation-
+             inforced. We employ the Microblogging as an example to quanti-                ships between users, retweeting relationships and replying relation-
+             tatively study the social context summarization problem. In partic-           ships between tweets. An example of SCAN is shown in Figure
+             ular, we crawl a data set from Twitter. The user generated content            2(a). In this figure, the upper layer includes two documents d1
+             is the tweet posted by the user. The retweeting (forwarding) and              and d2 , and d1 contains four sentences s1 , s2 , s3 , and s4 . The two
+             replying relationships between tweets form an implicit information            documents are respectively associated with two sets of messages
+             network, and the following relationships between users form the               M1 = {m5 , m6 , m7 , m8 } and M2 = {m9 , m10 } in the middle
+             user network. Some tweets have the links pointing to standard Web             layer. The lower layer refers to the user layer consisting of users
+             documents (such as news documents). The problem then becomes                  u1 , u2 and u3 , who are also associated with the messages M1 and
+             how to leverage both the information network and the user network             M2 . Besides external relationships between the objects across dif-
+             to generate high-quality summaries for standard Web documents.                ferent layers, SCAN also describes internal relationships between
+                The overview of the proposed method is a supervised framework              objects within the same layer (as shown in Figure 2(a)).
+             (as shown in Figure 1). In training, we estimate the importance                  Given this, we can formally define our problem of Social Context
+             of defined features and strength of dependencies for identifying              Summarization.
+             key sentences and microblogs in the social contexts. In test, given
+             a new Web document with its social context, we perform collec-                   Definition 3 (Social Context Summarization). Given a social
+             tive inference for the importance of each sentence and microblog              context augmented network Gd , the goal of social context summa-
+             and select a subset of sentences as the summary according to the              rization is to generate a summary which consists of two pieces of
+      social
+             trained models. We validate the proposed approach on the Twit-                information: the most important sentences Sd∗ ⊆ Sd and the most
+context
+             ter data set. The experiment results show that by leveraging the              representative messages Md∗ ⊆ Md .
+             social context information, our approach can significantly improve               The problem of social context summarization contains two sub-
+             (on average +10.8%) the performance of summarization. We also                 problems: Key Sentence Extraction and Tweet Summarization. In
+             compare with a set of alternative methods (i.e., CRF, SVM, LR,                the former subproblem, we aim to identify the most important sen-
+             PR, and DocLead), and our approach clearly outperforms (aver-                 tences from document d’s content, while in the latter subproblem,
+             agely +5.0%-17.3%) the baseline methods.                                      we intend to find the most representative tweets from the social
+                The paper is organized as follows: in Section 2, we introduce              context Cd of document d. Social context Cd contains rich infor-
+             some notations and formally define the problem. In Section 3, we              mation about the document d, which is helpful for the Key Sentence
+             propose the factor graph model to address the problem, and in Sec-            Extraction problem, while the important sentences in a document
+             tion 4, we conduct the experiments on the Twitter data set. Finally,          can equally help Tweet Summarization in the social context. The
+             in Section 5 and 6, we summarize related works and conclude.                  mutual reinforcement between the two subproblems can facilitate
+                                                                                           generating a high-quality summary. Moreover, social context sum-
+             2.    PROBLEM DEFINITION                                                      marization could also answer a number of related questions, e.g.,
+               In this section, we introduce some notations and representations            who are the most experienced users of a specific topic or a fact
+             necessary for the problem, and then define the problem of social              mentioned in a document.
+             context summarization.
+               Definition 1 (Social context). Given a Web document d, its                  2
+                                                                                            On Twitter, a Web document (e.g., news document) is often
+             social context Cd is defined as hMd , Ud i, where Md is a set of              pointed out by a URL address, which might be in some forms of
+             comments on d written by users Ud in a social network.                        encoded shortened URLs such as by tinyurl.com and bit.ly.
+                                             Cd          <               >
+
+
+
+                                                                                     256
+        s1        s2    s3     s4
+                                                                             s1              s2              s3              s4              s1                s2               s3                s4
+  d1                                     d2
+                                                                  Document
+                                                                  D               f1              f2              f3              f4              f1                f2               f3                f4
+                                                                                       g12             g23             g34                             g12               g23              g34
+                                                                    Layer
+                                                                             y1              y2              y3              y4              y1                y2               y3                y4
+                               m7
+                                                            m10
+       m5                                m8
+                       m6                         m9                              (b) Key Sentence Extraction                          h15                   h16
+                              reply                                                                                                                                       h37                   h47
+            reply
+            r
+                               retweet                 retweet Microblog                                                                               g56               g67
+                                                                 Layer                                                                                                                    g68
+                                                                             m5              m6              m7              m8              y5                y6               y7                y8
+                                    u2
+                                                                                  f5              f6              f7              f8              f5                f6               f7                f8
+             u1                                                                        g56             g67
+                                                       u3
+                                         follow                              y5              y6              y7              y8              m5                m6               m7                m8
+                             follow                                 User                                          g68
+                                                                    Layer
+
+             (a) An example of the problem                                             (c) Tweet Summarization                               (d) Social Context Summarization
+
+
+Figure 2: An example of the problem and factor graph representations for summarization tasks. In (b), (c), and (d), each gray circle
+with si indicates a sentence in the Web document; its associated white circle with yi denotes whether the sentence should be included
+in the document summary. Each gray circle with mi indicates a tweet and its associated white circle denotes whether the tweet would
+be included in the tweet summary.
+
+
+3.      PROBLEM SOLVING                                                                                 designed to model the tweet summarization problem. In the middle
+   In this section, we propose a dual wing factor graph (DWFG)                                          layer, we design a set of correlation factor functions h to bridge the
+model, which formulates the social context summarization problem                                        two tasks. By carefully designing the correlation factor function h,
+in a unified learning framework. The DWFG model simultaneously                                          we can elegantly combine the two tasks of key sentence extraction
+incorporates all resources in social context to generate high-quality                                   and tweet summarization into a unified framework. In the rest of
+summaries for Web documents.                                                                            this section, we will explain in details how we design and learn the
+                                                                                                        dual wing factor graph model.
+3.1 Basic Idea
+   In our Twitter data set, each Web document is associated with                                        3.2 Modeling Summarization via Dual Wing
+a social context. To generate summaries for Web documents, a                                                Factor Graphs
+straightforward method is to define a set of features to characterize                                      We model the social context summarization problem in the dual
+the importance of each sentence, and then use a classification model                                    wing factor graph (DWFG) model. Each sentence si ∈ Sd or tweet
+to identify which sentences should be included into the summary                                         mi ∈ Md is associated with a binary value yi indicating the im-
+[16, 25, 36]. To further consider the correlation between sentences,                                    portance of the sentence or tweet (1 representing important, and 0
+we can consider a sequential labeling approach such as conditional                                      representing unimportant).
+random field. Such a method has been studied by [8, 28]. Both of                                           We first collect a set of labeled SCANs (training set) T =
+them consider the sentence local features and similarities (correla-                                    {Gd }n  d=1 , i.e., each sentence si ∈ Sd or tweet mi ∈ Md in each
+                                                                                                                 T
+
+tions) between sentences, and model the sentence extraction task                                        social context Cd is associated with a known binary label yi , more-
+with a linear-chain conditional random field. An example of the                                         over, we also collect the test set S of unlabeled instances, which
+graphical representation is shown in Figure 2(b). The method only                                       consists of all the sentences and tweets not yet judged. Our goal is
+considers the correlation between sentences (the document layer in                                      then to learn a DWFG model from the training set and apply it to
+Figure 2(a)), but ignores the social context information resided in                                     predict which sentences and tweets are important in the test set S,
+the microblog and user layers.                                                                          i.e., to infer the value (label) of y, and then generate a summary for
+   To model the tweet network, we design another similar graphical                                      the social context.
+model with structures reflecting the information propagation. Fig-                                         We define three types of factor functions associated with indi-
+ure 2(c) presents an example. Each gray circle indicates a tweet,                                       vidual instances or instance groups: local attribute factor, intra-
+the arrow represents the replying/retweeting relationship between                                       domain dependency factor, and inter-domain dependency factor.
+two tweets. Based on such a formulation, we can define local fea-                                       Local attribute factor. The probability that a sentence or tweet is
+tures (content-based features) for each tweet, as well as edge fea-                                     important could be estimated by some local attributes (represented
+tures for each replying/retweeting relationship. By learning such                                       as x), which refer to features that are inherent to the sentence or
+a graphical model, we can classify which tweets are important (or                                       tweet itself. In general, we define similar features for sentences
+informative). Obviously, this model only considers the information                                      and tweets. The features include the average TF-IDF score over
+from the tweet side and does not consider the Web documents. An                                         words and the log likelihood generated by the context, the position
+ideal way is to incorporate the two tasks together so that they can                                     of the sentence in the document, the author’s authoritativeness, etc.
+reinforce each other.                                                                                   Details of the defined local features for sentences and tweets are
+   Based on these considerations, we propose a novel dual wing                                          given in Section 4.
+factor graph (DWFG) model. The graphical representation is                                                 To estimate the significance of each feature, we introduce a
+shown in Figure 2(d). In the DWFG model, the upper layer is used                                        weight variable λc for each feature c, and we define a local at-
+to model the key sentence extraction task and the bottom layer is                                       tribute factor fi,c for the feature c of each sentence si or tweet mi .
+
+
+
+
+                                                                                              257
+Formally, a factor could be defined as the local entropy:                                  We use L-BFGS, a quasi-Newton method for solving the non-
+                                                                                        linear optimization problem (i.e., Eq. 4). To avoid overfitting, we
+                     fi,c (λc , yi ) = exp (λc xi,c yi )                   (1)          add a penalty term − 21 ||Θ||2 /σ 2 , a spherical Gaussian prior, into
+where xi,c is the value of the c-th feature extracted from sentence                     the objective function, which is a regularization method commonly
+si or tweet mi .                                                                        used in maximum entropy and conditional random fields [6, 27,
+Intra-domain dependency factor. As described in Section 3.1, we                         28].
+introduce factors that are capable of handling multiple instances in                       Calculating the marginal distribution for each factor (in deriving
+either sentence level or tweet level, to characterize the dependen-                     the log-gradient of the objective function) requires a loopy sum-
+cies between sentences and tweets respectively. Intra-domain in-                        product inference algorithm. With the learned parameter Θ, we
+teraction may promote some sentences to become more important                           may summarize an unlabeled social context for a Web document
+while inhibit others from becoming important. We associate each                         in the test set by extracting important sentences, which are also
+type of interaction with a weight µc indicating the confidence of the                   identified by a similar max-sum inference procedure. The inference
+corresponding interaction. The interaction has a positive influence                     algorithm is introduced in the next section.
+only if the weight µc is greater than 0. We introduce factor gij,c to                   Connection with existing models. We note that the proposed
+capture the dependency between sentence pair si and sj or tweet                         DWFG model can also be viewed as a model generalized from
+pair mi and mj .                                                                        existing models. In Eq. 4, if parameter ν is fixed as 0, i.e., all
+                                                                                       factors {hij }i,j take constant values of 1, and factors {fi,c }i,c
+                              exp µc if some condition holds                            and {gij,c }i,j,c are only defined for sentences, then the simplified
+    gij,c (µc , yi , yj ) =                                       (2)
+                              1      otherwise                                          model only incorporates sentence local factors and sentence rela-
+                                                                                        tion factors, and DWFG model is degenerated to a special case: the
+   A document can be regarded as a sequence of sentences, and
+                                                                                        summarization approach based on linear-chain CRF [28]. More-
+thus key sentence extraction could be viewed as a sequence label-
+                                                                                        over, if all parameters {µc }c are also set as 0, i.e., only the local
+ing process [28], i.e., the judgment on a certain sentence is affected
+                                                                                        factors {i,c }i,c are non-trivial, then DWFG is turned into the logis-
+by the nearby sentences to avoid both sentences of high similarity
+                                                                                        tic regression classifier [25].
+are chosen simultaneously. Hence, the dependency conditions in
+Eq. 2 for a sentence pair si and sj can be formalized as follow:                        3.3 Inference Algorithm
+the factor takes value exp µc if yi 6= 1 or yj 6= 1. To avoid high
+                                                                                           Since the graphical model DWFG proposed for summarization
+computational complexity, we constrain only consecutive and sim-
+                                                                                        (cf. Figure 2(d)) contains cycles, we cannot directly employ a
+ilar sentences, i.e., establish sentence relation for sentence si and
+                                                                                        forward-backward algorithm like in [28] for exactly inferring the
+si+1 whose mutual similarity (e.g., cosine similarity) exceeds the
+                                                                                        optimal labeling for a test instance. We then propose an approxi-
+threshold θg .
+                                                                                        mate inference approach based on the loopy sum-product or max-
+   Moreover, we consider the two interactions between tweets: re-
+                                                                                        sum algorithm.
+plying and retweeting. If tweet mi replies or retweets tweet mj ,
+                                                                                           To achieve an approximate inference for predicting labels, the
+then mj successfully excites and attracts attentions from others,
+                                                                                        algorithm contains multiple iterations for updating the beliefs, and
+and it is reasonable that mj is more important than its succeeding
+                                                                                        each iteration is comprised of two phases. Here, we denote the up-
+tweets in the thread. Formally, for such a tweet pair mi and mj ,
+                                                                                        date variables for delivering beliefs between variables and factors
+the factor takes value exp µc if yi ≤ yj .
+                                                                                        by {pij }i,j and {qij }i,j , where pij represents the message propa-
+Inter-domain dependency factor. By leveraging knowledge from
+                                                                                        gating from variable (e.g., yi ) to factor (e.g., gij,c or hij,c ), and qij
+both domains, the inter-domain relationships may benefit to the
+                                                                                        represents the message propagating from factor to variable. The
+identification of social context summarization. We introduce a
+                                                                                        messages can be formulated as follows:
+set of factors defined on variables across domains, which are able
+to coordinate the labels of sentences and tweets simultaneously.
+                                                                                                                      X
+                                                                                                      pij =ri +                qik                              (5)
+Specifically, if tweet mj is considered as a representative tweet,                                                  k∈N(i)\{j}
+i.e., yj = 1, then a sentence si highly similar to mj (with simi-
+larity more than a threshold θh ) should be biased towards the same                                   qij = max{tij (1, 1) + pji , tij (1, 0)}
+                                                                                                                                                                    (6)
+label, i.e., yi = 1. Formally, for each sentence-tweet pair (si , mj )                                      − max{tij (0, 1) + pji , tij (0, 0)}
+of high similarity, we define
+                                                                                        where ri corresponds to the logarithmic value of the local factor,
+                                                                                        i.e.,
+                                    
+                                      exp ν if yi = yj
+                hij (ν, yi , yj ) =                                (3)
+                                      1     otherwise                                              X
+                                                                                              ri =     (log fi,c (λc , yi = 1) − log fi,c (λc , yi = 0)) (7)
+where ν is the weight variable that represents the significance of                                  c∈C
+inter-domain dependency factor.                                                         Analogously, tij (yi , yj ) is the logarithmic value of the dependency
+Objective function. Finally, the objective function can be defined                      factor, i.e.,
+as the normalized product of Eqs. 1 - 3 for all the instances. We
+denote Z as the normalization factor, which sums up the condi-                                tij (yi , yj ) = log gij,c (µc , yi , yj ) or log hij (ν, yi , yj )   (8)
+tional likelihood P (Y |X, Θ) over all the possible labels of all the
+                                                                                        Specific to a particular dependency factors, fi,j , gij,c , or hij (Eq. 1
+instances, where Y contains all the undetermined labels for sen-
+                                                                                        to 3), the message qij has a more succinct expression, e.g., the sen-
+tences and tweets, i.e., Y = {yi }i , and Θ is the collection of
+                                                                                        tence dependency factor qij = max{pji − µc , 0} − max{pji , 0}.
+weights, i.e., Θ = {λc }c ∪ {µc }c ∪ {ν}.
+                                                                                           We can obtain the label for each sentence si or tweet mi using
+   We first estimate the parameters Θ with a maximum likelihood
+                                                                                        the variables calculated in the two phases for the last iteration as
+procedure on the training instances, i.e.,
+                                                                                        follows:
+        1 Y Y                                                                                               
+  max               fi,c (λc , yi )·gij,c (µc , yi , yj )·hij (ν, yi , yj ) (4)                                1 if pij + qij > 0 for some j
+   Θ Z                                                                                                yi =                                                    (9)
+          i,j∈T c∈C                                                                                            0 otherwise
+
+
+
+
+                                                                                  258
+                                                                                                                          6
+    Algorithm 1: Social context summarization with DWFG                                                                 10
+
+
+
+
+                                                                                              mentioning the same URL
+     input : A document d with social context Cd and SCAN Gd
+
+
+
+
+                                                                                                 Number of tweets
+             of d, weight variables Θ, and number of iterations I                                                       10
+                                                                                                                          4
+
+     output: A summary for social context Cd : important
+             sentences Sd∗ and messages Md∗
+                                                                                                                          2
+                                                                                                                        10
+  // initialization
+1 calculate {ri }i according to Eq. 7;
+2 {qij }i,j ← 0;                                                                                                        10
+                                                                                                                          0
+                                                                                                                            0    2          4    6
+  // update message values                                                                                                10    10         10   10
+                                                                                                                                     URL
+3 for i ← 1 to I do
+4     update variables pij according to Eq. 5;
+5     update variables qij according to Eq. 6;                                      Figure 3: The distribution of URLs carried by the tweets
+     // output result
+6 foreach si ∈ Sd and mi ∈ Md do                                                users and used a crawler to collect all followers of these users by
+7     calculate yi according to Eq. 9;                                          traversing following edges. We continue the traversing process,
+      ∗
+8 Sd ← {si ∈ Sd |yi = 1};                                                       which produced in total 4,874,389 users. The crawler monitored
+    ∗
+9 Md ← {mi ∈ Md |yi = 1};                                                       tweets posted by these users from January 1st 2010 to July 17th
+                                                                                2010. We extracted all tweets posted by these users and in total
+                                                                                there are 404,544,462 tweets.
+                                                                                   We use explicit URLs (starting with “http://” or “https://”) to
+   The learning algorithm is depicted in Algorithm 1. Initially, we             identify Web documents from the Twitter data. In some cases, users
+calculate all local variables {ri }i according to Eq. 7, and initialize         may shorten the URL addresses via services such as tinyurl.com or
+all update variables {qij }i,j as 0 (Line 1 and 2). Next, we compute            bit.ly. We implemented a shorten URL decoder based on a HTTP
+new values for all the update variables {pij }i,j according to Eq. 5.           client to obtain the decoded URLs and finally aligned the obtained
+Then we estimate the new values for all {qij }i,j according to Eq. 6.           URLs.4 Finally, we use the most frequent (200,000) URLs to con-
+We continue to update the variables for a number of iterations until            stitute the collection of Web documents and employ their associ-
+some termination condition is satisfied (Line 3 - 5). Finally, the              ated (12,964,166) tweets to construct the social context. The dis-
+summary for the social context is generated according the update                tribution of frequency for these Web documents (URLs) is plotted
+variables (Line 6 - 9).                                                         in Figure 3 in log-logarithmic scale. We see that the distribution of
+Complexity analysis. If we denote the number of iterations for                  frequency follows the power law. According to the selected URLs,
+the inference algorithm as I, then the computational complexity of              we crawled the pointed webpages, and then constructed two kinds
+the algorithm is proportional to I · (|E s | + |E m | + |E c |), where          of data sets (webpages and their corresponding social tweets). The
+|E s |, |E m |, and |E c | correspond to the number of sentence re-             Web documents were then segmented into a set of sentences with
+lationships, tweet relationships, and inter-domain relationships re-            the jTokeniser Toolkit5 . Our summarization algorithm was then
+spectively. They can be varied from zero to many when we tune the               performed on both domains.
+thresholds θg and θh , which is further discussed in Section 4.2.2.                A preliminary analysis shows that many frequent URLs are ad-
+In fact, the inference algorithm can be easily parallelized or dis-             vertisement pages. To guarantee the quality of the data set, we re-
+tributed onto clusters to handle large-scale data set, and the design           strict ourselves to a few high-quality news websites such as CNN,
+of distributed algorithm will be reported elsewhere.                            BBC, Mashable etc., and selected a subset of URLs related to these
+                                                                                websites to perform a manual annotation for the summarization.
+4.        EXPERIMENT                                                            Descriptions of the five selected domains are given in Table 1.
+   In this section, we evaluate the proposed summarization method
+DWFG with manually labeled documents. We firstly introduce the                  4.1.2 Evaluation Methods
+data set, baseline methods that do not incorporate the relationship                To reduce the possible noise in the manual annotation data, we
+between the Web document domain and tweet thread domain, the                    further manually validated the informativeness of all the selected
+evaluation metrics, and then we give the detailed discussion of the             Web documents by posting both the Web documents and tweets
+experimental results with the comparison of other approaches. Re-               on Amazon Mechanical Turk6 . We totally issued 1,145 HITs on
+lated support materials (data description and software) of this work            Mechanical Turk, and for each HIT we asked at least two differ-
+can be found at http://arnetminer.org/socialcontext/.                           ent workers to read both Web documents and their corresponding
+                                                                                tweets. All the HITs were divided into 12 batches with each assign-
+4.1 Settings and Observations                                                   ment entitled “Key sentences and tweets extraction from news and
+                                                                                related tweets”. We gave a detailed description on how to label the
+4.1.1 Data Preparation                                                          sentences and tweets, and also emphasized that the workers should
+   We aim to find a collection of Web documents with their asso-                4
+                                                                                  A Web document might be referred by different URLs, e.g.,
+ciated social contexts, and labeled summaries for each document                     http://news.bbc.co.uk/1/hi/england/8604663.stm,
+and its social context, so that we can use the data set as the gold-                http://news.bbc.co.uk/2/hi/uk_news/england/8604663.stm,
+standard to evaluate different approaches for social context sum-                   http://news.bbc.co.uk/2/hi/8604663.stm
+marization. To begin the collection process, we selected the first              correspond to the same document. We further group such Web doc-
+and also one of the most popular users on Twitter, Jack Dorsey                  uments according to the unique document ID: 8604663.
+                                                                                5
+(@jack)3 , and collected his followers. We took these users as seed               http://code.google.com/p/jtokeniser/
+                                                                                6
+                                                                                  http://mturk.com, an Internet marketplace to use human intelli-
+3
+    the creator, co-founder and executive chairman of Twitter.                  gence to solve various kinds of problems
+
+
+
+
+                                                                          259
+             Table 1: Description on employed domains                                                                   Table 2: Feature list
+                                                        Data Size                                                N°   description
+      Domain           Description                                                                               1    sentence position in document
+                                                     Doc       Tweet
+      cnn.com          one of the most popular      1,303     62,225                                             2    sentence position in paragraph
+                       news websites                                                    Web                      3    average TF-IDF score of words in sentence
+      bbc.co.uk        the most popular news         336     10,264                     documents                4    the number of common words to the title
+                       website in the UK                                                                         5    sentence length
+      mtv.com          one of the most popular       176      9,848                                              6    the log likelihood generated by the document
+                       music television networks                                                                 7    average TF-IDF score of words in post
+      espn.go.com      one of the world’s leading    171      4,320                                              8    tweet length
+                       sports media                                                     Tweets                   9    the log likelihood generated by the tweet thread
+      mashable.com     the world’s largest tech     2,940   114,441                                              10   the number of users following the author
+                       blog                                                                                      11   the PageRank score of the post’s author
+
+
+
+
+                                                                              Normalized mean values
+“extract several sentences from news that attract them mostly”, and                                    1.6
+“after reading the news, extract the most interesting tweets that ap-                                  1.4
+peal you mostly”. We required the workers to label no less than                                        1.2                                                       Average
+5 tweets and 10 Web document sentences. Finally, 158 different                                          1                                                        CNN
+users have participated in annotating the benchmark for social con-                                                                                              BBC
+                                                                                                       0.8                                                       ESPN
+text summarization task. The labeled sets of sentences and tweets                                      0.6                                                       MTV
+formed the benchmark for evaluation.                                                                   0.4
+                                                                                                                                                                 Mashable
+   In this paper, two performance metrics applied in [29] were                                               1   2       3         4       5      6
+                                                                                                                      Feature values x
+adopted to evaluate the proposed approach DWFG. The first is Pre-                                                                    i,c
+
+cision, Recall and F-measure. In the following section, we will
+report the evaluation on F1 measure, which is defined as:                              Figure 4: Comparison of feature values for sentence domain on
+                                                                                       five domains
+                  Sref ∩ Scand      Sref ∩ Scand         2P R
+          P =                  ;R =              ; F1 =
+                      Scand              Sref           P +R
+                                                                                       it was extracted from the subtitle, 2 if the sentence was located in
+where Scand and Sref denote the sentences contained in the candidate                   the first paragraph of the original document, 1 if the sentence was
+summary and the reference summary respectively.                                        located in the last paragraph, and 0 otherwise.
+   Another performance metric is ROUGE [18], which measures                               The feature values extracted from sentence domain and tweet
+summarization quality according to the overlap between the units,                      domain are summarized in Figure 4 and 5. Since different features
+such as n-gram (referred to as ROUGE-N) etc, of machine gener-                         take values in diverse ranges, e.g., the maximum value of Feature 4
+ated summary and human generated summary. ROUGE-N is de-                               is 15, while the maximum value of Feature 6 is 1.495, we normal-
+fined as follows:                                                                      ize the feature values by the mean value of corresponding feature.
+                                                                                       From Figure 4, we can see that Web documents from different do-
+                     P        P
+                        s∈S      gram ∈s Countmatch (gramn )
+      ROUGE-N = P ref P n                                                              mains exhibit differently. For example, articles in CNN, BBC, and
+                          s∈Sref   gramn ∈s Count(gramn )
+                                                                                       ESPN have smaller values of Feature 1 but greater values of Fea-
+where n is the length of the n-gram, Countmatch (gramn) is the max-                    ture 2 than MTV, which indicates that news websites CNN, BBC,
+imum number of n-grams co-occurring in a candidate summary and                         and ESPN have longer articles consisting of a greater number of
+the reference summaries, Count(gramn) is the number of n-grams                         shorter paragraphs. Therefore, we trained an individual model on
+in the reference summaries.                                                            each domain respectively to capture the distinctiveness.
+   We employ the ROUGE evaluation methods implemented in
+the Dragon Toolkit7 , and report the experimental results in terms
+                                                                                                  4.1.4 Baseline Methods
+of ROUGE-1 and ROUGE-2 with stop words filtered out. Since                                We compare the proposed DWFG model with six supervised
+ROUGE is a recall-oriented metric, we keep the number of sen-                          baselines methods. SVM classifiers (SVM) and logistic regression
+tences extracted be equal with that of the human summary for fair                      classifiers (LR) are performed for each sentence and tweet only
+comparison. Specifically, we select the sentences and tweets with                      with its local features. Linear-chain and tree-structured CRF mod-
+the greatest positive beliefs according to p(yi = 1|X) (cf. Eq. 9).                    els (LC-/TS-CRF) are respectively trained and tested on documents
+                                                                                       and tweet threads, i.e., inter-domain relationships are considered
+4.1.3 Feature Description                                                              as a supplement to the basic local features. The linear-chain CRF
+   Many features have been designed for document summarization                         baseline model employed in the sentence summarizaiton is equiva-
+in prior literatures. In this paper, we only extract 11 basic and                      lent to the method proposed in [28].
+straight-forward features from both domains. Besides some fea-                            We also extend the feature list for each sentence and tweet by
+tures that are widely used in traditional summarization methods,                       considering the features of related sentences or tweets extracted
+we also utilize several features extracted from users’ online social                   from both domains (denoted as SVM+, LR+). Specifically, for each
+behaviors, e.g., the number of users following the tweet’s author                      sentence si in a document, we append 11 features (xsi,7 , . . . , xsi,17 ),
+and the PageRank score of the author. Table 2 gives the brief defi-                    where each of xsi,7 , . . . , xsi,12 adds up the corresponding feature
+nitions of these features applied in this paper, where some features                   values of its similar sentences, and each of xsi,13 , . . . , xsi,17 adds
+were represented by nominal values, e.g., Feature 1 will take value                    up the corresponding feature values of its related tweets. Similarly,
+4 if the sentence was extracted from the title of the document, 3 if                   for each tweet in the thread, we append 11 features, which are the
+                                                                                       sums of feature values of its relevant sentences or tweets.
+7
+    http://dragon.ischool.drexel.edu/                                                     In addition, we also compare DWFG with several unsuper-
+
+
+
+
+                                                                        260
+                         4
+                                                                                             Table 3: Experimental results for Web documents
+Normalized mean values
+
+
+                         3
+                                                                                                          CNN     BBC     MTV     ESPN    Mash    All
+                                                                                              SVM         0.288   0.322   0.490   0.337   0.321   0.351
+                         2
+                                                                    Average                   LR          0.284   0.340   0.531   0.352   0.297   0.361
+                                                                    CNN                       LC-CRF      0.307   0.349   0.596   0.364   0.340   0.391
+                                                                    BBC
+                                                                    ESPN
+                                                                                              SVM+        0.283   0.341   0.476   0.359   0.324   0.357
+                         1
+                                                                    MTV                       LR+         0.277   0.332   0.482   0.366   0.305   0.352
+                                                                    Mashable           F1     Random      0.314   0.321   0.455   0.351   0.305   0.349
+                         0
+                             7   8           9            10   11                             DocLead     0.334   0.356   0.441   0.317   0.415   0.373
+                                     Feature values x
+                                                    i,c                                       ParaLead    0.298   0.316   0.508   0.338   0.323   0.356
+                                                                                              PR          0.354   0.338   0.453   0.351   0.399   0.379
+                                                                                              DWFG        0.341   0.450   0.642   0.518   0.330   0.456
+Figure 5: Comparison of feature values for tweet domain on                                    SVM         0.224   0.612   0.392   0.520   0.511   0.452
+five domains                                                                                  LR          0.197   0.599   0.585   0.583   0.599   0.513
+                                                                                              LC-CRF      0.281   0.551   0.667   0.583   0.618   0.540
+                                                                                              SVM+        0.176   0.563   0.400   0.635   0.546   0.464
+vised summarization algorithms, i.e., the importance sentences and                            LR+         0.171   0.610   0.362   0.620   0.605   0.473
+tweets are selected according to a metric or score. First, we ran-                     R-1    Random      0.429   0.426   0.455   0.470   0.405   0.437
+domly select sentences or tweets (Random) as the basic unsuper-                               DocLead     0.410   0.473   0.542   0.372   0.576   0.475
+vised method. Another baseline method for summarization is to                                 ParaLead    0.414   0.337   0.629   0.432   0.414   0.445
+                                                                                              PR          0.433   0.325   0.563   0.426   0.482   0.446
+select the sentences according to their positions in the document or                          DWFG        0.389   0.594   0.777   0.701   0.613   0.615
+paragraph (DocLead and ParaLead). Finally, we apply PageRank                                  SVM         0.151   0.500   0.336   0.412   0.412   0.362
+algorithm for summarization on the whole graph consisting of three                            LR          0.131   0.491   0.522   0.481   0.496   0.424
+types of relationships (PR) [24].                                                             LC-CRF      0.197   0.496   0.542   0.515   0.516   0.453
+                                                                                              SVM+        0.115   0.463   0.351   0.539   0.449   0.383
+4.2 Results and Analysis                                                                      LR+         0.110   0.498   0.310   0.528   0.501   0.390
+                                                                                       R-2    Random      0.323   0.325   0.387   0.359   0.301   0.339
+                                                                                              DocLead     0.371   0.424   0.519   0.350   0.525   0.438
+4.2.1 Comparison Results                                                                      ParaLead    0.363   0.320   0.569   0.370   0.354   0.395
+   All experiments were conducted in the 10-fold cross validation                             PR          0.389   0.307   0.533   0.387   0.441   0.411
+procedure, where one fold is for test and the other nine folds for                            DWFG        0.228   0.417   0.687   0.612   0.557   0.500
+training. The performance results are shown in Table 3 and 4, and
+the best performances in the comparisons are highlighted in bold.
+In the following results, we set the similarity threshold for sentence               connected with all the tweets. To evaluate the impact of thresh-
+dependency θg = 0.1, and the similarity threshold for inter-domain                   olds to DWFG and baseline methods (e.g., LC-CRF), we varied θg
+dependency θh = 0.8. We will further discuss the variation of per-                   or θh from 0 to 1 with step length 0.1 respectively with the other
+formance with different assignment of thresholds in Section 4.2.2.                   threshold fixed. Due to space limitation, we only report the impact
+   From Table 3, we see that DWFG clearly outperforms the base-                      to the performance of DWFG in Figure 6(a) and (b) in terms of F1 ,
+line methods in most cases in terms of both F1 and ROUGE-N                           ROUGE-1, and ROUGE-2, and the performances of the baseline
+for document summarization. Moreover, we discover that the per-                      methods follow similar trends with different thresholds. We also
+formances are statistically significantly improved on the MTV and                    plot the percentage of consecutive sentence pairs with similarity
+ESPN domains by conducting sign test on the results, where the                       more than θg in Figure 6(a), and the percentage of sentence-tweet
+p values are much smaller than 0.01. In fact, we collect relatively                  relation pairs with similarity more than θh in Figure 6(b).
+fewer documents and corresponding tweets from MTV and ESPN                              From Figure 6(a), we can see that when θg increases from 0.0
+compared with other domains, and thus, additional dependencies,                      to 0.5, the performance drops by 5% ∼ 16% in terms of F1 and
+especially cross-domain dependencies boost the performance by                        ROUGE, which can be attributed to the lack of a complete view of
+leveraging additional information.                                                   sentence relations within the document. While with θg is 0.7, the
+   In contrast to the improvements in Web document summariza-                        performance reaches a local maximum when the retained sentence
+tion, DWFG performs comparably to the simpler CRF-based meth-                        relations have a relatively higher quality. As shown in Figure 6(b),
+ods for tweet summarization. In fact, the ground truth data are                      the performance of sentence identification reaches the global max-
+manually annotated from the perspective of readers’ interests and                    imum when θh is set between 0.5 and 0.6. With smaller or greater
+focuses, which naturally reveals the users’ motivations for writing                  θh , the extracted relation pairs between sentences and tweets may
+tweets. Therefore, the identification of important sentences from                    contain more low-quality relations or lack of high-quality relations.
+the Web document domain rarely influences the results for identi-                    Generally speaking, the performance of important tweet extraction
+fying important tweets.                                                              is relatively stable.
+
+4.2.2 Impact of Thresholds θg and θh                                                 4.2.3 Factor Contribution Analysis
+  In this section, we discuss the impact of thresholds θg and θh to                     We further analyze the contribution or significance of each fac-
+our proposed approach. Although the proposed approach within a                       tor. We show the estimated weights for sentence-level local factors
+supervised framework can automatically learn the optimal model                       λ1 , . . . , λ6 on five domains respectively and calculate their aver-
+parameters Θ based on the training instances, we still need to pre-                  ages in Figure 7, and show the estimated weights with their aver-
+define the thresholds θg and θh to control the number of inter-                      ages for tweet-level local factors λ7 , . . . , λ11 in Figure 8.
+domain and intra-domain dependencies in the factor graph model.                         From Figure 7, we see that most of the local factors have posi-
+Specifically, with larger θg or θh , we obtain fewer dependencies,                   tive contributions to our task except for Feature 4 (the number of
+and if θg = 0, each pair of consecutive sentences will be connected                  common words to the title). On average, it seems that Feature 5
+by a inter-domain factor, or if θh = 0, all the sentences will be                    (sentence length) and Feature 2 (sentence position in paragraph)
+
+
+
+
+                                                                               261
+                                    Table 4: Experimental results for tweet thread
+                                                                                                                                                                                      0.5
+                                                            CNN      BBC       MTV            ESPN       Mash           All
+
+
+
+
+                                                                                                                                                                     Weight values
+                                                                                                                                                                                      0.4
+                                    SVM                     0.323    0.542     0.640          0.610      0.379          0.499
+                                    LR                      0.370    0.531     0.606          0.616      0.408          0.506                                                         0.3                                                           Average
+                                    LC-CRF                  0.378    0.547     0.637          0.603      0.417          0.516                                                         0.2                                                           CNN
+                                                                                                                                                                                                                                                    BBC
+                                    SVM+                    0.378    0.537     0.641          0.607      0.405          0.514                                                         0.1                                                           ESPN
+                            F1      LR+                     0.369    0.537     0.725          0.608      0.408          0.529                                                           0                                                           MTV
+                                    Random                  0.356    0.486     0.665          0.586      0.353          0.489                                                                                                                       Mashable
+                                                                                                                                                                                     −0.1
+                                    PR                      0.281    0.428     0.666          0.520      0.327          0.445                                                                1       2        3        4        5     6
+                                    DWFG                    0.380    0.547     0.639          0.633      0.380          0.516                                                                                Parameter λ
+                                                                                                                                                                                                                       c
+                                    SVM                     0.531    0.631     0.670          0.701      0.617          0.630
+                                    LR                      0.657    0.618     0.702          0.708      0.737          0.684
+                                    LC-CRF                  0.673    0.647     0.730          0.703      0.748          0.700                                                        Figure 7: Parameter estimation results for sentence-level local
+                                    SVM+                    0.661    0.659     0.672          0.694      0.740          0.685                                                        factors on five domains
+                            R-1     LR+                     0.655    0.660     0.692          0.756      0.737          0.700
+                                    Random                  0.631    0.617     0.740          0.704      0.622          0.663
+                                    PR                      0.167    0.382     0.522          0.439      0.229          0.348
+                                                                                                                                                                                      0.4
+                                    DWFG                    0.669    0.647     0.731          0.763      0.700          0.702
+
+
+
+
+                                                                                                                                                                     Weight values
+                                    SVM                     0.486    0.571     0.661          0.678      0.570          0.593                                                         0.3
+                                    LR                      0.616    0.556     0.696          0.684      0.698          0.650                                                         0.2
+                                                                                                                                                                                                                                                    Average
+                                    LC-CRF                  0.610    0.563     0.708          0.699      0.682          0.653                                                                                                                       CNN
+                                                                                                                                                                                      0.1                                                           BBC
+                                    SVM+                    0.620    0.598     0.663          0.671      0.700          0.651                                                                                                                       ESPN
+                            R-2     LR+                     0.613    0.601     0.684          0.731      0.698          0.666                                                           0                                                           MTV
+                                    Random                  0.572    0.533     0.724          0.671      0.557          0.611                                                                                                                       Mashable
+                                                                                                                                                                                     −0.1
+                                    PR                      0.157    0.356     0.519          0.432      0.218          0.337                                                                 7          8        9        10        11
+                                    DWFG                    0.599    0.563     0.709          0.722      0.631          0.645                                                                                Parameter λ
+                                                                                                                                                                                                                       c
+
+
+
+                                        (a) Impact of θg                                        (b) Impact of θh                                                                     Figure 8: Parameter estimation results for tweet-level local fac-
+                       0.8                                             100     0.8                                              100                                                  tors on five domains
+                                                                                                                                      Number of dependencies (%)
+F1, ROUGE−1, ROUGE−2
+
+
+
+
+                       0.7                                                     0.7
+                                                                       80                                                       80
+                       0.6                                                     0.6
+
+                       0.5                                             60      0.5                                              60                                                   of 0.5 indicate that the corresponding factors have no preference on
+                                                                                                                                                                                     whether the sentences are regarded as part of the summary or not.
+                       0.4                                                     0.4
+                                                                       40                                                       40                                                   Beliefs taking values greater than 0.5 convey positive attitudes, and
+                       0.3                                                     0.3
+                                                                       20                                                       20
+                                                                                                                                                                                     the greater the belief values, the stronger the confidence that the as-
+                       0.2                                                     0.2                                                                                                   sociated variables should take values of 1. According to the calcu-
+                       0.1
+                          0       0.2      0.4        0.6      0.8    1
+                                                                       0       0.1
+                                                                                  0       0.2      0.4        0.6     0.8   1
+                                                                                                                             0                                                       lated beliefs, the summary for the social context is generated based
+                                                 θg                                                      θh
+                                                                                                                                                                                     on the selected sentences and tweets (in bold).
+                                                                                                                                                                                        We can see that the local features, e.g., statistical features, still
+                                           F1(S)            R1(S)      R2(S)          F1(T)        R1(T)            R2(T)
+                                                                                                                                                                                     play a major role for social context summarization. For example,
+                                                                                                                                                                                     since the most common words or phrases in the Web documents in-
+                   Figure 6: The impact of θg and θh to the performance of DWFG                                                                                                      clude “women”, “dead person”, “body”, “Liverpool Airport”, and
+                                                                                                                                                                                     those in tweet threads include “Liverpool airport”, “Weekend At
+                                                                                                                                                                                     Bernie’s”, texts that cover these words or phrases are more likely
+                   are the most important local factors for identifying the important                                                                                                chosen, and the probability that the relevant sentence-tweet pairs
+                   sentences. From Figure 8, we see the two most important local fac-                                                                                                are simultaneously selected is boosted. Moreover, various types
+                   tors for identifying the representative tweets are Feature 8 (tweet                                                                                               of relations also come into play. For example, since the last two
+                   length) and Feature 7 (average TF-IDF). In fact, we find that long                                                                                                tweets shown in the right column form a retweet pair, the content is
+                   tweets tend to cover both the main ideas of the Web documents and                                                                                                 evaluated more important, and thus the related sentence (the fourth
+                   the personal comments towards them.                                                                                                                               sentence) in the document then receives a higher belief (0.51) of
+                                                                                                                                                                                     taking a positive decision. As we suggested, in the social context
+                       4.2.4 Case Study                                                                                                                                              summarization task, the tweet thread contributes additional infor-
+                                                                                                                                                                                     mation (e.g., Weekend At Bernie’s9 ) to the original document con-
+                      In this section, we demonstrate an example of the inference
+                                                                                                                                                                                     tent, which unveils the users’ interests from an alternative angle.
+                   step for a specific Web document, an article entitled “Women try
+                   to take body on plane at Liverpool airport”8 , with its social con-
+                   text. In Figure 9, the left column lists a portion of sentences of                                                                                                5. RELATED WORK
+                   the Web document, and the right column lists a portion of tweets                                                                                                     Web-page summarization techniques have been widely studied
+                   containing URLs (or shortened URLs) directing to the article (the                                                                                                 for many years and various approaches have been developed. There
+                   selected texts are indicated by bold font). The established inter-                                                                                                are two major types of approaches for web-page summarization,
+                   domain and intra-domain dependencies are shown in arrows. Fur-                                                                                                    i.e., supervised and unsupervised. The supervised summarization
+                   thermore, beliefs propagated from local factors and pair-wise de-                                                                                                 approach treats the summarization task as a two-class classifica-
+                   pendency factors in the last iteration of our inference algorithm are                                                                                             tion problem [16, 25, 36] or as a sequence labeling problem [8,
+                   partly shown with the associated variables taking values of 1 (in                                                                                                 28] at the sentence level, where each sentence is represented by
+                   rectangles, rounded rectangles or diamonds). Beliefs taking values
+                                                                                                                                                                                     9
+                                                                                                                                                                                       a 1989 American motion picture comedy, which has a similar plot
+                       8
+                           http://news.bbc.co.uk/2/hi/8604663.stm                                                                                                                    as the news story.
+
+
+
+
+                                                                                                                                                                   262
+ 0.61               Police have arrested two women after they tried                                                                                          0.50
+ 0.55               to take the body of a dead relative on to a plane              0.51          BBC News, 'Women try to take body on                        0.50
+ 0.50               at Liverpool John Lennon Airport .                                           plane at Liverpool airport'                                 0.52
+ 0.39                                                                              0.51                                                                      0.50
+ 0.76               The women - his widow and step-daughter - said                               And in comedy news today, two women                         0.50
+ 0.52               they thought he was asleep.                                                  try to re-enact Weekend at Bernie’s at
+                     …                                                                           Liverpool Airport
+ 0.50               "I [did not] kill my Willi.                                                  Weekend At Bernie's come true (or                           0.51
+ 0.55   0.50
+                                                                                                 "Wochenende an Bernie" in German)                           0.50
+ 0.50               My Willi is my god.                                                                                                                      0.51
+ 0.49   0.50                                                                            0.49
+                    I [have loved] my Willi for 22 years."                       0.49            This is both weird and macabre at the                       0.50
+ 0.59                                                                                            same time.                                                  0.50
+ 0.50                 …
+                    And she insisted that with his eyes closed they                              Please don't disturb my friend, he's
+                    believed he was asleep.                                               0.51
+                                                                                                 dead tired <--- Lmao
+ 0.50                                                                                                                                              0.50      0.49
+ 0.55                …                                                    0.51                                                                               0.50
+                                                                                          0.51   Please don't disturb my friend, he's
+ 0.50               “A dead person you cannot carry to Germany,                                                                                              0.50
+                                                                          0.51                   dead tired                                                  0.48
+ 0.49               there are too many people checking and security.
+ 0.59   0.49                                                                                                                                                 0.50
+ 0.50               How can you bring a dead person to Germany? ”                                                                                  0.51
+
+               Sentence local                     Tweet local           Sent ence relation              Tweet relation                   Sentence-tweet
+               factor belief                      factor belief         factor belief                   factor belief                    relation factor belief
+
+Figure 9: An example of a social context summary with propagated beliefs. Left column is a part of the Web document, and the
+right column is a portion of tweet thread. Bold texts correspond to the summary for the Web document; colored rectangles, rounded
+rectangles or diamonds indicate the beliefs propagated in the inference algorithm.
+
+
+a vector of features. Comparably, the unsupervised approach re-                    commented sentence selection [13, 33, 19], or opinionated text [26,
+lies on a set of heuristic rules to develop the summarization. Web-                11, 15].
+page summarization can also be either generic or query-dependent.                     Different from previous works, we study to leverage multifaceted
+Generic summarization targets to cover the main idea of the page                   social media information for Web document summarization, es-
+while query-oriented summary is to present the information that is                 pecially social influence among users [30] and retweeting rela-
+most relevant to the given queries [4, 31].                                        tions among messages [35]. However, we adopt a totally differ-
+   Without consideration of context, the extracted summary is com-                 ent approach to not only incorporate the extra knowledge extracted
+posed of sentences from the Web documents, and thus features                       from microblogs, but also take full advantage of conventional tech-
+from local content of a document is the key to summarization. Tra-                 niques in single document summarization. In recent years, the rapid
+ditional document-oriented features can be defined either from lin-                growth of microblogging services provides an efficient way for in-
+guistic, such as rhetorical structure [22], lexical chains [2] or sta-             formation communication. Here, people can freely issue various
+tistical perspectives, such as term significance [20], sentences sim-              comments on any topic they interested in. Compared with tra-
+ilarity [24] and topic detection [12]. Although document-oriented                  ditional tightly-coupled relationship between Web document and
+features can disclose most of the basic characteristics of summary                 comments, messages from microblogs can provide more valuable
+sentences, as stated in [29], the textual information of a Web docu-               information beneficial for summarization. Microblog has been
+ment may be scarce and diverse in topics and, moreover, contain a                  widely studied in recent years. Some work focuses on investigating
+lot of noise.                                                                      the characteristics of Twitter, e.g.,[17], [7], [14], while some work
+   Document-oriented features cannot fully capture the main idea                   analyzes the patterns of retweets on Twitter, influential twitter and
+of a Web document. In the past few years, some work starts to                      the routines of changes of hashtags, etc., e.g., [34], [5], [3], [35].
+utilize various kinds of context to assist document summarization,                 To the best of our knowledge, little work in the literature has tried
+such as external documents or cited articles [23]. User requirement                to use microblog data for Web-page summarization.
+is one of the most important kind of context [10, 32]. In the study of
+[21], user’s needs come from a set of documents selected by user,
+where the top content words are extracted according to their G2                    6. CONCLUSION AND FUTURE WORK
+score and then treated as users’ interests. Hyperlinks among web-                     In this paper, we explore a novel problem of social context sum-
+pages are another kind of context. Based on the text surrounding                   marization and aim to utilize the mutual reinforcement between
+the hyperlink, summarization of the target webpage can be real-                    Web document and its associated social data to extract high-quality
+ized either by extracting the related sentences in surrounding text                summaries. In our study, the importance of each document sen-
+[1] or by extracting significant sentences from the linked webpage                 tence is firstly predicted by considering a series of local features
+[9]. Similar to the hyperlink context, Sun et al. [29] utilize search-             of a document. At the same time, the social context relating to
+engine clickthrough data to construct the extra knowledge. In their                the Web document is associated with it, in which the significant
+work, webpage and query terms collected from the clickthrough                      sentences are also identified by taking advantage of various social
+data work together to decide the significance of each word in sen-                 factors. We formally define the concept of social context for Web
+tences for summarization. With the rapid growth of social web-                     document and propose a unified summarization approach through
+sites, comments-oriented approach is also studied, where the most                  factor graph model. Our experiments are performed on a set of Web
+important comments are selected and leveraged into sentence se-                    documents and associated microblog messages. The experiment re-
+lection for summarization. Traditional feature-based methods and                   sults prove that the proposed summarization method shows signif-
+graph-based methods for sentence extraction have been applied for                  icant improvement over the baseline approaches on social context
+                                                                                   summarization task.
+
+
+
+
+                                                                             263
+   To systematically combine the content analysis and social be-            [16] J. Kupiec, J. Pedersen, and F. Chen. A trainable document
+haviors represents a new and interesting direction for information               summarizer. In SIGIR’95, pages 68–73, 1995.
+retrieval. There are many future directions of this work. For ex-           [17] H. Kwak, C. Lee, H. Park, and S. Moon. What is twitter, a
+ample, due to the fact that not only tweets are highly associated                social network or a news media? In WWW’10, pages
+with other tweets, users are also connected by the friendship re-                591–600, 2010.
+lations, we can extend this work by establishing the connection             [18] C.-Y. Lin and E. Hovy. Automatic evaluation of summaries
+among users and adding the dependencies between users and their                  using n-gram co-occurrence statistics. In NAACL’03, pages
+tweets. Intuitively, the influence among users will also affect the              71–78, 2003.
+identification of important tweets, and subsequently influence the          [19] Y. Lu, C. Zhai, and N. Sundaresan. Rated aspect
+importance of sentences in Web documents.                                        summarization of short comments. In WWW’09, pages
+                                                                                 131–140, 2009.
+7.   *ACKNOWLEDGMENTS                                                       [20] H. P. Luhn. The automatic creation of literature abstracts.
+  The work is supported by the Natural Science Foundation of                     IBM Journal of Research and Development, 2(2):159–165,
+China (No. 61073073, No. 60703059, No. 60973102), Chinese                        1958.
+National Key Foundation Research (No. 60933013, No.61035004),               [21] I. Mani and E. Bloedorn. Machine learning of generic and
+National High-tech R&D Program (No. 2009AA01Z138).                               user-focused summarization. In AAAI’98/IAAI’98, pages
+                                                                                 820–826, 1998.
+8.   REFERENCES                                                             [22] D. Marcu. From discourse structures to text summaries. In
+                                                                                 ACL Workshop on Intelligent Scalable Text Summarization,
+ [1] E. Amitay. Automatically summarising web sites - is there a                 pages 82–88, 1997.
+     way around it? In CIKM’00, pages 173–179, 2000.
+                                                                            [23] Q. Mei and C. Zhai. Generating impact-cased summaries for
+ [2] R. Barzilay and M. Elhadad. Using lexical chains for text                   scientific literature. In ACL’08, pages 816–824, 2008.
+     summarization. In ACL Workshop on Intelligent Scalable
+                                                                            [24] R. Mihalcea. Language independent extractive
+     Text Summarization, pages 10–17, 1997.
+                                                                                 summarization. In ACL’05, pages 49–52, 2005.
+ [3] d. boyd, S. Golder, and G. Lotan. Tweet, tweet, retweet:
+                                                                            [25] M. Osborne. Using maximum entropy for sentence
+     Conversational aspects of retweeting on twitter. In
+                                                                                 extraction. In ACL Workshop on Automatic Summarization,
+     HICSS’10, pages 1–10, 2010.
+                                                                                 pages 1–8, 2002.
+ [4] J. Carbonell and J. Goldstein. The use of mmr,
+                                                                            [26] M. J. Paul, C. Zhai, and R. Girju. Summarizing contrastive
+     diversity-based reranking for reordering documents and
+                                                                                 viewpoints in opinionated text. In EMNLP’10, pages 66–76,
+     producing summaries. In SIGIR’98, pages 335–336, 1998.
+                                                                                 2010.
+ [5] M. Cha, H. Haddadi, F. Benevenuto, and K. P. Gummadi.
+                                                                            [27] F. Sha and F. Pereira. Shallow parsing with conditional
+     Measuring user influence in twitter: The million follower
+                                                                                 random fields. In NAACL’03, pages 134–141, 2003.
+     fallacy. In ICWSM’10, pages 10–17, 2010.
+                                                                            [28] D. Shen, J. tao Sun, H. Li, Q. Yang, and Z. Chen. Document
+ [6] S. F. Chen and R. Rosenfeld. A gaussian prior for smoothing
+                                                                                 summarization using conditional random fields. In IJCAI’07,
+     maximum entropy models. Technical Report
+                                                                                 pages 2862–2867, 2007.
+     CMU-CS-99-108, Carnegie Mellon University, 1999.
+                                                                            [29] J.-T. Sun, D. Shen, H.-J. Zeng, Q. Yang, Y. Lu, and Z. Chen.
+ [7] M. Cheong and V. Lee. Integrating web-based intelligence
+                                                                                 Web-page summarization using clickthrough data. In
+     retrieval and decision-making from the twitter trends
+                                                                                 SIGIR’05, pages 194–201, 2005.
+     knowledge base. In SWSM’09, pages 1–8, 2009.
+                                                                            [30] J. Tang, J. Sun, C. Wang, and Z. Yang. Social influence
+ [8] J. M. Conroy and D. P. O’Leary. Text summarization via
+                                                                                 analysis in large-scale networks. In SIGKDD’09, pages
+     hidden markov models. In SIGIR’01, pages 406–407, 2001.
+                                                                                 807–816, 2009.
+ [9] J.-Y. Delort, B. Bouchon-Meunier, and M. Rifqi. Enhanced
+                                                                            [31] J. Tang, L. Yao, and D. Chen. Multi-topic based
+     web document summarization using hyperlinks. In
+                                                                                 query-oriented summarization. In SDM’09, pages
+     Hypertext’03, pages 208–215, 2003.
+                                                                                 1147–1158, 2009.
+[10] A. Díaz and P. Gervás. User-model based personalized
+                                                                            [32] C. Teng, N. Xiong, Y. He, L. T. Yang, and D. Liu. A
+     summarization. Information Processing & Management,
+                                                                                 behavioural mode research on user-focus summarization.
+     43(6):1715–1734, 2007.
+                                                                                 Mathematical and Computer Modelling, 51(7-8):985–994,
+[11] K. Ganesan, C. Zhai, and J. Han. Opinosis: a graph-based                    2010.
+     approach to abstractive summarization of highly redundant
+                                                                            [33] X. Wan and J. Yang. Multi-document summarization using
+     opinions. In COLING’10, pages 340–348, 2010.
+                                                                                 cluster-based link analysis. In SIGIR’08, pages 299–306,
+[12] Y. Gong and X. Liu. Generic text summarization using                        2008.
+     relevance measure and latent semantic analysis. In SIGIR’01,
+                                                                            [34] J. Weng, E.-P. Lim, J. Jiang, and Q. He. Twitterrank: Finding
+     pages 19–25, 2001.
+                                                                                 topic-sensitive influential twitterers. In WSDM’10, pages
+[13] M. Hu, A. Sun, and E.-P. Lim. Comments-oriented document                    261–270, 2010.
+     summarization: understanding documents with readers’
+                                                                            [35] Z. Yang, J. Guo, K. Cai, J. Tang, J. Li, L. Zhang, and Z. Su.
+     feedback. In SIGIR’08, pages 291–298, 2008.
+                                                                                 Understanding retweeting behaviors in social networks. In
+[14] A. Java, X. Song, T. Finin, and B. Tseng. Why we twitter:
+                                                                                 CIKM’10, pages 1633–1636, 2010.
+     understanding microblogging usage and communities. In
+                                                                            [36] J.-Y. Yeh, H.-R. Ke, W.-P. Yang, and I.-H. Meng. Text
+     WebKDD/SNA-KDD’07, pages 56–65, 2007.
+                                                                                 summarization using a trainable summarizer and latent
+[15] H. D. Kim and C. Zhai. Generating comparative summaries
+                                                                                 semantic analysis. Inf. Process. Manage., 41(1):75–95, 2005.
+     of contradictory opinions in text. In CIKM’09, pages
+     385–394, 2009.
+
+
+
+
+                                                                      264
+

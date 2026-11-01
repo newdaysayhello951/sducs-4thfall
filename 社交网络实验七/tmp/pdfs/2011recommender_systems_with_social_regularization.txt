@@ -1,0 +1,709 @@
+            Recommender Systems with Social Regularization
+
+                            Hao Ma                                     Dengyong Zhou                               Chao Liu
+                The Chinese University of                             Microsoft Research                     Microsoft Research
+                       Hong Kong                                      One Microsoft Way                      One Microsoft Way
+                 Shatin, N.T., Hong Kong                             Redmond, WA 98052                      Redmond, WA 98052
+               hma@cse.cuhk.edu.hk    denzho@microsoft.com     chaoliu@microsoft.com
+                             Michael R. Lyu             Irwin King
+                                         The Chinese University of                    The Chinese University of
+                                                Hong Kong                                    Hong Kong
+                                          Shatin, N.T., Hong Kong                      Shatin, N.T., Hong Kong
+                                         lyu@cse.cuhk.edu.hk                         king@cse.cuhk.edu.hk
+
+ABSTRACT                                                                             1.   INTRODUCTION
+Although Recommender Systems have been comprehensively                                  As an indispensable type of Information Filtering tech-
+analyzed in the past decade, the study of social-based rec-                          nique, recommender systems have attracted a lot of atten-
+ommender systems just started. In this paper, aiming at                              tion in the past decade. Related recommendation techniques
+providing a general method for improving recommender sys-                            have been widely studied in research communities of infor-
+tems by incorporating social network information, we pro-                            mation retrieval [5, 8, 12, 21, 36, 38, 39, 40], machine learn-
+pose a matrix factorization framework with social regulariza-                        ing [28, 30, 31, 33, 41] and data mining [1, 3, 11, 14, 15]. Due
+tion. The contributions of this paper are four-fold: (1) We                          to their great commercial value, recommender systems have
+elaborate how social network information can benefit recom-                          also been successfully deployed in industry, such as prod-
+mender systems; (2) We interpret the differences between                             uct recommendation at Amazon, music recommendation at
+social-based recommender systems and trust-aware recom-                              iTunes, movie recommendation at Netflix, etc.
+mender systems; (3) We coin the term Social Regularization                              In the past few years, the dramatic expanding of Web 2.0
+to represent the social constraints on recommender systems,                          Web sites and applications poses new challenges for tradi-
+and we systematically illustrate how to design a matrix fac-                         tional recommender systems. Traditional recommender sys-
+torization objective function with social regularization; and                        tems always ignore social relationships among users. But
+(4) The proposed method is quite general, which can be eas-                          in our real life, when we are asking our friends for recom-
+ily extended to incorporate other contextual information,                            mendations of nice digital cameras or touching movies, we
+like social tags, etc. The empirical analysis on two large                           are actually requesting verbal social recommendations. So-
+datasets demonstrates that our approaches outperform other                           cial recommendation is a daily occurrence, and we always
+state-of-the-art methods.                                                            turn to our friends for recommendations. Hence, in order
+                                                                                     to improve recommender systems and to provide more per-
+                                                                                     sonalized recommendation results, we need to incorporate
+Categories and Subject Descriptors                                                   social network information among users.
+H.3.3 [Information Search and Retrieval]: Information                                   Recently, based on the intuition that users’ trust relations
+filtering; J.4 [Computer Applications]: Social and Be-                               can be employed to enhance traditional recommender sys-
+havioral Sciences                                                                    tems, a few trust-aware recommendation methods have been
+                                                                                     proposed [2, 22, 23, 25, 27]. These methods utilize the in-
+                                                                                     ferred implicit or observed explicit trust information to fur-
+General Terms                                                                        ther improve traditional recommender systems. Trust-aware
+Algorithms, Experimentation                                                          recommender systems move an important step forward in
+                                                                                     the research of recommender systems. However, to achieve
+                                                                                     the goal of “social recommendation”, these approaches still
+Keywords                                                                             have several inherent limitations and weaknesses that need
+Recommender Systems, Collaborative Filtering, Social Net-                            to be addressed.
+work, Matrix Factorization, Social Regularization                                       First of all, “trust relationships” are different from “social
+                                                                                     friendships” in many aspects. Typically, on the Web, when a
+                                                                                     user ui likes a review issued by another user ut , user ui prob-
+                                                                                     ably will add user ut to his/her trust list. This process of
+Permission to make digital or hard copies of all or part of this work for            trust generation is a unilateral action that does not require
+personal or classroom use is granted without fee provided that copies are            user ut to confirm the relationship. This also indicates that
+not made or distributed for profit or commercial advantage and that copies
+                                                                                     user ui does not need to even know user ut in the real life.
+bear this notice and the full citation on the first page. To copy otherwise, to
+republish, to post on servers or to redistribute to lists, requires prior specific   “Social friendships” refer to the cooperative and mutual re-
+permission and/or a fee.                                                             lationships that surround us, such as classmates, colleagues,
+WSDM’11, February 9–12, 2011, Hong Kong, China.                                      or relatives, etc. Lots of social networking Web sites, like
+Copyright 2011 ACM 978-1-4503-0493-1/11/02 ...$10.00.
+Facebook and Orkut, are designed for online users to interact     approaches and model-based approaches. Neighborhood-
+and connect with their friends in the real life. From the def-    based methods mainly focus on finding the similar users [4,
+inition, we can see that trust-aware recommender systems          12] or items [6, 17, 32] for recommendations. User-based
+cannot represent the concept of “social recommendation”,          approaches predict the ratings of active users based on the
+since the idea of “social recommendation” anticipates to im-      ratings of similar users found, while item-based approaches
+prove recommender systems by incorporating a social friend        predict the ratings of active users based on the computed
+network.                                                          information of items similar to those chosen by the active
+   Secondly, trust-aware recommender systems are based on         user. User-based and item-based approaches often use Pear-
+the assumption that users have similar tastes with other          son Correlation Coefficient (PCC) algorithm [29] and Vec-
+users they trust. This hypothesis may not always be true          tor Space Similarity (VSS) algorithm [4] as the similarity
+in social recommender systems since the tastes of one user’s      computation methods. PCC method can generally achieve
+friends may vary significantly. Some friends may share simi-      higher performance than VSS approach, since the former
+lar favors with this user while other friends may have totally    considers the differences of user rating style.
+different tastes. Hence, trust-aware recommendation algo-            In contrast to the neighborhood-based approaches, the
+rithms cannot be directly applied to generate recommenda-         model-based approaches to collaborative filtering use the
+tions in social recommender systems.                              observed user-item ratings to train a compact model that
+   Thirdly, due to the rapid growth of Web 2.0 applications,      explains the given data, so that ratings could be predicted
+online users spend more and more time on social network           via the model instead of directly manipulating the origi-
+related applications since interacting with real friends is the   nal rating database as the neighborhood-based approaches
+most attractive activity on the Web. On the contrary, only        do [19]. Algorithms in this category include the clustering
+few online systems, like Epinions, have implementations of        model [13], the aspect models [8, 9, 33], the latent factor
+trust mechanism. Thus, in order to provide more proactive         model [5], the Bayesian hierarchical model [40] and the rank-
+and personalized recommendation results to online users,          ing model [19]. [13] presented an algorithm for collaborative
+we should pay more attention to the research of social rec-       filtering based on hierarchical clustering, which tried to bal-
+ommendation, in addition to the existing research of trust-       ance both robustness and accuracy of predictions, especially
+aware recommendation.                                             when few data were available. [8] proposed an algorithm
+   In this paper, aiming at solving the problems mentioned        based on a generalization of probabilistic latent semantic
+above, we propose two social recommendation methods that          analysis to continuous-valued response variables.
+utilize social information to improve the prediction accu-           Recently, due to the efficiency in dealing with large datasets,
+racy of traditional recommender systems. More specifically,       several low-dimensional matrix approximation methods [28,
+the social network information is employed in designing two       30, 31, 34] have been proposed for collaborative filtering.
+social regularization terms to constrain the matrix factor-       These methods all focus on fitting the user-item rating ma-
+ization objective function. Moreover, friends with dissim-        trix using low-rank approximations, and employ the matrix
+ilar tastes are treated differently in the social regulariza-     to make further predictions. The Low-rank matrix factoriza-
+tion terms in order to represent the taste diversity of each      tion methods are very efficient in training since they assume
+user’s friends. Our proposed approaches are quite general,        that in the user-item rating matrix, only a small number
+and they can also be applied to trust-aware recommender           of factors influences preferences, and that a user’s prefer-
+systems. The experimental analysis on two large datasets          ence vector is determined by how each factor applies to that
+(one dataset contains a social friend network while the other     user. Low-rank matrix approximations based on minimiz-
+dataset contains a social trust network) shows that our meth-     ing the sum-squared errors can be easily solved using Sin-
+ods outperform other state-of-the-art algorithms.                 gular Value Decomposition (SVD), and a simple and effi-
+   The remainder of this paper is organized as follows. In        cient Expectation Maximization (EM) algorithm for solving
+Section 2, we provide an overview of several major approaches     weighted low-rank approximation is proposed in [34]. In [35],
+for recommender systems and some related work. Section 3          Srebro et al. proposed a matrix factorization method to
+describes the problem we study in this paper. Section 4 de-       constrain the norms of U and V instead of their dimension-
+tails the concept of low-rank matrix factorization. The so-       ality. Salakhutdinov et al. presented a probabilistic linear
+cial regularization framework is presented in Section 5. The      model with Gaussian observation noise in [31]. In [30], the
+results of an empirical analysis are presented in Section 6,      Gaussian-Wishart priors are placed on the user and item
+followed by the conclusion and future work in Section 7.          hyperparameters.
+
+2. RELATED WORK                                                   2.2    Trust-aware Recommender Systems
+  In this section, we review several major approaches to rec-        Traditional recommender systems have been well stud-
+ommender systems, including (1) traditional recommender           ied and developed both in academia and in industry, but
+systems which are mainly based on collaborative filtering         they are all based on the assumption that users are inde-
+techniques, (2) trust-aware recommender systems which have        pendent and identically distributed, and ignore the relation-
+drawn lots of attention recently, and (3) social recommender      ships among users. Based on this intuition, many researchers
+systems which we study in this paper.                             have recently started to analyze trust-based recommender
+                                                                  systems [2, 22, 23, 24, 25, 27].
+2.1 Traditional Recommender Systems                                  Bedi et al. in [2] proposed a trust-based recommender
+  As mentioned in [10], one of the most commonly-used and         system for the Semantic Web; this system runs on a server
+successfully-deployed recommendation approaches is collab-        with the knowledge distributed over the network in the form
+orative filtering. In the field of collaborative filtering, two   of ontologies, and employs the Web of trust to generate the
+types of methods are widely studied: neighborhood-based           recommendations. In [24], a trust-aware method for recom-
+            (a) Real World Social Recommendation           (b) Social Network        (c) User-Item Rating Matrix
+
+                                                   Figure 1: A Toy Example
+
+
+
+mender system is proposed. In this work, the collaborative             The concept“Social Recommender Systems”we mentioned
+filtering process is informed by the reputation of users, which     in this paper is defined as using social friends network to im-
+is computed by propagating trust. Trust values are com-             prove recommender systems. There are also a few related
+puted in addition to similarity measures between users. The         work in the literature [7, 18, 23, 37] which studies social
+experiments on a large real dataset show that this work in-         recommendation problems. However, there are some disad-
+creases the coverage (number of ratings that are predictable)       vantages of previous work. Although the method proposed
+while not reducing the accuracy (the error of predictions).         in [37] is called “social recommendation”, it essentially does
+In [27], two trust-aware methods are proposed to improve            not utilize any social network information. It only explores
+standard collaborative filtering methods. The experimen-            the similar users to generate recommendations. In [23], the
+tal analysis shows that these trust information can help in-        proposed social recommendation method is actually a trust-
+crease recommendation accuracy. In recent work proposed             aware method since it utilizes trust information in the ex-
+in [23], Ma et al. developed a factor analysis method based         perimental analysis. The approaches proposed in [7, 18]
+on the probabilistic graphical model, which fuses the user-         only either utilize very simple heuristics in making recom-
+item matrix with the users’ social trust networks by shar-          mendations or use neighborhood-based method similar with
+ing a common latent low-dimensional user feature matrix.            the approach proposed in [24] to generate social recommen-
+The experimental analysis shows that this method gener-             dations. Hence, the social recommendation problem is not
+ates better recommendations than the traditional collabora-         well studied in previous work. In this paper, we systemati-
+tive filtering algorithms. The disadvantage of this work is         cally analyze the social recommendation problem based on
+that it lacks physical interpretations, which does not reflect      matrix factorization framework. We also elaborate the de-
+the real world recommendation process. Hence, in order to           tailed differences between social recommender systems and
+model trust-aware recommender systems more realistically,           trust-aware recommender systems.
+in [22], the authors interpret one user’s final rating decision
+as the balance between this user’s own taste and his/her
+trusted users’ favors. Finally, an ensemble probabilistic ma-
+                                                                    3.    PROBLEM DEFINITION
+trix factorization method is proposed to interpret this intu-          The problem we study in this paper is different from tradi-
+ition. The experimental results illustrate that this approach       tional recommender systems since the latter normally only
+can better model the problem.                                       considers the user-item rating matrix. In this paper, we
+   The trust-aware recommender systems open a new direc-            will also incorporate users’ social network information to im-
+tion in the research of recommender systems. However, as            prove recommender systems. Figure 1(a) shows the social
+analyzed in Section 1, they have several inherent limitations.      process of recommendation in the real world. Actually, this
+                                                                    scenario includes two central elements of social recommen-
+                                                                    dation: the friends network and the favors of these friends,
+2.3 Social Recommender Systems                                      which can essentially be modeled by the examples of social
+   How to utilize social network information has been exten-        network graph in Figure 1(b) and user-item matrix in Fig-
+sively studied in many research tasks. In [20], in order to pre-    ure 1(c), respectively.
+dict review quality, Lu et al. proposed a generic framework            In this toy example, totally, there are 5 users (from u1
+for incorporating social context information (about authors’        to u5 ) and 5 items (from v1 to v5 ) with user social rela-
+identities and social networks) by adding regularization con-       tions (edges). Each edge represents the social connection
+straints to the text-based predictor. The experimental re-          between two users. Normally, the edges in social friend net-
+sults show that incorporating social contextual information         work are bidirectional. This is different with social trust net-
+can help improve the accuracy of review quality prediction          work since user u1 trusts user u2 does not necessary mean
+especially when the available training data is sparse. In [26],     user u2 should trust user u1 . Typically, each user also rates
+Mei et al. proposed a method combines topic modeling and            some items on a 5-point integer scale to express the extent
+social network analysis, and leveraged the power of both sta-       of the favor of each item (normally, 1, 2, 3, 4 and 5 represent
+tistical topic models and discrete regularization. The pro-         “hate”, “don’t like”, “neutral”, “like” and “love”, respectively).
+posed method can be applied to a wide range of text mining             The problem we study in this paper is how to effectively
+problems such as author-topic analysis, community discov-           and efficiently predict the missing values of the user-item
+ery, and spatial text mining.                                       matrix by employing these different data sources.
+4. LOW-RANK MATRIX FACTORIZATION                                        our first social recommendation model based on matrix fac-
+   An efficient and effective approach to recommender sys-              torization technique,
+tems is to factorize the user-item rating matrix, and uti-                                                m   n
+                                                                                                     1 XX
+lize the factorized user-specific and item-specific matrices to           min L1 (R, U, V )    =               Iij (Rij − UiT Vj )2
+make further missing data prediction [28, 30, 31, 39]. The                U,V                        2 i=1 j=1
+premise behind a low-dimensional factor model is that there                                               m
+                                                                                                     αX           1                     X
+is only a small number of factors influencing the preferences,                                 +           kUi − +                              Uf k2F
+and that a user’s preference vector is determined by how                                             2 i=1      |F (i)|
+                                                                                                                                   f ∈F + (i)
+each factor applies to that user [28].                                                               λ1          λ2
+   In this paper, we consider an m × n rating matrix R de-                                     +        kU k2F +    kV k2F ,                         (5)
+                                                                                                     2           2
+scribing m users’ numerical ratings on n items. A low-rank
+matrix factorization approach seeks to approximate the rat-             where α > 0, F + (i) is the set of friends of user ui , and
+ing matrix R by a multiplication of l-rank factors,                     |F + (i)| denotes the number of friends in the set F + (i). Ac-
+                                                                        tually, we use the notation F + (i) to denote ui ’s outlink
+                            R ≈ U T V,                           (1)    friends, and use the notation F − (i) to represent ui ’s in-
+where U ∈ R   l×m
+                   and V ∈ R     l×n
+                                  with l < min(m, n). Since             link friends. In some networks, like the social network in
+in the real world, each user only rates a very small portion            Facebook, F + (i) equals to F − (i) since if ui is in uf ’s friend
+of items, the matrix R is usually extremely sparse.                     list then uf must be in ui ’s friend list. However, in some
+   Traditionally, the Singular Value Decomposition (SVD)                other networks, like trust network in Epinions, F + (i) does
+method is utilized to approximate a rating matrix R by min-             not equal to F − (i) since ui trusts uf does not indicate that
+imizing                                                                 uf should also trust ui .
+                                                                           In the above objective function, we impose a social regu-
+                         1                                              larization term
+                           ||R − U T V ||2F ,                    (2)
+                         2                                                               m
+                                                                                      αX           1                X
+where || · ||2F denotes the Frobenius norm. However, due to                                 kUi − +                            Uf k2F                (6)
+                                                                                      2 i=1      |F (i)|
+the reason that R contains a large number of missing values,                                                      f ∈F + (i)
+we only need to factorize the observed ratings in matrix R.
+Hence, we change Equation 2 to                                          to minimize the tastes between user ui and ui ’s friends.
+                                                                        More specifically, if user ui ’s friend list is F + (i), then we
+                        m    n
+                     1 XX                                               could assume that ui ’s taste Ui (feature vector) should be
+                 min           Iij (Rij − UiT Vj )2 ,            (3)    close to the                                            +
+                 U,V 2                                                              P average tastes of all the friends in F (i), which
+                       i=1 j=1
+                                                                        is |F +1(i)| f ∈F + (i) Uf .
+where Iij is the indicator function that is equal to 1 if user             This social regularization term makes an assumption that
+ui rated item vj and equal to 0 otherwise. In order to avoid            every user’s taste is close to the average taste of this user’s
+overfitting, two regularization terms are added into Equa-              friends. However, this may not always be true in the real
+tion 3. Hence we have                                                   world. For example, in Facebook, it is very normal that
+         m   n                                                          one user may have hundreds or even thousands of friends.
+     1 XX                             λ1            λ2
+ min           Iij (Rij − UiT Vj )2 +    ||U ||2F +    ||V ||2F , (4)   Among all of these friends, some friends may have similar
+ U,V 2                                2             2
+       i=1 j=1                                                          tastes with this user, while some other friends may have
+                                                                        totally different tastes. Hence, a more realistic model should
+where λ1 , λ2 > 0. The optimization problem in Equation 4               treat all friends differently based on how similar they are.
+minimizes the sum-of-squared-errors objective function with             We thus change the social regularization term in Equation 6
+quadratic regularization terms. Gradient based approaches               to
+can be applied to find a local minimum. It also contains                               m
+                                                                                                  P
+a nice probabilistic interpretation with Gaussian observa-                          αX               f ∈F + (i) Sim(i, f ) × Uf 2
+                                                                                          kUi −      P                         kF ,   (7)
+tion noise, which is detailed in [31]. The above algorithm is                       2 i=1               f ∈F + (i) Sim(i, f )
+perhaps one of the most popular methods in collaborative
+filtering.                                                              where Sim(i, f ) ∈ [0, 1] is the similarity function to indicate
+                                                                        the similarity between user ui and user uf . Hence, we have
+                                                                        the objective function
+5. SOCIAL REGULARIZATION
+                                                                                                 m    n
+  In this section, we will systematically interpret how to                                 1 XX
+                                                                        min L1 (R, U, V ) =          Iij (Rij − UiT Vj )2
+model social network information as regularization terms to             U,V                2 i=1 j=1
+constrain the matrix factorization framework. Section 5.1                                     m
+                                                                                                          P
+will detail the average-based regularization method while                                  αX               f ∈F + (i) Sim(i, f ) × Uf 2
+                                                                                         +       kUi −      P                         kF ,
+Section 5.2 introduces the individual-based regularization                                 2 i=1               f ∈F + (i) Sim(i, f )
+approach.
+                                                                                              λ1          λ2
+                                                                                         +       kU k2F +    kV k2F .                                    (8)
+5.1 Model 1: Average-based Regularization                                                     2           2
+   As mentioned in Section 1, we always turn to our friends                The similarity function Sim(i, f ) allows the social regu-
+for movie, music or book recommendations in the real world              larization term to treat users’ friends differently. If user ui
+since we believe the tastes of our friends. Sometimes, in or-           and user uf are very similar, say Sim(i, f ) = 0.95, then
+der to make a decision, we will consult lots of our friends for         user uf should contribute more in the average taste of ui ’s
+valuable suggestions. Based on this intuition, we propose               friends. On the other hand, if these two users are dissimilar,
+say Sim(i, f ) = 0.1, then uf should contribute less. The                                  performing gradient descent in latent feature vectors Ui and
+details on how to calculate the values of similarity function                              Vj ,
+Sim(i, f ) will be explained in Section 5.3.                                                                        n
+                                                                                                      ∂L2           X
+   A local minimum of the objective function given by Equa-                                                   =            Iij (UiT Vj − Rij )Vj + λ1 Ui
+tion 8 can be found by performing gradient descent in feature                                         ∂Ui           j=1
+vectors Ui and Vj ,                                                                                                        X
+          n
+                                                                                                              +     β                Sim(i, f )(Ui − Uf )
+ ∂L1      X                                                                                                             f ∈F + (i)
+     =    Iij (UiT Vj − Rij )Vj + λ1 Ui                                                                                    X
+ ∂Ui j=1
+                                                                                                              +     β                Sim(i, g)(Ui − Ug ),
+               P
+                  f ∈F + (i) Sim(i, f ) × Uf                                                                            g∈F − (i)
+     + α(Ui −      P                         )                                                                      m
+                      f ∈F + (i) Sim(i, f )                                                           ∂L2           X
+                                                  P                                                           =            Iij (UiT Vj − Rij )Ui + λ2 Vj .                  (12)
+                                                      f ∈F + (g)
+                                                                   Sim(g,f )×Uf                       ∂Vj
+              X         −Sim(i, g)(Ug −               P
+                                                                       Sim(g,f )
+                                                                                   )                                i=1
+                                                          f ∈F + (g)
+       +α                        P                                                     ,
+            g∈F − (i)                    f ∈F + (g)    Sim(g, f )                          5.3     Similarity Function
+        m                                                                                    In Section 5.1 and Section 5.2, the proposed two social
+ ∂L1 X                                                                                     regularization terms require the knowledge of similarities be-
+     =     Iij (UiT Vj − Rij )Ui + λ2 Vj .                                          (9)
+ ∂Vj   i=1                                                                                 tween users. Since we have the rating information of all the
+                                                                                           users, the evaluation of similarities between two users can
+5.2 Model 2: Individual-based Regularization                                               be calculated by measuring the issued ratings of these two
+   The first model we propose imposes a social regulariza-                                 users. There are two very popular methods we can borrow
+tion term to constrain user ui ’s taste with the average taste                             in the literature, which are Vector Space Similarity (VSS)
+of his/her friends. However, this approach is insensitive to                               and Pearson Correlation Coefficient (PCC) [4]. VSS is em-
+those users whose friends have diverse tastes. This will cause                             ployed to define the similarity between two users i and f
+information loss problem, which will result in inaccurate                                  based on the items they rated in common:
+modeling of feature vector Ui . Hence, in order to tackle                                                              X
+                                                                                                                               Rij · Rf j
+this problem, we propose another social regularization term
+                                                                                                                           j∈I(i)∩I(f )
+to impose constraints between one user and their friends                                         Sim(i, f ) = s                              s                          ,   (13)
+                                                                                                                        X                           X
+individually:                                                                                                                         2
+                                                                                                                                     Rij ·                      Rf2 j
+                  m                                                                                               j∈I(i)∩I(f )                   j∈I(i)∩I(f )
+               βX         X
+                                     Sim(i, f )kUi − Uf k2F ,                      (10)
+               2 i=1                                                                       where j belongs to the subset of items which user i and user
+                        f ∈F + (i)
+                                                                                           f both rated. Rij is the rate user i gave item j. From the
+where β > 0, and Sim(i, f ) is the same similarity function                                above definition, we can see that VSS similarity in Sim(i, f )
+we use in Equation 8, which will be detailed in Section 5.3.                               is within the range [0, 1], and a larger value means users i
+A small value of Sim(i, f ) indicates that the distance be-                                and f are more similar.
+tween feature vectors Ui and Uf should be larger, while a                                     Actually, the similarity calculation in VSS does not con-
+large value tells that the distance between the feature vec-                               sider that different users may have different rating styles.
+tors should be smaller.                                                                    Some users may potentially give a higher ratings to all the
+  Thus, our second social recommendation model can be                                      products while some other users probably tend to issue lower
+formulated as:                                                                             ratings. Hence, PCC is proposed to solve this problem:
+                                     m    n                                                                              X
+                               1 XX
+ min L2 (R, U, V )       =               Iij (Rij − UiT Vj )2                                                                        (Rij − Ri ) · (Rf j − Rf )
+ U,V                           2 i=1 j=1                                                                           j∈I(i)∩I(f )
+                                                                                           Sim(i, f ) = s       X                            s        X                            ,
+                                     m
+                               βX             X                                                                            (Rij − Ri )2 ·                        (Rf j − Rf )2
+                         +                            Sim(i, f )kUi − Uf k2F                                j∈I(i)∩I(f )                          j∈I(i)∩I(f )
+                               2 i=1
+                                         f ∈F + (i)                                                                                                                         (14)
+                         + λ1 kU k2F + λ2 kV k2F .                                 (11)    where Ri represents the average rate of user i. From this
+                                                                                           definition, user similarity Sim(i, f ) is ranging from [−1, 1],
+  Another advantage of this approach is that it indirectly                                 and a larger value means users i and f are more similar.
+models the propagation of tastes. More specifically, if user                               For consistency with VSS similarities, we employ a map-
+ui has a friend uf and user uf has a friend ug (suppose ui                                 ping function f (x) = (x + 1)/2 to bound the range of PCC
+and ug are not friends), we actually indirectly minimize the                               similarities into [0, 1].
+distance between feature vectors Ui and Ug when we are
+minimizing the distances                                                                   5.4     Extensions
+       Sim(i, f )||Ui − Uf ||2F       and Sim(f, g)||Uf − Ug ||2F .                           Our proposed method is quite general, and it can be eas-
+                                                                                           ily extended to incorporate other contextual information,
+The propagation of tastes will reach a harmonic status when                                including social tags issued by users, movie genres, user de-
+the values of the objective function converge in the learning                              mographic information, etc. By taking advantages of these
+phase.                                                                                     information, we can use Cosine similarity of other similarity
+   Similar to the first model, a local minimum of the ob-                                  calculation methods to compute the affinities between users
+jective function given by Equation 11 can also be found by                                 or items. Then we can plug in those similar users or items
+Table 1: Statistics of User-Item Matrix of Douban                 Table 3: Statistics of User-Item Matrix of Epinions
+             Statistics        User   Item                                       Statistics       User Item
+       Min. Num. of Ratings     1       1                                  Max. Num. of Ratings 1960 7082
+       Max. Num. of Ratings 6,328 49,504                                   Avg. Num. of Ratings 12.21 7.56
+       Avg. Num. of Ratings 129.98 287.51
+
+                                                                    Table 4: Statistics of Trust Network of Epinions
+    Table 2: Statistics of Friend Network of Douban                   Statistics  Trust per User Be Trusted per User
+                Statistics  Friends per User                         Max. Num.         1763             2443
+               Max. Num.          986                                Avg. Num.         9.91             9.91
+               Avg. Num.         13.07
+
+                                                                  purchase or they can join for free and begin writing reviews
+into our social regularization framework to further improve       that may earn them reward and recognition. To post a re-
+the performance of recommender systems. We do not dis-            view, members need to first rate the product or service on
+cuss the details in this paper since our focus of this paper is   a rating scale from 1 to 5 stars. Every member of Epinions
+to illustrate how to incorporate social friends information.      maintains a “trust” list which presents a network of trust re-
+                                                                  lationships between users, and a “block (distrust)” list which
+6. EXPERIMENTAL ANALYSIS                                          presents a network of distrust relationships. This network
+                                                                  is called the “Web of trust”, and is used by Epinions to re-
+  In this section, we conduct several experiments to compare      order the product reviews such that a user first sees reviews
+the recommendation qualities of our approaches with other         by users that they trust.
+state-of-the-art recommendation methods.                             The dataset we collected from Epinions consists of 51,670
+                                                                  users who have rated a total of 83,509 different items. The
+6.1 Datasets                                                      total number of ratings is 631,064. As to the user social
+   Our proposed models are quite general, and can be uti-         trust network, the total number of issued trust statements
+lized to both social recommender systems and trust-aware          is 511,799. Other statistics of this dataset are respectively
+recommender systems. Hence, in this paper, we evaluate            shown in Table 3 and Table 4.
+our methods on two datasets: one dataset contains a social
+friend network while another one has a trust network.             6.2   Metrics
+   The first data source we choose is Douban1 . Douban,
+                                                                    We use two popular metrics, the Mean Absolute Error
+launched on March 6, 2005, is a Chinese Web 2.0 Web site
+                                                                  (MAE) and the Root Mean Square Error (RMSE), to mea-
+providing user rating, review and recommendation services
+                                                                  sure the prediction quality of our proposed approach in com-
+for movies, books and music. It is also the largest online
+                                                                  parison with other collaborative filtering and trust-aware
+Chinese language book, movie and music database and one
+                                                                  recommendation methods.
+of the largest online communities in China. Users can as-
+                                                                    The metrics MAE is defined as:
+sign 5-scale integer ratings (from 1 to 5) to movies, books
+and music. It also provides Facebook-like social network-                                    1 X          bij |,
+                                                                                   M AE =          |Rij − R                (15)
+ing services, which allows users to find their friends through                               T i,j
+their email accounts. This means that most of the friends on
+Douban actually know each other offline2 . Hence, Douban is                                                           bij de-
+                                                                  where Rij denotes the rating user i gave to item j, R
+an ideal source for our research on social recommendation.        notes the rating user i gave to item j as predicted by a
+   Users on Douban can join different interesting groups.         method, and T denotes the number of tested ratings. The
+Currently, there are more than 700 groups under the “Movie”       metrics RMSE is defined as:
+subcategory. We crawled all the users in these groups, and
+used these users as seeds to further crawl their social net-                               s
+works with their movie ratings. Finally, we obtain 129,490                                     1 X          bij )2 .
+                                                                                RM SE =              (Rij − R              (16)
+unique users and 58,541 unique movies with 16,830,839 movie                                    T i,j
+ratings. As to the social friend network, the total number of
+friend links between users is 1,692,952. The statistics of the     From the definitions, we can see that a smaller MAE or
+Douban user-item rating matrix and social friend network          RMSE value means a better performance.
+are summarized in Table 1 and Table 2, respectively.
+   The second dataset we employ for evaluation is Epinions3 .     6.3   Comparisons
+Epinions is a well-known general consumer review site that          In this section, in order to show the effectiveness of our
+was established in 1999. At Epinions, visitors can read re-       proposed recommendation approaches, we compare the rec-
+views about a variety of items to help them decide on a           ommendation results of the following methods:
+1
+  http://www.douban.com
+2                                                                   1. UserMean: this method uses the mean value of every
+  At the time when we were crawling the Douban dataset,
+Douban only allowed Facebook-like relationship building ap-            user to predict the missing values.
+proach. Now Douban also supports Twitter-like following
+mechanism.                                                          2. ItemMean: this method utilizes the mean value of
+3
+  http://www.epinions.com                                              every item to predict the missing values.
+                            Table 5: Performance Comparisons (Dimensionality = 10)
+  Dataset     Training   Metrics UserMean ItemMean NMF      PMF   RSTE SR1vss SR1pcc                       SR2vss    SR2pcc
+                          MAE      0.6809   0.6288  0.5732 0.5693 0.5643
+                                                                           0.5579 0.5576                   0.5548    0.5543
+                         Improve   18.59%   11.85%  3.30% 2.63% 1.77%
+                80%
+                          RMSE     0.8480   0.7898  0.7225 0.7200 0.7144
+                                                                           0.7026 0.7022                   0.6992    0.6988
+                         Improve   17.59%   11.52%  3.28% 2.94% 2.18%
+                          MAE      0.6823   0.6300  0.5768 0.5737 0.5698
+                                                                           0.5627 0.5623                   0.5597    0.5593
+                         Improve   18.02%   11.22%  3.03% 2.51% 1.84%
+  Douban        60%
+                          RMSE     0.8505   0.7926  0.7351 0.7290 0.7207
+                                                                           0.7081 0.7078                   0.7046    0.7042
+                         Improve   17.20%   11.15%  4.20% 3.40% 2.29%
+                          MAE      0.6854   0.6317  0.5899 0.5868 0.5767
+                                                                           0.5706 0.5702                   0.5690    0.5685
+                         Improve   17.06%   10.00%  3.63% 3.12% 1.42%
+                40%
+                          RMSE     0.8567   0.7971  0.7482 0.7411 0.7295
+                                                                           0.7172 0.7169                   0.7129    0.7125
+                         Improve   16.83%   10.61%  4.77% 3.86% 2.33%
+                          MAE      0.9134   0.9768  0.8712 0.8651 0.8367
+                                                                           0.8290 0.8287                   0.8258    0.8256
+                         Improve   9.61%    15.48%  5.23% 4.57% 1.33%
+                90%
+                          RMSE     1.1688   1.2375  1.1621 1.1544 1.1094
+                                                                           1.0792 1.0790                   1.0744    1.0739
+                         Improve   8.12%    13.22%  7.59% 6.97% 3.20%
+  Epinions
+                          MAE      0.9285   0.9913  0.8951 0.8886 0.8537
+                                                                           0.8493 0.8491                   0.8447    0.8443
+                         Improve   9.07%    14.83%  5.68% 4.99% 1.10%
+                80%
+                          RMSE     1.1817   1.2584  1.1832 1.1760 1.1256
+                                                                           1.1016 1.1013                   1.0958    1.0954
+                         Improve   7.30%    12.95%  7.42% 6.85% 2.68%
+
+
+  3. NMF: this method is originally proposed in [16] for        latent features are shown in Table 5. In this table, parame-
+     image analysis. However, it is widely used in collabo-     ters α and β in our two models are set to 0.001 on Douban
+     rative filtering recently. It only uses user-item matrix   dataset and 0.01 on Epinions dataset. The standard devia-
+     for recommendations.                                       tions of the results generated of our method are all around
+                                                                0.004.
+  4. PMF: this method is proposed by Salakhutdinov and             From the results, we can observe that our methods con-
+     Minh in [31]. It also only uses user-item matrix for       sistently outperform other approaches in all the settings of
+     recommendations.                                           both datasets. The percentages in Table 5 are the improve-
+                                                                ments of our SR2PCC method over the corresponding ap-
+  5. RSTE: this approach is proposed in [22]. It is a trust-    proaches. Our methods can generate better results than
+     aware recommendation method that models one user’s         the state-of-the-art trust-aware recommendation algorithms
+     ratings as the balance between this user’s own favors      RSTE. The MAE and RMSE values generated by all the
+     and the tastes of his/her trusted users.                   methods on Epinions dataset are much higher than those on
+                                                                Douban dataset. This indicates that the Epinions trust net-
+   As we mentioned in the related work, there is no repre-      work probably contains lots of noises. Since our algorithms
+sentative or suitable social recommendation method we can       treat one user’s trusted users differently based on how simi-
+compare with in the literature. Hence, among all the above      lar they are, we can reduce some of the errors that are caused
+algorithms, we include a state-of-the-art trust-aware recom-    by those noises.
+mendation algorithms RSTE for experimental study.                  We also notice totally different characteristics of these two
+   We call our method proposed in Section 5.1 SR1, and we       datasets. We find that in Douban dataset, the method Item-
+name the approach proposed in Section 5.2 SR2. Since we         Mean outperforms UserMean while in Epinions dataset, the
+also have two different similarity functions in Section 5.3     method UserMean outperforms ItemMean. This can be ex-
+that can be used in SR1 and SR2, we thus use the name           plained by the statistics in Table 1 and Table 3. In Douban
+SR1vss to represent SR1 method with VSS similarity func-        dataset, the average number of ratings per item is much
+tion and SR1pcc to indicate SR1 method with PCC similarity      higher than the average number of ratings per user. In this
+function. The notations SR2vss and SR2pcc also have similar     case, item-based method can generally generate better re-
+meanings.                                                       sults since every item has more information to use. How-
+   For the Douban dataset, we use different training data       ever, in Epinions dataset, the average number of ratings per
+settings (80%, 60% and 40%) to test the algorithms. Train-      item is lower than the average number of ratings per user.
+ing data 80%, for example, means we randomly select 80% of      This is the possible cause of why the user-based method has
+the ratings from user-item rating matrix as the training data   better performance.
+to predict the remaining 20% of ratings. For the Epinions          Among our two models, the second model proposed in Sec-
+dataset, since the dataset is much sparser, we use 90% and      tion 5.2 outperforms the first model proposed in Section 5.1.
+80% as the training data settings. The random selection was     We also notice that PCC-based methods are slightly better
+carried out 5 times independently, and we report the aver-      than VSS-based methods, which shows that PCC similarity
+age results. In all the experiments conducted in this paper,    function is generally more accurate in capturing the similar-
+the values of λ1 and λ2 are set to a trivial value 0.001. The   ities between two users.
+experimental results using 10 dimensions to represent the
+                                          Dimensionality = 10                                                 Dimensionality = 10
+                       0.58                                                                  0.73
+                                                     40% as training data                                              40% as training data
+                                                     60% as training data                                              60% as training data
+                                                     80% as training data                    0.72                      80% as training data
+                       0.57
+
+
+
+
+                                                                                      RMSE
+                 MAE                                                                         0.71
+
+                       0.56
+                                                                                              0.7
+
+
+                       0.55 0    −1          −2        −3    −4        −5        −6
+                                                                                             0.69 0      −1      −2      −3    −4     −5      −6
+                          10    10         10      10    10       10        10                  10     10      10      10    10     10     10
+                                                Parameter β                                                         Parameter β
+                                 (a) Douban (MAE)                                                       (b) Douban (RMSE)
+
+                                          Dimensionality = 10                                                 Dimensionality = 10
+                       0.87                                                                  1.12
+                                                     80% as training data                                             80% as training data
+                                                     90% as training data                                             90% as training data
+                       0.86                                                                  1.11
+
+                       0.85                                                                   1.1
+                                                                                      RMSE
+                 MAE
+
+
+
+
+                       0.84                                                                  1.09
+
+                       0.83                                                                  1.08
+
+                       0.82 0                                                                1.07 0  −1   −2   −3     −4   −5   −6
+                                     −1         −2     −3    −4     −5       −6
+                          10    10         10   10    10          10        10                  10 10   10   10   10     10   10
+                                             Parameter β                                                  Parameter β
+                                (c) Epinions (MAE)                                                      (d) Epinions (RMSE)
+
+                                 Figure 2: Impact of Parameter β (Dimensionality = 10)
+
+
+6.4 Impact of Parameters α and β                                                         a certain threshold like 0.01 on Epinions dataset, the MAE
+  In our methods proposed in this paper, the parameters α                                and RMSE values increase (prediction accuracy decreases)
+and β play very important roles. They control how much                                   with further increase of the value of β. The existence of
+our methods should incorporate the information of the social                             the yielding point confirms with the intuition that purely
+network. In the extreme case, if we use a very small value of                            using the user-item rating matrix or purely using the social
+α or β, we only mine the user-item rating matrix for matrix                              network information for recommendations cannot generate
+factorization, and simply employ users’ own tastes in making                             better performance than appropriately integrating these two
+recommendations. On the other side, if we employ a very                                  sources together.
+large value of α or β, the social network information will
+dominate the learning processes. In many cases, we do not
+                                                                                         6.5          Impact of Similarity Functions
+want to set α and β to these extreme values since they will                                 The similarity function Sim(i, f ) measures how similar
+potentially hurt the recommendation performance. In this                                 users ui and uf are. It can help distinguish friends with dif-
+section, we analyze how the changes of α and β can affect                                ferent tastes. In this paper, we employ two popular similar-
+the final recommendation accuracy.                                                       ity functions: PCC and VSS. In order to examine how much
+  The impact of α generally shares the same trend as the                                 the similarity function Sim(i, f ) contributes to the whole
+impact of β. Hence we only illustrate the results of β here                              social regularization framework, we also conduct an experi-
+due to the space limitation. Figure 2 shows the impacts                                  mental analysis on some special similarity settings. We are
+of β on MAE and RMSE in our second model. We ob-                                         especially interested in two cases:
+serve that the value of β impacts the recommendation re-
+                                                                                              1. What is the performance of our social regularization
+sults significantly, which demonstrates that incorporating
+                                                                                                 framework if we discard the similarity calculation func-
+the social network information greatly improves the recom-
+                                                                                                 tion Sim(i, f )? This case is also equivalent to setting
+mendation accuracy. From the results, we can see that no
+                                                                                                 all the similarities between friends to 1.
+matter using which dataset and which training data setting,
+as β increases, the MAE and RMSE values decrease (pre-                                        2. What if we assign a random similarity to any pair of
+diction accuracy increases) at first, but when β goes below                                      friendship?
+                                  Table 6: Similarity Analysis (Dimensionality = 10)
+                                                          SR2       SR2
+                            Dataset Training Metrics                        SR2vss SR2pcc
+                                                         Sim=1 Sim=Ran
+                                                 MAE     0.5579    0.5592   0.5548 0.5543
+                                        80%
+                                                RMSE     0.7034    0.7047   0.6992 0.6988
+                                                 MAE     0.5631    0.5643   0.5597 0.5593
+                            Douban      60%
+                                                RMSE     0.7083    0.7098   0.7046 0.7042
+                                                 MAE     0.5724    0.5737   0.5690 0.5685
+                                        40%
+                                                RMSE     0.7195    0.7209   0.7129 0.7125
+                                                 MAE     0.8324    0.8345   0.8258 0.8256
+                                        90%
+                                                RMSE     1.0794    1.0809   1.0744 1.0739
+                            Epinions
+                                                 MAE     0.8511    0.8530   0.8447 0.8443
+                                        80%
+                                                RMSE     1.1002    1.1018   1.0958 1.0954
+
+
+   We evaluate the results on our second social regulariza-      ignoring the item side. Actually, if we can find some cor-
+tion model SR2, and the comparison is shown in Table 6. In       relations between the items, we can also incorporate item
+this table, Sim=1 means we set all the similarities between      regularization terms into our framework to further improve
+friends to 1 while Sim=Ran indicates that all the similarities   the prediction accuracy. We can achieve this if we have so-
+are replaced by random values within the range [0,1]. We         cial tagging data in the recommender systems. The tags
+can see that SR2 with these two settings all perform worse       associated with each item can be treated as features of each
+than Simvss and Simpcc . This observation demonstrates the       item. For every item, we then find some similar items us-
+importance of similarity function Sim(i, f ). We cannot ei-      ing similarity calculation functions, like Cosine method. Fi-
+ther discard this function from our framework or simply use      nally, these similar items can be added as item regularization
+some random values to represent the friend relationships.        terms in our matrix factorization framework. As analyzed
+                                                                 in Section 5.4, we can further incorporate more contextual
+                                                                 information to improve recommender systems if we have suf-
+7. CONCLUSION AND FUTURE WORK                                    ficient data.
+   In this paper, we focus on the social recommendation             As the rapid growth of online social network sites contin-
+problem which is rarely studied in the literature before.        ues, we believe the social-based research will become more
+Based on the intuition that users’ social friend information     and more popular and important. We also plan to develop
+can help improve the prediction accuracy of recommender          similar techniques to allow one user’s friends to influence
+systems, we propose two social recommendation algorithms         this user’s search results, query suggestions. This would be
+that impose social regularization terms to constrain matrix      an interesting social search problem to explore in the future.
+factorization objective functions. The proposed methods
+are quite general since they can also be applied to solve        Acknowledgments
+the trust-aware recommendation problems. The experimen-
+tal analysis on two large real-world datasets shows that our     The work described in this paper was fully supported by
+proposed approaches indicate a promising future.                 two grants from the Research Grants Council of the Hong
+   In our proposed social regularization methods, we actu-       Kong Special Administrative Region, China (Project No.
+ally utilize all the social connections of each user. But the    CUHK4154/10E and CUHK 4152/10E) and a Google Fo-
+existence of some social connections may hurt the recom-         cused Grant Project under “Mobile 2014”. The authors also
+mendation performance. Moreover, in the real world, we           would like to thank the reviewers for their helpful comments.
+normally will not consult all our friends before making deci-
+sions. We may ask some friends for movie recommendations         8.   REFERENCES
+since these friends are experts on reviewing movies. At the
+same time, we may ask another group of friends for some           [1] D. Agarwal and B.-C. Chen. flda: matrix factorization
+other recommendation tasks. Hence, in order to model the              through latent dirichlet allocation. In Proc. of WSDM
+social recommender systems more realistically, in the future,         ’10, pages 91–100, New York, New York, USA, 2010.
+we need to design an effective algorithm to identify the most     [2] P. Bedi, H. Kaur, and S. Marwaha. Trust based
+suitable group of friends for different recommendation tasks.         recommender system for semantic web. In Proc. of
+This is a research direction worthy of further exploration,           IJCAI’07, pages 2677–2682, 2007.
+and it may need to develop a scalable and effective user          [3] R. Bell, Y. Koren, and C. Volinsky. Modeling
+clustering method.                                                    relationships at multiple scales to improve accuracy of
+   The similarity function in this paper plays as an important        large recommender systems. In Proc. of KDD ’07,
+role in distinguishing different tastes between users. Cur-           pages 95–104, San Jose, California, USA, 2007.
+rently, we only utilize the traditional PCC and VSS for sim-      [4] J. S. Breese, D. Heckerman, and C. Kadie. Empirical
+ilarity computations. However, if we have more information            analysis of predictive algorithms for collaborative
+about the users, such as the users’ clicking behaviors, pur-          filtering. In Proc. of UAI ’98, 1998.
+chasing histories or tagging records, we can design a more        [5] J. Canny. Collaborative filtering with privacy via
+complete and accurate similarity calculation function.                factor analysis. In Proc. of SIGIR ’02, pages 238–245,
+   In this paper, we only constrain user feature vectors while        Tampere, Finland, 2002.
+ [6] M. Deshpande and G. Karypis. Item-based top-n                    filtering for recommender systems. In Proceedings of
+     recommendation. ACM Transactions on Information                  CoopIS/DOA/ODBASE, pages 492–508, 2004.
+     Systems, 22(1):143–177, 2004.                               [25] P. Massa and P. Avesani. Trust-aware recommender
+ [7] I. Guy, N. Zwerdling, D. Carmel, I. Ronen, E. Uziel,             systems. In Proc. of RecSys ’07, pages 17–24,
+     S. Yogev, and S. Ofek-Koifman. Personalized                      Minneapolis, MN, USA, 2007.
+     recommendation of social software items based on            [26] Q. Mei, D. Cai, D. Zhang, and C. Zhai. Topic
+     social relations. In Proc. of RecSys ’09, pages 53–60,           modeling with network regularization. In Proc. of
+     New York, New York, USA, 2009.                                   WWW ’08, pages 101–110, Beijing, China, 2008.
+ [8] T. Hofmann. Collaborative filtering via gaussian            [27] J. O’Donovan and B. Smyth. Trust in recommender
+     probabilistic latent semantic analysis. In Proc. of              systems. In Proc. of IUI ’05, pages 167–174, San
+     SIGIR ’03, pages 259–266, Toronto, Canada, 2003.                 Diego, California, USA, 2005.
+ [9] T. Hofmann. Latent semantic models for collaborative        [28] J. D. M. Rennie and N. Srebro. Fast maximum margin
+     filtering. ACM Transactions on Information Systems,              matrix factorization for collaborative prediction. In
+     22(1):89–115, 2004.                                              Proc. of ICML ’05, 2005.
+[10] Z. Huang, H. Chen, and D. Zeng. Applying associative        [29] P. Resnick, N. Iacovou, M. Suchak, P. Bergstrom, and
+     retrieval techniques to alleviate the sparsity problem           J. Riedl. Grouplens: An open architecture for
+     in collaborative filtering. ACM Trans. Inf. Syst.,               collaborative filtering of netnews. In Proc. of CSCW
+     22(1):116–142, 2004.                                             ’94, 1994.
+[11] M. Jahrer, A. Töscher, and R. Legenstein. Combining        [30] R. Salakhutdinov and A. Mnih. Bayesian probabilistic
+     predictions for accurate recommender systems. In                 matrix factorization using markov chain monte carlo.
+     Proc. of KDD ’10, pages 693–702, Washington, DC,                 In Proc. of ICML ’08, 2008.
+     USA, 2010.                                                  [31] R. Salakhutdinov and A. Mnih. Probabilistic matrix
+[12] R. Jin, J. Y. Chai, and L. Si. An automatic weighting            factorization. In Advances in Neural Information
+     scheme for collaborative filtering. In Proc. of SIGIR            Processing Systems, volume 20, 2008.
+     ’04, pages 337–344, Sheffield, United Kingdom, 2004.        [32] B. Sarwar, G. Karypis, J. Konstan, and J. Reidl.
+[13] A. Kohrs and B. Merialdo. Clustering for collaborative           Item-based collaborative filtering recommendation
+     filtering applications. In Proceedings of CIMCA, 1999.           algorithms. In Proc. of WWW ’01, pages 285–295,
+[14] Y. Koren. Factorization meets the neighborhood: a                Hong Kong, Hong Kong, 2001.
+     multifaceted collaborative filtering model. In Proc. of     [33] L. Si and R. Jin. Flexible mixture model for
+     KDD ’08, pages 426–434, Las Vegas, Nevada, USA,                  collaborative filtering. In Proc. of ICML ’03, 2003.
+     2008.                                                       [34] N. Srebro and T. Jaakkola. Weighted low-rank
+[15] Y. Koren. Collaborative filtering with temporal                  approximations. In Proc. of ICML ’03, pages 720–727,
+     dynamics. In Proc. of KDD ’09, pages 447–456, Paris,             2003.
+     France, 2009.                                               [35] N. Srebro, J. D. M. Rennie, and T. Jaakkola.
+[16] D. D. Lee and H. S. Seung. Learning the parts of                 Maximum-margin matrix factorization. In NIPS, 2004.
+     objects by non-negative matrix factorization. Nature,       [36] J. Wang, A. P. de Vries, and M. J. T. Reinders.
+     401(6755):788–791, Oct. 1999.                                    Unifying user-based and item-based collaborative
+[17] G. Linden, B. Smith, and J. York. Amazon.com                     filtering approaches by similarity fusion. In Proc. of
+     recommendations: Item-to-item collaborative filtering.           SIGIR ’06, pages 501–508, Seattle, Washington, USA,
+     IEEE Internet Computing, pages 76–80, Jan/Feb 2003.              2006.
+[18] F. Liu and H. J. Lee. Use of social network information     [37] X. Xin, I. King, H. Deng, and M. R. Lyu. A social
+     to enhance collaborative filtering performance. Expert           recommendation framework based on multi-scale
+     Syst. Appl., 37(7):4772–4778, 2010.                              continuous conditional random fields. In Proc. of
+[19] N. N. Liu and Q. Yang. Eigenrank: a ranking-oriented             CIKM ’09, pages 1247–1256, Hong Kong, China, 2009.
+     approach to collaborative filtering. In Proc. of SIGIR      [38] G.-R. Xue, C. Lin, Q. Yang, W. Xi, H.-J. Zeng, Y. Yu,
+     ’08, pages 83–90, Singapore, Singapore, 2008.                    and Z. Chen. Scalable collaborative filtering using
+[20] Y. Lu, P. Tsaparas, A. Ntoulas, and L. Polanyi.                  cluster-based smoothing. In Proc. of SIGIR ’05, pages
+     Exploiting social context for review quality prediction.         114–121, Salvador, Brazil, 2005.
+     In Proc. of WWW ’10, pages 691–700, Raleigh, North          [39] K. Yu, S. Zhu, J. Lafferty, and Y. Gong. Fast
+     Carolina, USA, 2010.                                             nonparametric matrix factorization for large-scale
+[21] H. Ma, I. King, and M. R. Lyu. Effective missing data            collaborative filtering. In Proc. of SIGIR ’09, pages
+     prediction for collaborative filtering. In Proc. of SIGIR        211–218, Boston, MA, USA, 2009.
+     ’07, pages 39–46, Amsterdam, The Netherlands, 2007.         [40] Y. Zhang and J. Koren. Efficient bayesian hierarchical
+[22] H. Ma, I. King, and M. R. Lyu. Learning to                       user modeling for recommendation system. In Proc. of
+     recommend with social trust ensemble. In Proc. of                SIGIR ’07, pages 47–54, Amsterdam, The
+     SIGIR ’09, pages 203–210, Boston, MA, USA, 2009.                 Netherlands, 2007.
+[23] H. Ma, H. Yang, M. R. Lyu, and I. King. SoRec:              [41] S. Zhu, K. Yu, and Y. Gong. Stochastic relational
+     Social recommendation using probabilistic matrix                 models for large-scale dyadic data using mcmc. In
+     factorization. In Proc. of CIKM ’08, pages 931–940,              Advances in Neural Information Processing Systems,
+     Napa Valley, USA, 2008.                                          volume 21, 2009.
+[24] P. Massa and P. Avesani. Trust-aware collaborative
+

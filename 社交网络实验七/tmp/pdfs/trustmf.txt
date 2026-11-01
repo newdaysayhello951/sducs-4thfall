@@ -1,0 +1,536 @@
+                              Proceedings of the Twenty-Third International Joint Conference on Artificial Intelligence
+
+
+
+
+                                   Social Collaborative Filtering by Trust
+
+            Bo Yang      Yu Lei     Dayou Liu                                                      Jiming Liu
+       School of Computer Science and Technology                                          Department of Computer Science
+                 Jilin University, China                                               Hong Kong Baptist University, Hong Kong
+      {ybo, liudy}@jlu.edu.cn, leiyu11@mails.jlu.edu.cn                                      jiming@comp.hkbu.edu.hk
+
+
+                         Abstract                                           Granovetter, 1973; Kautz et al., 1997], which implies that the
+                                                                            underlying social networks of users might play a
+    To accurately and actively provide users with their
+                                                                            fundamental role in helping them filter information. Trust
+    potentially interested information or services is the
+                                                                            relationship is one of the most important types of social
+    main task of a recommender system. Collaborative
+                                                                            information in that we are more likely to accept viewpoints
+    filtering is one of the most widely adopted
+                                                                            from whom we trust [Sinha and Swearingen, 2001; Ziegler
+    recommender algorithms, whereas it is suffering the
+                                                                            and Lausen, 2004]. Thus, it has become a big opportunity as
+    issues of data sparsity and cold start that will
+    severely degrade quality of recommendations. To                        well as a big challenge to improve recommendation quality
+                                                                            by sufficiently and effectively utilizing available trust
+    address such issues, this article proposes a novel
+                                                                            information. Recently, several model-based methods have
+    method, trying to improve the performance of
+                                                                            been proposed for social recommendation [Ma et al., 2011;
+    collaborative filtering recommendation by means of
+                                                                            Jamali and Ester, 2010; Ma et al., 2009; Ma et al., 2008].
+    elaborately integrating twofold sparse information,
+    the conventional rating data given by users and the                    Most of them are based on the technique of fast matrix
+                                                                            factorization, which firstly map users and items into
+    social trust network among the same users. It is a
+                                                                            low-dimensional feature spaces simultaneously, and then
+    model-based method adopting matrix factorization
+                                                                            train a prediction model by optimizing some objective
+    technique to map users into low-dimensional latent
+                                                                            functions over rating and trust data.
+    feature spaces in terms of their trust relationship,
+                                                                               Distinct from above model-based methods and memory-
+    aiming to reflect users’ reciprocal influence on their
+                                                                            based methods such as [Yang et al., 2012], this work studies
+    own opinions more reasonably. The validations
+                                                                            a new strategy of fusing rating and trust data by sufficiently
+    against a real-world dataset show that the proposed
+                                                                            exploring how the observed ratings are generated under the
+    method performs much better than state-of-the-art
+                                                                            influence of trust behaviors of users entangled by their trust
+    recommendation algorithms for social collaborative
+                                                                            network, rather than just simply fitting two kinds of data as
+    filtering by trust.
+                                                                            most of the existing studies do. Our work is motivated by the
+                                                                            observation that users are caught in their social network of
+1   Introduction                                                            mutuality, and whatever affects one directly also affects all
+In the literature, great efforts have been made to address the              indirectly. More specifically, when a user is rating, he/she
+task of personalized recommendation. Among existing                         will be more likely affected by the existing ratings or reviews
+techniques, collaborative filtering (CF) is relatively simple               provided by others he/she trusts, and in the same way, his/her
+and effective which has been widely used by many                            contributions (ratings or reviews) will consequently have
+commercial web sites. However, the existing CF confronts                    influence on the decisions of others who trust him/her. In
+two main challenges: data sparsity and cold start, which will               modeling this, we propose a simple but effective way to map
+greatly degenerate its performance. By data sparsity, it is                 users into two low-dimensional spaces, i.e. truster space and
+meant the available rating data are usually very sparse. Due                trustee space, by factorizing trust network according to the
+to cold start, CF is hardly able to give satisfactory                       directional properties of trust. The vectors of truster and
+recommendations to those users who rarely rated items.                      trustee in two spaces describe “to trust by reading ratings or
+   One potential way to solve these problems is by exploring                reviews” and “to be trusted by generating ratings or reviews”
+available social networks. With the rapid development of                    behaviors of a user, respectively. Suppose user A trusts user
+web 2.0 technologies, in addition to the ratings of items                   B with strength w, then w can be represented as the inner
+contributed by users, the social information of users get much              product of A’s truster vector by B’s trustee vector.
+more readily obtained than before through social networking                 Furthermore, the two spaces will be used in tandem with the
+services. It is believed that human beings usually acquire and              user space and item space obtained by factorizing rating
+disseminate information through their acquaintances such as                 matrix to construct a novel fusing model, named TrustMF, to
+friends, colleagues or partners [Resnick and Varian, 1997;                  fit both rating and trust data.
+
+
+
+
+                                                                       2747
+  We validate the performance of TrustMF and compare it                       purely mathematical perspectives like [Ma et al., 2008]
+with representative methods against one real dataset with big                 without explicitly exploring the real-world implications of
+sparsity. Results show that TrustMF performs much better,                     feature vectors. We will see later this new way of modeling
+especially in the case of cold start, than the state-of-the-art               trust value not only characterizes the directional property of
+CF methods based on both ratings and trust.                                   trust relationship in a more proper way, but also gives a better
+                                                                              interpretation on how the mutual trust among users are
+2    TrustMF: A Model-based Method                                            generated and how they affect users’ respective opinions.
+                                                                                 Provided we have only trust data, the feature matrices
+2.1 Problem Description                                                       . ∈ ℝ× and / ∈ ℝ× can be learned by minimizing the
+Suppose we have a recommender system which involves m                         following objective function:
+users and n items. Let  = [ ]× denotes the user-item                                                  
+rating matrix, where each element Rij represents the rating of                ℒ = ∑(,')∈1. /' − &'  + (‖.‖ + ‖/‖ )                (3)
+item j given by user i, which is an integer number from 1 to 5.
+Let  = {(, ):  ≠ 0} denotes the locations of observed                    2.3 The TrustMF Algorithm
+ratings in rating matrix. One wants to map users and items to                 We have performed matrix factorization just based on either
+a low-dimensional feature space. Let a d-dimension vector Ui                  rating data or trust data. In this section, we will present our
+be the user-specific latent feature vector of user i and a                    matrix factorization model to fuse both of them.
+d-dimension vector Vj be the item-specific latent feature
+vector of item j. Then we have the user feature matrix                        Truster Model
+   ∈ ℝ× and the item feature matrix  ∈ ℝ× . By                           Users of social networking such as Epinions enable to browse
+employing low-rank approximation over the observed rating                     and generate opinions (ratings or reviews) on items they are
+matrix, one can recover the unknown ratings by UTV. The                       interested and then build their respective turst nets based on
+feature matrix U and V can be learned by minimizing a loss                    such opinions. Through tangled trust ties, the opinions of an
+function as follows:                                                          individual will be affected by others and vise verse. Here we
+                                                                             first propose a truster model to characterize first aspect, that
+ℒ = ∑(,)∈   −   + (‖ ‖ + ‖‖ )                  (1)          is, how others will affect a specific user’s opinions.
+where ‖∙‖ denote the Frobenius norm, and λ is a parameter                      Note that the 2 users getting involved in rating matrix R
+which controls the model complexity to avoid over-fitting.                    and trust matrix T are the same. So, one can associate R and T
+   To further avoid over-fitting when learning parameters, a                  into one matrix factorization process by sharing a common
+so-called weighted-λ-regularization was introduced to above                   user-specific latent space. Fig. 1 shows the proposed truster
+model [Zhou et al, 2008]. It increases the penalization to the                model that is able to characterize how a user A’s ratings are
+feature vectors of users or items involving more ratings.                     affected by other users he trusts by means of BATVj.
+Correspondingly, new objective is obtained as follows:
+                                                            
+ℒ = ∑(,)∈   −   + λ ∑ ! ‖  ‖ + ∑ "# $ $ % (2)
+                                                                                                                      D
+where ! and "# denote the numbers of ratings given by
+user i and given to item j, respectively.                                                                       TAD         D affects A
+
+2.2 Matrix Factorization of the Trust Network
+Suppose we have a trust network N with m nodes, where                                                 RDj             A      BA
+nodes represent users and arcs represent directional trust
+relation among users. One can use adjacent matrix & =
+                                                                                                                          RAj =
+[&' ]× to describe the structure of N. Tik is a real number
+within the interval [0, 1], where “0” indicates user i distrusts
+k while “1” indicates user i trusts k heavily. Since user i trusts                                                    j      Vj
+user k do not always means k trusts i in the same way, the
+matrix T is not symmetric. Let * = {(, -): &' ≠ 0} denote                   Figure 1: Truster model BTV: How others affect user A’s rating on
+the locations of observed trust relations in trust network. Due               item j.
+to dissymmetrical property of trust, we map each user i of
+trust network as two distinct latent feature vectors, depicted                   In this model, we choose the truster-specific feature matrix
+by truster-specific feature vector Bi and trustee-specific                    B as the latent space commonly shared by R and T. Vector BA
+feature vector Wi, respectively. Bi and Wi characterize the                   simultaneously characterizes twofold meanings: How a user
+behaviors of “to trust others” and “to be trusted by others”,                 A trusts (or is affected by) others and how the same user rates
+respectively. Give such vectors, one can model trust value Tik                items. The item-specific latent feature vector Vj depicts how
+as the inner product of Bi and Wk. It is important to notify that,            an item j is rated by users. Putting together, the BATVj
+this way of modeling trust value is totally distinct from                     indicates how other users affect user A to rate item j, which is
+existing methods, most of which model trust value from                        the approximation of real score RAj. Therefore, one can learn
+
+
+
+
+                                                                       2748
+the feature matrics B, V and W simultaneously by minimizing                    Algorithm 1 Truster-MF
+the following objective function:                                              Input: R, T, d, λ, λT, α (learning rate)
+                                                                               1. Initialize B, V, W with small random numbers
+                                                                             2. while ℒ has not converged:
+ℒ = ∑(,)∈.  −   +   ∑(,')∈1. /' − &'  +
+                                                                                                    LM
+(‖.‖ + ‖‖ + ‖/‖ )                                         (4)          3. HI ← HI − K ∙ LH , I = N, … , O
+                                                                                                    I
+                                                                                                  LM
+                                                                               4. PQ ← PQ − K ∙ LP , Q = N, … , R
+where the parameter λT controls the proportion of effect                                            Q
+                                                                                                        LM
+between rating preference and trust relation when training                     5. ST ← ST − K ∙ LS , T = N, … , R
+                                                                                                         T
+model. In this way, one can integrate two kinds of data                        6. end while
+sources and hence obtain latent spaces B and V that can work                                                V QI ← WPXQ HI  ∙ URYZ
+                                                                               Output the predicted rating: U
+together to produce a more accurate prediction. In our
+                                                                                         Table 1: The learning algorithm of truster model
+validations, we set λT =1.
+   Since the trust value Tik is between 0 and 1, in order to
+learn parameters in a more convenient way, we map raw                          Time Complexity Analysis
+rating Rij into an interval [0, 1] by employing the function                   The time of learning a truster model is mainly taken by
+3(4) = 4/67 .Where Rmax (equal to 5 in this work) is the                     computing object function ℒ and its gradients against feature
+maximum of ratings in a recommender system. In order to fit                    vectors. The time of computing ℒ is O(td(|Ω|+|Ψ|)), where t
+data more conveniently, we adopt a logistic function                           is the required iterations, d is the dimensionality of feature
+8(4) = 1/(1 + exp(−4)) suggested by [Salakhutdinov and                         vectors, |Ω| and |Ψ| are the numbers of observed ratings and
+Mnih, 2007] to bound the inner product of latent feature                       observed trust links, respectively. The costs of computing the
+vectors into the interval [0, 1]. One can get the prediction by                gradients of ℒ against B, V, W are O(td(|Ω|+|Ψ|)), O(td|Ω|)
+8.   ∙ 67 after model training. Moreover, we                           and O(td|Ψ|), respectively. Therefore, the time complexity of
+incorporate a similar regularization approach derived from                     Truster-MF is O(td(|Ω|+|Ψ|)), linearly scaling to the
+[Zhou et al., 2008] into our model. In summary, the objective                  numbers of observed ratings and trust links.
+to be optimized in the proposed truster model is as follows:
+
+                                                             
+ℒ = ; 8(.  ) −   +   ; 8(. /' ) − &'  +
+                                                                                                                  D
+    (,)∈                        (,')∈1
+                                         
+λ ∑(<! + 2<! ) ‖. ‖ + ∑ "# $ $ + ∑' 2>? ‖/' ‖ %      (5)                              D follows A        TDA
+
+where <! and "# denote the numbers of ratings given by
+                                                                                                                  A         RDj= ?
+user i and given to item j, respectively, 2<! denotes the                                                    WA
+number of users who are trusted by user i and 2>? denotes
+the number of users who trust user -. One can minimize the                                                            RAj
+above objective function by performing the following
+gradient descents on Bi, Vj and Wk for all users and items.                                                  Vj   j
+1 Aℒ
+ ∙    = ; 8′(.  )(8.   −  )                                     Figure 2: Trustee model WTV : How others follow user A’s rating on
+2 A.                                                                          item j.
+          ∈ℛ()
+
+ +   ; 8′(. /' )(8(. /' ) − &' ) /' + λ(<! + 2<! ). ,
+       '∈ℱ()                                                                  Trustee Model
+1 Aℒ
+ ∙    = ; 8′(.  )(8.   −  ). + λ"#  ,                         Fig. 2 shows the proposed trustee model that is able to
+2 A   E                                                                      characterize how a user A’s opinions affect the decisions of
+          ∈ℛ ()
+1 Aℒ                                                                           others who trust A by means of WATVj. Distinct from truster
+ ∙    =   ; 8F . /' 8. /'  − &' . + λ2>? /' ,                    model, this time we choose the trustee-specific feature matrix
+2 A/'       E   ∈ℱ (')                                                        W as the latent space commonly shared by R and T. In trustee
+where ℛ() denotes the set of items which user i has rated,                    model, vector WA simultaneously characterizes twofold
+ℛ G ( ) denotes the set of users who have rated item j, ℱ()                   meanings: how a user A is trusted (or followed) by others and
+denotes the set of users who are trusted by user i and ℱ G (-)                 how the same user rates items. Again, the item-specific latent
+denotes the set of users who trust user k. 8F (4) =                            feature vector Vj depicts how an item j is rated by users.
+exp(−4)/(1 + exp(−4)) is the derivative of logistic                           Putting together, the WATVj indicates how other users follow
+function g(x).                                                                 user A to rate item j, which is the approximation of real score
+   As the model in Equation (5) uses truster-specific feature                  Rij as well.
+matrix B as the commonly shared user latent space, we refer                       Similarly, one can learn the feature matrices W, V and B
+to the learning algorithm as Truster-MF, and its pseudo-code                   simultaneously by minimizing the following objective:
+is given in Table 1.
+
+
+
+
+                                                                        2749
+                                                                        hand, trustee model learns user preference from their
+ℒ = ; 8(/  ) −   +  ; 8(.' / ) − &'  +
+    (,)∈                           (',)∈1
+                                                                          writtings or ratings, in which Ui is approximated by Wi,
+                                                                         implying that one will more likely generate opinions about
+   λ ∑(>! + 2>! ) ‖/ ‖ + ∑ "# $ $ + ∑' 2<? ‖.' ‖ % (6)
+                                                                          items he prefers. As a result, users are encouraged to interact
+                                                                          with the system, more social activities getting more accurate
+where >! and "# denote the numbers of ratings given by                  recommendations for them. The truster and trustee models
+user i and given to item j, respectively, 2>! denotes the                 favor those users having more browing and writing activities,
+number of users who trust user i and 2<? denotes the number               respectively. While, TrustMF tries to provide high-quality
+of users who are trusted by user k.                                       recommendations for both kinds of users.
+   As the model in Equation (6) uses trustee-specific feature
+matrix W as the commonly shared user latent space, we refer               3    Experiments and Validations
+to corresponding learning algorithm as Trustee-MF.
+                                                                          3.1 Description of the Dataset
+2.4 Synthetic Influence of Trust Propagation
+                                                                          The data used in our experiments is Epinions, containing
+Individuals will affect each other during the process of rating.
+                                                                          both ratings and trust relations as a benchmark for validating
+This point is emphasized in our work. That is to say, your                trust-based recommender methods, which is taken from the
+decision on whether or not to rate something and how to rate
+                                                                          web site www.trustlet.org/wiki/Epinions. We use it to test
+them will be based on the opinions of your trustees.
+                                                                          and compare the performance of TrustMF with up-to-date
+Meanwhile, your decisions will inevitably influence the                   model-based methods. This dataset is extremely sparse and
+choices of your trusters. Comprehensively, it is suggested
+                                                                          imbalanced containing 49,289 users and 139,738 items. The
+that the observed ratings are actually generated according to
+                                                                          total number of ratings is 664,823, and the number of trust
+the propagation of such twofold influence among users.                    relations between users is 487,183. Its density is 0.0097%
+   After independently training truster model and trustee
+                                                                          and 0.0201% in terms of ratings and trust relations,
+model, one can obtain two sets of feature matrices. Let .\
+                                                                          respectively. The statistics of it is presented in Table 2.
+and  \ be the truster-specific vector and item-specific
+vector learned by algorithm Truster-MF. Let /^ ,  ^ be the             3.2 Experimental Setup
+trustee-specific vector and item-specific vector learned by
+algorithm Trustee-MF. We suggest following synthetic                      Cross-validation
+strategy, named as TrustMF, to generate the approximation                 We use a 5-fold cross-validation for learning and testing. In
+of real rating scores.                                                    each time we randomly select 80% of data as training set and
+                                                                          the rest of 20% for test. For each experiment discussed below,
+              a       c
+                    d# Gd#a       c                                       we conduct five times and take the mean as the final result.
+           ` Gb
+_ = 8 ( ! ! ) (       )% ∙ 67                           (7)
+                             
+
+2.5 Insights into the Truster and Trustee Models                               Statistics of Rating Matrix        User            Item
+The key idea behind the proposed truster and trustee models                       Avg. Num. of Ratings            13.49           4.76
+is to construct a bridge between ratings and trust by mapping                     Max. Num. of Ratings            1023            2026
+them into the same d-dimension latent space, in which each                        Min. Num. of Ratings              0               1
+dimention characterizes one of d latent features of items.                     Statistics of Trust Network Out-degree          In-degree
+Then we have, Vj (item-specific feature vector of item j), Ui                             Average                    9.88         9.88
+(user-specific feature vector of user i), Bi (truster-specific                           Maximum                    1760         2589
+feature vector of user i) and Wi (trustee-specific feature                               Minimum                       0            0
+vector of user i) depict “what type item j is”, “what types of
+                                                                                             Table 2: Statistics of Epinions
+items user i prefers”, “what types of opinions (ratings or
+reviews) user i prefers to browse” and “what types of
+opinions user i prefers to generate” in terms of the same d               Evaluate Metrics
+latent features, respectively. Actually, browing/generating               The evaluation metrics used in our experiments are mean
+opinions exactly model how users follow/affect others. Note               absolute error (MAE) and root mean square error (RMSE)
+that, one tends to give high ratings to his preferred items and           which are defined as:
+trust those whose opinions are relevant and helpful to him.                           ∑,j − _ j                ∑,( − _ )
+Reasonably, observed ratings and trust can be approximated                    MAE =                     ,   RMSE = n
+                                                                                            k                                 k
+by measuring the coincidence of respective feature vectors in
+                                                                          where  is the rating in the test set, _ is the predicted
+terms of inner products, i.e.  ≈   and &' ≈ . /' .
+                                                                          rating, and N is the number of ratings in the test set.
+   We enable the system to learn user preference from their
+social activities. Specificially, truster model learns user               Comparison Methods
+preference from their browsing behaviors, in which Ui is                  To comparatively evaluate the performance of our proposed
+approximated by Bi, implying that one will pay more                       methods, we select seven representative CF methods as
+attentions to the opinions about items he prefers. On the other           competitors, which are given in Table 3.
+
+
+
+
+                                                                   2750
+             Methods                         Rationale                   3.3 Experimental Results
+ UserMean                           mean rating of users
+                                                                         Validation on Epinions
+ ItemMean                           mean rating of items
+                                                                         We now validate the performance of TrustMF and compare it
+ PMF[Salakhutdinov and Mnih,        matrix factorization based
+ 2007]                              upon user-item ratings
+                                                                         with its competitors on Epinions. Table 5 shows that
+                                                                         TrustMF performs the best of all. The improvements of
+ SoRec [Ma et al., 2008]
+                                                                         TrustMF against respective competitors given in the table
+ RSTE [Ma et al., 2009]             matrix factorization based           imply that our proposed truster, trustee and synthetic models
+ SocialMF [Jamali and Ester, 2010] upon both user-item                   properly catch on the influential propagation of trust on the
+ SR2PCC [Ma et al., 2011]           ratings and trust relations
+                                                                         generation of observed ratings, and hence get significant
+ TrustMF                                                                 promotion on the quality of recommendations.
+         Table 3: Representative methods to be compared
+                                                                         Validation on Cold Start Users
+                                                                         As mentioned in introduction section, cold start is one big
+             Methods         Optimal Parameters
+                                                                         challenge faced by CF methods. We now evaluate the
+           PMF             o =d =0.001                                 capabilities of addressing cold start users by respective
+           SoRec           o =d =q =0.001, r =1                      competitors. Conventionally, those who have rated five or
+           RSTE            o =d =0.001, α=0.4                          fewer ratings are seemed as cold start users [Jamali and Ester,
+           SocialMF        o =d =0.001,   =1                         2010]. 5-fold cross-validation is still used in the test but we
+           SR2PCC          s = =0.001, β=0.001                        only care about the accuracy of prediction for cold start users.
+           TrustMF         =0.001,   =1                               Table 6 shows that TrustMF performs the best once again and
+         Tabel 4: Parameter settings of respective methods               gets remarkable improvements against the other CF methods
+                                                                         with respect to addressing cold start users.
+                                                                            To further validate model-based methods against cold start
+  For all methods to be validated, we set respective optimal             users, we take users with many ratings (between 50 and 70).
+parameters either according to corresponding references or               For each user, remove all but 5 ratings, compute the latent
+based on our experiments. The main parameters of respective              space mapping based on these ratings, then evaluate the
+methods are given in Table 4. To focus on verifying models               performance on removed (unseen) ratings. The motivation is,
+and fairly comparing them, for all matrix factorization based            when one evaluates with users who only have 5 or fewer
+methods, we set the dimensionality of latent space as 5 and              ratings, the performance might be less indicative. The above
+10, respectively, and adopte the same initialization strategy,           method would allow us to evaluate prediction accuracy on 45
+which randomly initialize all involved feature matrices with a           or more held-out ratings (actually 60863 ratings of 1145
+uniform distribution within the interval [0, 1].                         users). As shown in Table 7 (d=5 in this case), TrustMF ranks
+                                                                         top once again.
+
+
+               Metrics UserMean ItemMean          PMF        SoRec    RSTE SocialMF          SR2PCC      T-r      T-e       T
+                MAE         0.9420     0.9512     0.8440     0.9197   0.8635      0.8826     0.8450    0.8329    0.8345   0.8212
+        d=5    Improve      12.8%      13.7%       2.7%      10.7%     4.9%        7.0%       2.8%      1.4%      1.6%
+                RMSE        1.2166     1.2363     1.0828     1.1510   1.1071      1.1107     1.0977    1.0729    1.0751
+                                                                                                                          1.0585
+               Improve      13.0%      14.4%       2.2%       8.0%     4.4%        4.7%       3.6%      1.3%      1.5%
+                MAE         0.9420     0.9512     0.8382     0.9152   0.8572      0.8567     0.8671    0.8267    0.8291
+                                                                                                                          0.8148
+               Improve      13.5%      14.3%       2.8%      11.0%     4.9%        4.9%       6.0%      1.4%      1.7%
+       d=10
+                RMSE        1.2166     1.2363     1.1146     1.1773   1.1483      1.1113     1.1199    1.0932    1.0970
+                                                                                                                          1.0771
+               Improve      11.5%      12.9%       3.4%       8.5%     6.2%        3.1%       3.8%      1.5%      1.8%
+           Table 5: Experimental results on Epinions (T-r, T-e, T refer to Truster-MF, Trustee-MF and TrustMF, respectively)
+
+               Metrics UserMean ItemMean          PMF        SoRec    RSTE SocialMF          SR2PCC      T-r      T-e       T
+                MAE        1.1524      0.9312     0.9145     0.9124   0.9143      1.0954     0.9250    0.9094    0.9075   0.8901
+        d=5    Improve     22.8%        4.4%       2.7%       2.4%     2.6%       18.7%       3.8%      2.1%      1.9%
+                RMSE       1.5054      1.2192     1.1412     1.1461   1.1439      1.3094     1.1888    1.1332    1.1308
+                                                                                                                          1.1089
+               Improve     26.3%        9.0%       2.8%       3.2%     3.1%       15.3%       6.7%      2.1%      1.9%
+                MAE        1.1524      0.9312     0.8531     0.8499   0.8293      1.0296     0.9833    0.8368    0.8424
+                                                                                                                          0.8260
+               Improve     28.3%       11.3%       3.2%       2.8%     0.4%       19.8%      16.0%      1.3%      1.9%
+       d=10
+                RMSE       1.5054      1.2192     1.1608     1.1717   1.1621      1.2772     1.2370    1.1306    1.1369
+                                                                                                                          1.1143
+               Improve     26.0%        8.6%       4.0%       4.9%     4.1%       12.8%       9.9%      1.4%      2.0%
+                                        Table 6: Experimental results on testing cold start users
+
+
+
+
+                                                                  2751
+                                                    d=5                                                             d=5
+                          1.1                                                          1.4      1.14
+                                         SoRec
+                                         RSTE
+                                                                                                1.12
+                            1            SocialMF                                      1.3
+                                         SR2pcc                                                   1.1
+                                         TrustMF
+
+
+
+
+                                                                                RMSE
+                    MAE
+                          0.9                                                          1.2      1.08
+                                                                                                      <6                  6-10
+                          0.8                                                          1.1
+
+
+                          0.7                                                           1
+                            <6   6-10   11-20     21-40 41-100 101-500   >500           <6     6-10        11-20    21-40 41-100 101-500   >500
+                                                 Degree                                                            Degree
+                                                  d=10                                                              d=10
+                          1.1                                                          1.4      1.18
+                                        SoRec
+                                                                                                1.16
+                                        RSTE
+                           1            SocialMF                                       1.3      1.14
+                                        SR2pcc
+                                                                                                1.12
+                                        TrustMF
+
+
+
+
+                                                                                RMSE
+                    MAE
+
+
+
+
+                          0.9                                                          1.2       1.1
+                                                                                                      <6                  6-10
+
+                          0.8                                                          1.1
+
+
+                          0.7                                                           1
+                            <6   6-10   11-20    21-40 41-100 101-500    >500           <6     6-10        11-20    21-40 41-100 101-500   >500
+                                                Degree                                                             Degree
+
+                                           Figure 3: The predict error on users with different degrees
+
+
+  The above two experiments indicate that, compared with                           strongly indicates TrustMF can utilize sparse trust data more
+current CF methods, TrustMF has demonstraed the ability to                         effectively compared with other social CF methods.
+provide high quality recommendations to cold start users.
+                                                                                   4         Conclusions
+         Methods           MAE (rank)           RMSE (rank)                        Collaborative filtering methods are facing the difficulty of
+         PMF                0.8787 (4)           1.1039 (3)                        data sparsity and cold start. Aiming at addressing them by
+         SoRec              1.0060 (6)           1.2351 (6)                        utilizing additional trust data more effectively, we have
+         RSTE               0.8763 (3)           1.1118 (4)                        proposed a novel social CF method named TrustMF, which is
+         SocialMF           0.8684 (2)           1.0960 (2)                        motivated by the heuristic that individuals will affect each
+         SR2PCC             0.8827 (5)           1.1341 (5)                        other during the process of reviewing. In properly catching
+                                                                                   on a twofold influence of trust propagation on the generation
+         TrustMF            0.8224 (1)           1.0757 (1)
+                                                                                   of observed opinions, a truster model and a trustee model
+      Table 7: Cold start testing by removing existing ratings                     have been proposed to map users into the same latent feature
+                                                                                   spaces but with different implications that can explicitly
+Validation on Users with Different Degrees                                         describe the feedback how users affect or follow the opinions
+In previous experiments, the trust link number (outboud plus                       of others. Moreover, the two models are naturally synthetized
+inbound) on average of cold start user is 5.39. In order to                        to one fusing model simultaneously fitting available ratings
+further check the capabilities of respective methods to utilize                    and trust ties. As has been verified that the TrustMF gets
+sparse trust data for recommending, we conduct a special                           remarkable improvements against the state-of-the-art social
+experiment. Distinct from previous validations focusing on                         CF methods according to the validations and comparisons on
+comparing global quality of recommendations in terms of the                        a real-world dataset. Especially, for the cold start users who
+average accuracy over all users, here we are particularly                          have few ratings or occupy only a few trust ties, TrustMF
+interested in testing the performance of respective social CF                      performs significantly better than its competitors.
+methods in regard to different categories of users. We first
+group all users into several groups according to their degrees                     Acknowledgments
+in trust network, and then calculate prediction error over each                    This work was supported in part by the National Natural
+group, respectively.                                                               Science Foundation of China under grants 60873149,
+   Fig. 3 shows following observations. The performance of                         61133011, and 61170092, the Program for New Century
+all five compared methods varies at different extent with                          Excellent Talents in University under grant NCET-11-0204,
+respect to different groups. TrustMF performs quite stably                         Hong Kong Research Grants Council under grant
+and demonstrates the best quality for almost all groups,                           RGC/HKBU211212, and Key Laboratory of Symbolic
+especially for the group with no more than 6 trust relations                       Computation and Knowledge Engineering of Ministry of
+(62.3% of total users) and the group with 6 to 10 trust                            Education, Jilin University.
+relations (12.5% of total users) in terms of RMSE. This
+
+
+
+
+                                                                           2752
+References                                                               Guangzhou, China, November 2012. Institute of
+                                                                         Electrical and Electronics Engineers.
+[Granovetter, 1973] Mark S. Granovetter. The strength of
+   weak ties. The American Journal of Sociology,                      [Zhou et al., 2008] Yunhong Zhou, Dennis Wilkinson,
+   78(6):1360–1380, May 1973.                                            Robert Schreiber and Rong Pan. Large-scale parallel
+                                                                         collaborative filtering for the Netflix prize. In
+[Jamali and Ester, 2010] Mohsen Jamali and Martin Ester. A               Proceedings of 4th International Conference on
+   matrix factorization technique with trust propagation for             Algorithmic Aspects in Information and Management,
+   recommendation in social networks. In Proceedings of                  pages 337–348, Shanghai, China, June 2008.
+   the Fourth ACM Conference on Recommender Systems,                     Springer-Verlag.
+   pages 135–142, Barcelona, Spain, September 2010.
+   Association for Computing Machinery.                               [Ziegler and Lausen, 2004] Cai N. Ziegler and Georg Lausen.
+                                                                         Analyzing correlation between trust and user similarity in
+[Kautz et al., 1997] Henry Kautz, Bart Selman and Mehul                  online communities. In Proceedings of the Second
+   Shah. ReferralWeb: Combining social networks and                      International Conference on Trust Management, Page
+   collaborative filtering. Communications of the ACM,                   251–265, Oxford, UK, March 2004. Springer-Verlag.
+   40(3):63–65, March 1997.
+[Ma et al., 2008] Hao Ma, Haixuan Yang, Michael R. Lyu
+   and Irwin King. SoRec: Social recommendation using
+   probabilistic matrix factorization. In Proceedings of the
+   17th ACM Conference on Information and Knowledge
+   Management, pages 931–940, Napa Valley, California,
+   USA, October 2008. Association for Computing
+   Machinery.
+[Ma et al., 2009] Hao Ma, Irwin King and Michael R. Lyu.
+   Learning to recommend with social trust ensemble. In
+   Proceedings of the 32nd International ACM SIGIR
+   Conference on Research and Development in Information
+   Retrieval, pages 203–210, Boston, Massachusetts, USA,
+   July 2009. Association for Computing Machinery.
+[Ma et al., 2011] Hao Ma, Dengyong Zhou, Chao Liu,
+   Michael R. Lyu and Irwin King. Recommender systems
+   with social regularization. In Proceedings of the Fourth
+   ACM International Conference on Web Search and Data
+   Mining, pages 287–296, Hong Kong, China, February
+   2011. Association for Computing Machinery.
+[Resnick and Varian, 1997] Paul Resnick and Hal R. Varian.
+   Recommender systems. Communications of the ACM,
+   40(3):56–58, March 1997.
+[Salakhutdinov and Mnih, 2007] Ruslan Salakhutdinov and
+   Andriy Mnih. Probabilistic matrix factorization. In
+   Proceedings of the 22nd Annual Conference on Advances
+   in Neural Information Processing Systems, pages 1257–
+   1264, Vancouver, Canada, December 2007. Association
+   for Computing Machinery.
+[Sinha and Swearingen, 2001] Rashmi Sinha and Kirsten
+   Swearingen. Comparing recommendations made by
+   online systems and friends. In Proceedings of the Joint
+   DELOS-NSF Workshop on Personalization and
+   Recommender systems in Digital Libraries, pages 64–69,
+   Dublin, Ireland, June 2001.
+[Yang et al., 2012] Bo Yang, Pengfei Zhao, Shuqiu Ping and
+   Jing Huang. Improving the recommendation of
+   collaborative filtering by fusing trust network. In
+   Proceedings of the 7th International Conference on
+   Computational Intelligence and Security, pages 195–199,
+
+
+
+
+                                                               2753
+

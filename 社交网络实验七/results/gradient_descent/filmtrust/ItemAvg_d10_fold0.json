@@ -1,0 +1,59 @@
+{
+  "dataset": "filmtrust",
+  "model": "ItemAvg",
+  "dim": 10,
+  "fold": 0,
+  "seed": 20261036,
+  "hyperparameters": {
+    "reg": 0.001,
+    "social": 1.0,
+    "alpha": 1.0
+  },
+  "n_train": 28397,
+  "n_test": 7100,
+  "status": "completed",
+  "data": {
+    "counts": [
+      1508,
+      2071,
+      35497,
+      1853
+    ],
+    "expected": [
+      1508,
+      2071,
+      35497,
+      1853
+    ],
+    "duplicate_pairs": 3,
+    "matches_paper": true,
+    "user_union": 1642,
+    "ratings_sha256": "241167424e24d588e8871d68641e94ead98d5b3a4f0db01ef3181a74ad35e7a1",
+    "trust_sha256": "64573a033add72b988a0fb140fdbc0ad3464cb9821f940007aff6fda44b09603"
+  },
+  "optimizer": "gd",
+  "validation_fraction": 0.1,
+  "maxiter": 200,
+  "all": {
+    "n": 7100,
+    "mae": 0.7306647469006537,
+    "rmse": 0.9365805609927568
+  },
+  "cold_train_lt5": {
+    "n": 250,
+    "mae": 0.8239425398680853,
+    "rmse": 1.053597374537416
+  },
+  "cold_total_lt5": {
+    "n": 134,
+    "mae": 0.858423107015964,
+    "rmse": 1.1086629519321485
+  },
+  "all_unclipped": {
+    "n": 7100,
+    "mae": 0.7306647469006537,
+    "rmse": 0.9365805609927568
+  },
+  "training": [],
+  "seconds": 0.11820280000029015
+}

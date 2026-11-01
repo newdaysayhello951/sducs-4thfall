@@ -1,0 +1,30 @@
+{
+  "filmtrust": {
+    "ratings.txt": {
+      "records": 35497,
+      "column1_unique": 1508,
+      "column2_unique": 2071,
+      "sha256": "241167424e24d588e8871d68641e94ead98d5b3a4f0db01ef3181a74ad35e7a1"
+    },
+    "trust.txt": {
+      "records": 1853,
+      "column1_unique": 609,
+      "column2_unique": 732,
+      "sha256": "64573a033add72b988a0fb140fdbc0ad3464cb9821f940007aff6fda44b09603"
+    }
+  },
+  "epinions_665k": {
+    "ratings_data.txt": {
+      "records": 664824,
+      "column1_unique": 40163,
+      "column2_unique": 139738,
+      "sha256": "6da14f79369cf882911a271efd5f4575bc4292d0497ccf3190b6421a6d198e42"
+    },
+    "trust_data.txt": {
+      "records": 487183,
+      "column1_unique": 33960,
+      "column2_unique": 49288,
+      "sha256": "7562075fdcc27d04cd1d88d592e04f4fa57e5d7043246187789d0ccc3e1985f0"
+    }
+  }
+}

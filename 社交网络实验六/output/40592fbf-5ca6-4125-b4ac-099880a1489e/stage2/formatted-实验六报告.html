@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="A4" name="docx-page-size"/>
+<title>实验六：话题检测论文复现</title>
+<style>
+@page { @bottom-center { content: counter(page); } }
+body { font-family: "宋体", SimSun, serif; font-size: 12pt; line-height: 1.5; color: #000000; padding: 2cm 2cm 2cm 2cm; }
+p { font-size: 12pt; text-indent: 2em; margin-bottom: 0.35em; text-align: justify; }
+td p { margin-bottom: 0.35em; }
+h1 { font-family: "黑体", SimHei, sans-serif; font-size: 14pt; font-weight: bold; margin: 0.5em 0 0.4em 0; text-indent: 0; }
+h2 { font-family: "黑体", SimHei, sans-serif; font-size: 12pt; font-weight: bold; margin: 0.6em 0 0.3em 0; text-indent: 0; }
+.form-td { border: 0.5pt solid #000000; padding: 5pt 7pt; vertical-align: top; }
+.head-td { font-family: "黑体", SimHei, sans-serif; font-size: 12pt; }
+.fig { text-align: center; text-indent: 0; margin: 0.5em 0 0.2em 0; }
+.cap { text-align: center; text-indent: 0; font-size: 10.5pt; font-family: "黑体", SimHei, sans-serif; margin-bottom: 0.8em; }
+.tblcap { text-align: center; text-indent: 0; font-size: 10.5pt; font-family: "黑体", SimHei, sans-serif; margin: 0.5em 0 0.25em 0; }
+.t3 { border-collapse: collapse; width: 100%; font-size: 10.5pt; }
+.t3 th { border-top: 1.5pt solid #000000; border-bottom: 0.75pt solid #000000; padding: 3pt 4pt; text-align: left; font-family: "黑体", SimHei, sans-serif; font-weight: bold; }
+.t3 td { padding: 3pt 4pt; text-align: left; vertical-align: top; }
+.t3 td.last { border-bottom: 1.5pt solid #000000; }
+.t3 th.c, .t3 td.c { text-align: center; }
+.note { font-size: 10.5pt; text-indent: 0; margin: 0.3em 0 0.6em 0; }
+</style>
+</head>
+<body>
+<section data-page-restart="1" role="body">
+<table style="border-collapse:collapse;width:100%;">
+<tr>
+<td class="form-td head-td" colspan="2" style='border:0.5pt solid #000000;padding:5pt 7pt;vertical-align:top;font-family:"黑体",SimHei,sans-serif;font-size:12pt;'>实验题目： 实验六：Learning Similarity Functions for Topic Detection in Online Reputation Monitoring 复现</td>
+<td class="form-td head-td" style='border:0.5pt solid #000000;padding:5pt 7pt;vertical-align:top;font-family:"黑体",SimHei,sans-serif;font-size:12pt;'>学号：202300130069</td>
+</tr>
+<tr>
+<td class="form-td head-td" style='border:0.5pt solid #000000;padding:5pt 7pt;vertical-align:top;font-family:"黑体",SimHei,sans-serif;font-size:12pt;'>日期：2026/10/19</td>
+<td class="form-td head-td" style='border:0.5pt solid #000000;padding:5pt 7pt;vertical-align:top;font-family:"黑体",SimHei,sans-serif;font-size:12pt;'>班级： 23计科2班</td>
+<td class="form-td head-td" style='border:0.5pt solid #000000;padding:5pt 7pt;vertical-align:top;font-family:"黑体",SimHei,sans-serif;font-size:12pt;'>姓名： 黎贤栗</td>
+</tr>
+<tr>
+<td class="form-td head-td" colspan="3" style='border:0.5pt solid #000000;padding:5pt 7pt;vertical-align:top;font-family:"黑体",SimHei,sans-serif;font-size:12pt;'>Email：3176222094@qq.com</td>
+</tr>
+<tr>
+<td class="form-td" colspan="3" style="border:0.5pt solid #000000;padding:5pt 7pt;vertical-align:top;">
+<h1>1.实验方法介绍：</h1>
+<h2>1.1 研究背景</h2>
+<p>社交媒体上的舆论监测是计算社会科学与信息检索的交叉问题。对企业、机构与公众人物而言，及时发现"正在被讨论什么"以及"是否存在可能损害声誉的议题"，是公共关系管理的前置环节。人工监控推文流在成本上不可行，因此需要自动化的实体级话题检测。</p>
+<p>与热榜话题检测相比，该任务的难点在于数据稀疏：除极少数头部实体外，特定机构在某一时段的相关推文量比全局热榜低若干数量级，话题粒度也更细，属于长尾问题。论文把该任务概括为三个要求：一是效率，需要处理持续到达的推文流；二是精度，需要在细粒度、小样本话题上仍能正确归并；三是可监督性，需要能利用历史标注数据改进模型。</p>
+<h2>1.2 论文贡献</h2>
+<p>论文的主要贡献有四点。第一，将在线声誉监控形式化为实体级话题检测任务，并指出其与热榜检测的本质差异在于数据稀疏。第二，提出"把成对推文相似度学习为二分类问题"的思路，用有监督分类器的置信度替代传统无监督相似度度量。第三，系统整理并实现了 13 个相似度特征，覆盖词面、语义、元数据与时间四族，其中作者、时间戳、话题标签、被提及用户等属于 Twitter 特有信号。第四，在 RepLab 2013 数据集上验证该框架优于当时最优系统与 Temporal Twitter-LDA，并接近人工标注者之间的一致率。</p>
+<h2>1.3 本复现目标</h2>
+<p>本实验不以"逐数字复现论文全部表格"为唯一目标，因为论文所依赖的推文正文在数据集发布时即被平台条款限制。本实验的目标是：依据论文第 2、3 节从零重写完整流水线，不参考作者公开仓库的实现；在可获取的数据条件下跑通特征抽取、成对分类、层次聚类与官方指标评测；逐项对照论文报告的数值并给出偏差的可验证解释；通过外部带正文语料验证文本特征通路是否正确。</p>
+<h2>1.4 任务定义与相似度学习建模</h2>
+<p>给定实体 e 与某一时间跨度内提及该实体的推文集合 T，任务是将 T 划分为若干簇，每个簇对应声誉管理专家识别的一个话题、事件或议题。该任务不是分类任务，因为话题集合未知；也不是标准话题检测，因为每条推文都必须被分配到一个话题。</p>
+<p>论文将"两条推文是否属于同一话题"建模为二分类问题。设 d 与 d′ 为两条推文，F(d, d′) 为二者在各类信号上的重叠度特征向量，则相似度定义为后验概率 sim(d, d′) = P( G(d, d′) | F(d, d′) )，其中 G 为取值为真或假的判别函数。分类器对正类的置信度即作为相似度使用。</p>
+<h2>1.5 相似度特征</h2>
+<p>论文共使用 13 个特征，分为四族，如表 1 所示。需要指出一处细节：论文将 Lin 相似度称为"Jaccard 的加权变体"，但式 (4) 的分母为两侧权重之和而非并集权重，其形式实为 Dice 系数的加权版本。在权重均匀时，式 (4) 退化为 2|A∩B|/(|A|+|B|)，而非 |A∩B|/|A∪B|。本复现严格按论文公式实现，未做"修正"。</p>
+<p class="tblcap">表 1  论文的 13 个相似度特征</p>
+<table class="t3" style="border-collapse:collapse;width:100%;font-size:10.5pt;">
+<thead><tr><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>特征族</th><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>特征名</th><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>定义</th><th class="c" style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;text-align:center;'>依赖正文</th></tr></thead>
+<tbody>
+<tr><td style="padding:3pt 4pt;">词面</td><td style="padding:3pt 4pt;">terms_jaccard</td><td style="padding:3pt 4pt;">|Wd ∩ Wd′| / |Wd ∪ Wd′|</td><td class="c" style="padding:3pt 4pt;text-align:center;">是</td></tr>
+<tr><td style="padding:3pt 4pt;">词面</td><td style="padding:3pt 4pt;">terms_lin_cf</td><td style="padding:3pt 4pt;">2Σ∩log(1/p(w)) ÷ (ΣWd log(1/p(w)) + ΣWd′ log(1/p(w)))，p(w)=cf(w)/Σcf</td><td class="c" style="padding:3pt 4pt;text-align:center;">是</td></tr>
+<tr><td style="padding:3pt 4pt;">词面</td><td style="padding:3pt 4pt;">terms_lin_tfidf</td><td style="padding:3pt 4pt;">同上，p(w) 换为以实体伪文档为单位的 tf.idf 权重</td><td class="c" style="padding:3pt 4pt;text-align:center;">是</td></tr>
+<tr><td style="padding:3pt 4pt;">语义</td><td style="padding:3pt 4pt;">semantic_jaccard</td><td style="padding:3pt 4pt;">在 Wikipedia 概念袋上的 Jaccard</td><td class="c" style="padding:3pt 4pt;text-align:center;">是</td></tr>
+<tr><td style="padding:3pt 4pt;">语义</td><td style="padding:3pt 4pt;">semantic_lin_cf</td><td style="padding:3pt 4pt;">在概念袋上的 Lin 相似度（集合词频加权）</td><td class="c" style="padding:3pt 4pt;text-align:center;">是</td></tr>
+<tr><td style="padding:3pt 4pt;">语义</td><td style="padding:3pt 4pt;">semantic_lin_tfidf</td><td style="padding:3pt 4pt;">在概念袋上的 Lin 相似度（tf.idf 加权）</td><td class="c" style="padding:3pt 4pt;text-align:center;">是</td></tr>
+<tr><td style="padding:3pt 4pt;">元数据</td><td style="padding:3pt 4pt;">author</td><td style="padding:3pt 4pt;">两条推文是否同一作者</td><td class="c" style="padding:3pt 4pt;text-align:center;">否</td></tr>
+<tr><td style="padding:3pt 4pt;">元数据</td><td style="padding:3pt 4pt;">namedusers</td><td style="padding:3pt 4pt;">共现的 @提及用户数</td><td class="c" style="padding:3pt 4pt;text-align:center;">是</td></tr>
+<tr><td style="padding:3pt 4pt;">元数据</td><td style="padding:3pt 4pt;">urls</td><td style="padding:3pt 4pt;">共现的 URL 数</td><td class="c" style="padding:3pt 4pt;text-align:center;">否</td></tr>
+<tr><td style="padding:3pt 4pt;">元数据</td><td style="padding:3pt 4pt;">hashtags</td><td style="padding:3pt 4pt;">共现的话题标签数</td><td class="c" style="padding:3pt 4pt;text-align:center;">是</td></tr>
+<tr><td style="padding:3pt 4pt;">时间</td><td style="padding:3pt 4pt;">time_millis</td><td style="padding:3pt 4pt;">1/(1+|Δt|)，Δt 以毫秒计</td><td class="c" style="padding:3pt 4pt;text-align:center;">否</td></tr>
+<tr><td style="padding:3pt 4pt;">时间</td><td style="padding:3pt 4pt;">time_hours</td><td style="padding:3pt 4pt;">同上，以小时计</td><td class="c" style="padding:3pt 4pt;text-align:center;">否</td></tr>
+<tr><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">时间</td><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">time_days</td><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">同上，以天计</td><td class="c last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;text-align:center;">否</td></tr>
+</tbody>
+</table>
+<h2>1.6 单链接层次聚类与阈值扫描</h2>
+<p>论文采用单链接层次凝聚聚类。相似度矩阵由上一阶段分类器的正类置信度构成。算法初始时每条推文自成一簇，迭代合并相似度最高的两簇，直至最高相似度低于预设阈值，得到平坦聚类结果。选择单链接的理由在于无需预先指定簇数，且在数据稀疏场景下表现稳健；其已知缺陷是可能因个别噪声点导致簇被串联合并。</p>
+<p>论文称在"相似度百分位"上扫描阈值。但在单链接层次聚类中，簇结构完全由最小生成树的边权决定。当模型判别力较弱时，两两相似度会集中在极窄区间内，按百分位切分得到的阈值几乎重合，曲线退化为少数几个点，曲线下面积失真。本复现改为在层次树的合并高度上扫描，保证从"全单点"到"全一簇"的完整层次被覆盖，与论文"扫描阈值得到 R&amp;S 曲线"的意图一致。</p>
+<h2>1.7 评测指标</h2>
+<p>论文使用 RepLab 2013 官方指标：可靠度 R、敏感度 S 及二者的调和平均 F1(R,S)。在聚类任务中，R 与 S 分别等价于 BCubed 的精确率与召回率。对实体内每条推文 d1，敏感度为与其同属一个金标准话题的推文中、被系统也分到同一簇的比例；可靠度为与 d1 同属一个系统簇的推文中、金标准也相同的比例。实体级 R、S 为各推文值的算术平均，F1 = 2RS/(R+S)，最终指标为 61 个实体上的宏平均。</p>
+<p>官方脚本有一处容易被忽略的行为：若某条推文未出现在系统输出中，则 S 记 0 而 R 记 1，即对缺失文档在可靠度上给满分。这一设定会使"系统输出越少、R 越高"，复现时必须照做，否则数值无法对齐。</p>
+</td>
+</tr>
+<tr>
+<td class="form-td" colspan="3" style="border:0.5pt solid #000000;padding:5pt 7pt;vertical-align:top;">
+<h1>2.实验步骤</h1>
+<h2>2.1 软件环境</h2>
+<p>论文原实现使用 Python 2.7 做特征与学习、R 的 fastcluster 做聚类、Perl 做评测。本复现统一迁移至 Python 3.12 生态，聚类改用 SciPy 的 linkage，评测指标依据官方脚本语义在 Python 中重写。全部实验在纯 CPU 上完成，不需要 GPU。</p>
+<p class="tblcap">表 2  软件环境</p>
+<table class="t3" style="border-collapse:collapse;width:100%;font-size:10.5pt;">
+<thead><tr><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>组件</th><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>版本 / 说明</th></tr></thead>
+<tbody>
+<tr><td style="padding:3pt 4pt;">Python</td><td style="padding:3pt 4pt;">3.12</td></tr>
+<tr><td style="padding:3pt 4pt;">NumPy / pandas</td><td style="padding:3pt 4pt;">1.26 / 2.2，数值计算与数据表处理</td></tr>
+<tr><td style="padding:3pt 4pt;">SciPy</td><td style="padding:3pt 4pt;">1.13，稀疏矩阵、单链接层次聚类</td></tr>
+<tr><td style="padding:3pt 4pt;">scikit-learn</td><td style="padding:3pt 4pt;">1.5，线性核 SVM、交叉验证</td></tr>
+<tr><td style="padding:3pt 4pt;">matplotlib</td><td style="padding:3pt 4pt;">3.9，结果绘图</td></tr>
+<tr><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">设备</td><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">纯 CPU</td></tr>
+</tbody>
+</table>
+<h2>2.2 数据集</h2>
+<p>RepLab 2013 是 CLEF 框架下在线声誉管理的评测活动，也是该任务迄今规模最大的公开测试集，含 61 个实体、142,527 条英西双语推文，采集时间为 2012 年 6 月至 12 月。本复现按论文口径只保留与实体相关且被标注了话题的推文，并剔除标记为近重复的推文，统计结果如表 3 所示。</p>
+<p class="tblcap">表 3  RepLab 2013 数据集构成</p>
+<table class="t3" style="border-collapse:collapse;width:100%;font-size:10.5pt;">
+<thead><tr><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>项目</th><th class="c" style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;text-align:center;'>论文报告</th><th class="c" style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;text-align:center;'>本次复现统计</th></tr></thead>
+<tbody>
+<tr><td style="padding:3pt 4pt;">实体数</td><td class="c" style="padding:3pt 4pt;text-align:center;">61</td><td class="c" style="padding:3pt 4pt;text-align:center;">61</td></tr>
+<tr><td style="padding:3pt 4pt;">原始推文</td><td class="c" style="padding:3pt 4pt;text-align:center;">142,527</td><td class="c" style="padding:3pt 4pt;text-align:center;">142,519</td></tr>
+<tr><td style="padding:3pt 4pt;">剔除近重复后推文</td><td class="c" style="padding:3pt 4pt;text-align:center;">100,869</td><td class="c" style="padding:3pt 4pt;text-align:center;">106,008</td></tr>
+<tr><td style="padding:3pt 4pt;">话题数</td><td class="c" style="padding:3pt 4pt;text-align:center;">8,765</td><td class="c" style="padding:3pt 4pt;text-align:center;">9,456</td></tr>
+<tr><td style="padding:3pt 4pt;">训练集推文（每实体）</td><td class="c" style="padding:3pt 4pt;text-align:center;">544</td><td class="c" style="padding:3pt 4pt;text-align:center;">557（合计 33,952）</td></tr>
+<tr><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">测试集推文（每实体）</td><td class="c last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;text-align:center;">1,109</td><td class="c last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;text-align:center;">1,181（合计 72,056）</td></tr>
+</tbody>
+</table>
+<p>复现统计略高于论文，原因是论文还剔除了正文无法回捞的推文，而本复现无法判断哪些推文不可回捞。更关键的限制在于：RepLab 2013 的数据包中每条推文仅包含标识符、作者、实体编号、时间戳与 URL 字段，不包含推文正文。数据集说明文件明确写着"in order to respect Twitter's terms of service, the organizers do not provide the contents of the tweets"。这直接决定了复现边界——表 1 中标记为"依赖正文"的 8 个特征无法计算，实际只有 author、urls 与三个时间特征可用。</p>
+<h2>2.3 外部验证语料</h2>
+<p>为区分"实现错误"与"数据缺失"，另引入带正文的公开语料 HumAID（Alam 等，2021）。该数据集包含 41,152 条人工标注英文推文，覆盖 11 场自然灾害，字段为推文标识符、正文与人道主义信息类别，直接提供正文。映射关系为：灾害事件对应实体，人道主义信息类别对应话题；时间戳从推文的雪花标识符还原，URL、话题标签与 @提及从正文正则抽取。由于 HumAID 的类别是信息类型而非具体事件话题，该组结果不与论文数字直接比较，仅用于检验文本特征是否真正生效。</p>
+<h2>2.4 复现模块与文件</h2>
+<p>复现代码按职责划分为十个模块，如表 4 所示。所有代码依据论文正文编写，未参考作者公开仓库的实现。</p>
+<p class="tblcap">表 4  复现代码模块</p>
+<table class="t3" style="border-collapse:collapse;width:100%;font-size:10.5pt;">
+<thead><tr><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>模块</th><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>职责</th></tr></thead>
+<tbody>
+<tr><td style="padding:3pt 4pt;">replab_io.py</td><td style="padding:3pt 4pt;">数据加载、近重复剔除、按实体切分</td></tr>
+<tr><td style="padding:3pt 4pt;">text_source.py</td><td style="padding:3pt 4pt;">推文正文获取（本地文件或 X API v2）</td></tr>
+<tr><td style="padding:3pt 4pt;">normalize.py</td><td style="padding:3pt 4pt;">论文式归一化：去标点、小写、空白分词、去停用词、去短词</td></tr>
+<tr><td style="padding:3pt 4pt;">features.py</td><td style="padding:3pt 4pt;">13 个相似度特征的四族实现</td></tr>
+<tr><td style="padding:3pt 4pt;">sampling.py</td><td style="padding:3pt 4pt;">80,000 个平衡推文对采样</td></tr>
+<tr><td style="padding:3pt 4pt;">model.py</td><td style="padding:3pt 4pt;">线性核 SVM、10 折交叉验证、消融组合</td></tr>
+<tr><td style="padding:3pt 4pt;">clustering.py</td><td style="padding:3pt 4pt;">单链接 HAC 与阈值扫描</td></tr>
+<tr><td style="padding:3pt 4pt;">metrics.py</td><td style="padding:3pt 4pt;">RepLab 官方 R、S、F 及曲线级指标</td></tr>
+<tr><td style="padding:3pt 4pt;">run_pipeline.py</td><td style="padding:3pt 4pt;">端到端编排</td></tr>
+<tr><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">validate_metrics.py</td><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">指标实现校验</td></tr>
+</tbody>
+</table>
+<h2>2.5 实验协议</h2>
+<p>相似度学习阶段，按论文设置从训练集随机采样 80,000 个推文对并保持正负类均衡，以线性核 SVM 做 10 折交叉验证，报告平均准确率，并按特征族做消融。话题检测阶段，对测试集每个实体构建两两相似度矩阵，执行单链接层次聚类，在合并高度上取 25 个阈值点，逐点计算 61 个实体的宏平均 R、S、F1，并汇总为曲线下面积 AUC、平均可靠度 MAR 与单实体最大 F1。</p>
+<p>与论文实现的差异如表 5 所示，其中阈值扫描与语义特征两处为有意的偏离，其余为技术栈替换。</p>
+<p class="tblcap">表 5  与论文的实现差异</p>
+<table class="t3" style="border-collapse:collapse;width:100%;font-size:10.5pt;">
+<thead><tr><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>环节</th><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>论文</th><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>本次复现</th><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>说明</th></tr></thead>
+<tbody>
+<tr><td style="padding:3pt 4pt;">聚类实现</td><td style="padding:3pt 4pt;">R fastcluster</td><td style="padding:3pt 4pt;">SciPy linkage</td><td style="padding:3pt 4pt;">算法等价</td></tr>
+<tr><td style="padding:3pt 4pt;">相似度取值</td><td style="padding:3pt 4pt;">SVM 置信度</td><td style="padding:3pt 4pt;">sigmoid(decision_function)</td><td style="padding:3pt 4pt;">单调变换，不改变排序</td></tr>
+<tr><td style="padding:3pt 4pt;">阈值扫描</td><td style="padding:3pt 4pt;">相似度百分位</td><td style="padding:3pt 4pt;">层次树合并高度</td><td style="padding:3pt 4pt;">见 1.6 节</td></tr>
+<tr><td style="padding:3pt 4pt;">语义特征</td><td style="padding:3pt 4pt;">Wikipedia 实体链接</td><td style="padding:3pt 4pt;">接口已实现，默认返回空集</td><td style="padding:3pt 4pt;">需锚文本统计</td></tr>
+<tr><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">显著性检验</td><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">t 检验</td><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">未做</td><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">单次运行，未做多种子重复</td></tr>
+</tbody>
+</table>
+<h2>2.6 正确性验证</h2>
+<p>复现工作的主要风险是"代码有误但结果看似合理"。为此设计三层校验。第一层是指标实现校验：官方评测脚本以 Perl 提供，本机无 Perl 环境，故采用两路交叉验证——构造完美聚类、全并一簇、全单点、系统漏文档四种解析解情形，其 R、S、F 均可手算；另写一份严格照抄官方脚本双重循环结构的平方复杂度版本，与主实现逐实体比对。四种情形全部通过，最大绝对误差为 0。</p>
+<p>第二层是特征公式单元测试，15 个用例全部通过，覆盖 Jaccard 手算、时间特征手算、Lin 相似度在均匀权重下退化为 Dice 系数、以及缺失正文时文本类特征正确输出空值并被上层剔除。第三层是合成语料端到端验证：构造一个包含 4 个实体、4 个话题、960 条带正文推文的迷你语料，话题由专属关键词区分，运行完整流程后 terms_jaccard 准确率 0.9643、terms 准确率 0.9837、全特征准确率 1.0000、话题检测最大 F1 为 0.947。</p>
+</td>
+</tr>
+<tr>
+<td class="form-td" colspan="3" style="border:0.5pt solid #000000;padding:5pt 7pt;vertical-align:top;">
+<h1>3.结论分析：</h1>
+<h2>3.1 相似度学习结果</h2>
+<p>各特征组合的交叉验证准确率如表 6 所示。时间特征族的复现值 0.5537 与论文的 0.56 相差 0.006，处于交叉验证标准差量级内。这一对齐具有重要意义：它同时验证了数据切分、负样本采样、时间特征公式与 SVM 配置四个环节的正确性，其中任一环节出错都难以恰好落回 0.56。metadata 一项为 0.5057，明显低于论文的 0.58，原因是只保留了 author 与 urls，缺少 hashtags 与 namedusers 两个更强的信号。</p>
+<p class="tblcap">表 6  相似度学习准确率对照（10 折交叉验证）</p>
+<table class="t3" style="border-collapse:collapse;width:100%;font-size:10.5pt;">
+<thead><tr><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>特征组合</th><th class="c" style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;text-align:center;'>论文</th><th class="c" style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;text-align:center;'>本次复现</th><th class="c" style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;text-align:center;'>实际特征数</th><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>备注</th></tr></thead>
+<tbody>
+<tr><td style="padding:3pt 4pt;">time</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.56</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.5537 ± 0.0036</td><td class="c" style="padding:3pt 4pt;text-align:center;">3</td><td style="padding:3pt 4pt;">与论文一致</td></tr>
+<tr><td style="padding:3pt 4pt;">metadata</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.58</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.5057 ± 0.0050</td><td class="c" style="padding:3pt 4pt;text-align:center;">2</td><td style="padding:3pt 4pt;">缺 hashtags、namedusers</td></tr>
+<tr><td style="padding:3pt 4pt;">terms_jaccard</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.59</td><td class="c" style="padding:3pt 4pt;text-align:center;">—</td><td class="c" style="padding:3pt 4pt;text-align:center;">0</td><td style="padding:3pt 4pt;">需正文</td></tr>
+<tr><td style="padding:3pt 4pt;">semantics</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.59</td><td class="c" style="padding:3pt 4pt;text-align:center;">—</td><td class="c" style="padding:3pt 4pt;text-align:center;">0</td><td style="padding:3pt 4pt;">需正文与 Wikipedia</td></tr>
+<tr><td style="padding:3pt 4pt;">terms</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.59</td><td class="c" style="padding:3pt 4pt;text-align:center;">—</td><td class="c" style="padding:3pt 4pt;text-align:center;">0</td><td style="padding:3pt 4pt;">需正文</td></tr>
+<tr><td style="padding:3pt 4pt;">terms + time</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.61</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.5537 ± 0.0036</td><td class="c" style="padding:3pt 4pt;text-align:center;">3</td><td style="padding:3pt 4pt;">退化为 time</td></tr>
+<tr><td style="padding:3pt 4pt;">terms + semantics</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.60</td><td class="c" style="padding:3pt 4pt;text-align:center;">—</td><td class="c" style="padding:3pt 4pt;text-align:center;">0</td><td style="padding:3pt 4pt;">需正文</td></tr>
+<tr><td style="padding:3pt 4pt;">terms + semantics + metadata</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.62</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.5057 ± 0.0050</td><td class="c" style="padding:3pt 4pt;text-align:center;">2</td><td style="padding:3pt 4pt;">退化为 metadata</td></tr>
+<tr><td style="padding:3pt 4pt;">terms + semantics + time</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.61</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.5537 ± 0.0036</td><td class="c" style="padding:3pt 4pt;text-align:center;">3</td><td style="padding:3pt 4pt;">退化为 time</td></tr>
+<tr><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">all</td><td class="c last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;text-align:center;">0.63</td><td class="c last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;text-align:center;">0.5578 ± 0.0034</td><td class="c last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;text-align:center;">5</td><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">—</td></tr>
+</tbody>
+</table>
+<h2>3.2 话题检测结果</h2>
+<p>话题检测的指标对照如表 7 所示。图 1 为论文原文的可靠度—敏感度曲线，横轴为敏感度、纵轴为可靠度，点的大小表示 F1；论文的最优系统在各阈值上均位于最上方，与最佳 RepLab 系统及 Temporal Twitter-LDA 相比有统计显著改进，其峰值 F1 为 0.47，接近人工标注者之间的一致率 0.48。</p>
+<p class="tblcap">表 7  话题检测指标对照</p>
+<table class="t3" style="border-collapse:collapse;width:100%;font-size:10.5pt;">
+<thead><tr><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>指标</th><th class="c" style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;text-align:center;'>论文（全特征）</th><th class="c" style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;text-align:center;'>本次复现（5 特征）</th></tr></thead>
+<tbody>
+<tr><td style="padding:3pt 4pt;">曲线下面积 AUC</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.41</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.215</td></tr>
+<tr><td style="padding:3pt 4pt;">平均可靠度 MAR</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.61</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.556</td></tr>
+<tr><td style="padding:3pt 4pt;">单实体最大 F1</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.47</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.334</td></tr>
+<tr><td style="padding:3pt 4pt;">单一阈值宏平均 F1</td><td class="c" style="padding:3pt 4pt;text-align:center;">—</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.299</td></tr>
+<tr><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">人工标注一致率</td><td class="c last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;text-align:center;">0.48</td><td class="c last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;text-align:center;">—</td></tr>
+</tbody>
+</table>
+<p class="fig"><img src="C:/Users/86134/Desktop/大四上/社交网络实验六/output/40592fbf-5ca6-4125-b4ac-099880a1489e/stage2/images/paper_fig1_rs_curves.png" style="width:330pt;"/></p>
+<p class="cap">图 1  论文原文 Figure 1：各系统的可靠度—敏感度曲线</p>
+<p>图 2 为本次复现的结果。曲线形态正确：随着阈值降低，簇变大，敏感度上升而可靠度下降，呈现预期的权衡关系。但整条曲线明显位于论文曲线下方，峰值 F1 仅 0.334。值得注意的是平均可靠度一项，复现值 0.556 与论文的 0.61 差距不大，而曲线下面积与最大 F1 差距显著。原因在于可靠度在"近乎全单点"的一端天然接近 1，对特征缺失不敏感；而曲线下面积与最大 F1 衡量的是"高敏感度时能否维持可靠度"，恰恰依赖词面与语义信号。没有正文，模型无法判断两条推文是否在谈论同一件事，只能在时间与作者维度上做粗粒度分组。</p>
+<p class="fig"><img src="C:/Users/86134/Desktop/大四上/社交网络实验六/output/40592fbf-5ca6-4125-b4ac-099880a1489e/stage2/images/our_fig_rs_curve.png" style="width:430pt;"/></p>
+<p class="cap">图 2  复现得到的可靠度—敏感度曲线（RepLab 2013 测试集，61 个实体）</p>
+<h2>3.3 外部语料验证</h2>
+<p>在同一份 HumAID 数据上，仅切换是否提供正文，其余配置完全一致，结果如表 8 与图 3 所示。补上正文使曲线下面积由 0.292 升至 0.506，提升 73%；最大 F1 由 0.381 升至 0.505，提升 33%；全特征准确率由 0.5095 升至 0.5648。分特征族观察，无正文时 time 为 0.5095、metadata 为 0.5111，均接近随机；有正文后 terms_jaccard 为 0.5551、terms 为 0.5636，成为唯一明显高于随机的信号族。</p>
+<p class="tblcap">表 8  HumAID 同语料消融（仅切换是否提供正文）</p>
+<table class="t3" style="border-collapse:collapse;width:100%;font-size:10.5pt;">
+<thead><tr><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>配置</th><th class="c" style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;text-align:center;'>特征数</th><th class="c" style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;text-align:center;'>AUC</th><th class="c" style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;text-align:center;'>MAR</th><th class="c" style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;text-align:center;'>最大 F1</th><th class="c" style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;text-align:center;'>all 准确率</th></tr></thead>
+<tbody>
+<tr><td style="padding:3pt 4pt;">无正文</td><td class="c" style="padding:3pt 4pt;text-align:center;">5</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.292</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.634</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.381</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.5095</td></tr>
+<tr><td style="padding:3pt 4pt;">有正文</td><td class="c" style="padding:3pt 4pt;text-align:center;">10</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.506</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.651</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.505</td><td class="c" style="padding:3pt 4pt;text-align:center;">0.5648</td></tr>
+<tr><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">提升</td><td class="c last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;text-align:center;">+5</td><td class="c last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;text-align:center;">+0.214（+73%）</td><td class="c last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;text-align:center;">+0.017</td><td class="c last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;text-align:center;">+0.124（+33%）</td><td class="c last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;text-align:center;">+0.055</td></tr>
+</tbody>
+</table>
+<p class="fig"><img src="C:/Users/86134/Desktop/大四上/社交网络实验六/output/40592fbf-5ca6-4125-b4ac-099880a1489e/stage2/images/our_fig_ablation.png" style="width:440pt;"/></p>
+<p class="cap">图 3  文本特征消融：三组实验的 R&amp;S 曲线与关键指标对照</p>
+<p>该验证证明文本特征通路与聚类环节均能正常工作：当正文存在且话题可由词面区分时，流水线能近乎完美地还原话题。因此 RepLab 上跑不出论文数字，原因是数据缺失而非实现缺陷。这一结论同时支持了论文的核心论断——非文本信号有增益但有限，判别力主要来自文本内容。</p>
+<h2>3.4 数据不可得造成的边界</h2>
+<p>本复现暴露了社交媒体研究的一个结构性问题：由于平台服务条款限制，多数论文只能发布推文标识符。而推文的删除率随时间快速上升，导致此类数据集在发布数年后实际可复现性大幅下降。RepLab 2013 采集于 2012 年，至 2026 年已有相当比例的推文不可回捞，这意味着即便研究者持有接口凭证，也难以完整重建原始实验条件。</p>
+<p>因此本报告不声称复现论文的原始绝对数值。RepLab 上的实验用于验证流水线正确性与可计算特征的真实性能；HumAID 上的实验用于验证文本特征的有效性。两者合起来才构成对本论文的完整检验。</p>
+<h2>3.5 复现中发现的实现陷阱</h2>
+<p>复现过程中遇到若干不查文档就极易踩错的地方，整理如表 9。这些问题多数不会报错，只会让结果悄悄变差，因此值得记录。</p>
+<p class="tblcap">表 9  复现中发现的实现陷阱</p>
+<table class="t3" style="border-collapse:collapse;width:100%;font-size:10.5pt;">
+<thead><tr><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>问题</th><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>现象</th><th style='border-top:1.5pt solid #000000;border-bottom:0.75pt solid #000000;padding:3pt 4pt;text-align:left;font-weight:bold;font-family:"黑体",SimHei,sans-serif;'>修复</th></tr></thead>
+<tbody>
+<tr><td style="padding:3pt 4pt;">Lin 相似度被误当作 Jaccard</td><td style="padding:3pt 4pt;">均匀权重下单测期望值对不上</td><td style="padding:3pt 4pt;">按式 (4) 实现为加权 Dice 形式</td></tr>
+<tr><td style="padding:3pt 4pt;">阈值按相似度百分位扫描</td><td style="padding:3pt 4pt;">相似度挤在 0.47—0.53 窄带，曲线退化、AUC 为 0</td><td style="padding:3pt 4pt;">改为在层次树合并高度上扫描</td></tr>
+<tr><td style="padding:3pt 4pt;">官方脚本对缺失文档的处理</td><td style="padding:3pt 4pt;">R 值偏高，指标无法对齐</td><td style="padding:3pt 4pt;">缺失文档 S 记 0、R 记 1，照做</td></tr>
+<tr><td style="padding:3pt 4pt;">采样时每样本重建话题分组</td><td style="padding:3pt 4pt;">60,000 对采样耗时 32 秒</td><td style="padding:3pt 4pt;">预计算分组与权重，降至 3 秒</td></tr>
+<tr><td class="last" style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">tf.idf 按列遍历稀疏矩阵</td><td style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">terms 特征计算耗时 26 秒</td><td style="border-bottom:1.5pt solid #000000;padding:3pt 4pt;">列求和向量化，降至 9 秒</td></tr>
+</tbody>
+</table>
+<h2>3.6 进一步改进方向</h2>
+<p>后续工作有三个方向。其一，若能获取 RepLab 推文正文，哪怕只有部分，以文本文件参数接入即可运行 7 个文本特征，得到与论文可比的数字，并应按"有正文子集"单独报一组指标而非与全量数字直接对比。其二，下载 Wikipedia 锚文本统计以启用三个语义特征，凑齐 13 个特征。其三，引入多种子重复与配对 t 检验，补上论文所做的显著性分析，目前本复现仅为单次运行。</p>
+</td>
+</tr>
+<tr>
+<td class="form-td" colspan="3" style="border:0.5pt solid #000000;padding:5pt 7pt;vertical-align:top;">
+<p style="text-indent:0;"><strong>结论：</strong>本实验依据论文正文从零实现了 Spina 等人 SIGIR 2014 论文的完整流水线，并在其原始数据集上完成了端到端复现，未参考作者公开仓库的实现。方法链路复现正确：时间特征族分类准确率 0.5537 与论文报告的 0.56 一致，指标实现与官方脚本语义吻合，特征公式通过 15 项单元测试，合成语料上全特征准确率达 1.0000。数据缺失是唯一实质障碍：RepLab 2013 不含推文正文，导致 8 个特征不可计算，话题检测的曲线下面积与最大 F1 分别降至 0.215 与 0.334，低于论文的 0.41 与 0.47。文本特征的作用在外部真实语料上得到直接验证：同一份 HumAID 数据上补上正文使曲线下面积提升 73%、最大 F1 提升 33%。综合来看，本实验应被定义为"方法复现加替代数据验证"，而非论文表格的逐数字复制；论文关于"非文本信号有增益但有限、判别力主要来自文本内容"的核心论断获得了方向性支持。</p>
+</td>
+</tr>
+</table>
+</section>
+</body>
+</html>

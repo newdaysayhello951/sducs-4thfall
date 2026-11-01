@@ -1,0 +1,654 @@
+           TrustWalker: A Random Walk Model for Combining
+             Trust-based and Item-based Recommendation
+
+                                               Mohsen Jamali                                Martin Ester
+                                      School of Computing Science                    School of Computing Science
+                                        Simon Fraser University                        Simon Fraser University
+                                         Burnaby, BC, Canada                            Burnaby, BC, Canada
+                                     mohsen_jamali@cs.sfu.ca                             ester@cs.sfu.ca
+
+ABSTRACT                                                                             satisfy this need, recommender systems have emerged, e.g.
+Collaborative filtering is the most popular approach to build                        there are popular recommenders for movies1 , books2 , mu-
+recommender systems and has been successfully employed                               sic3 , etc.
+in many applications. However, it cannot make recommen-                                 Typically in a recommender system, we have a set of users
+dations for so-called cold start users that have rated only                          and a set of items. Each user u rates a set of items by some
+a very small number of items. In addition, these methods                             values. The recommender has the task to predict the rating
+do not know how confident they are in their recommenda-                              for user u on a non-rated item i or to generally recommend
+tions. Trust-based recommendation methods assume the ad-                             some items for the given user u based on the ratings that
+ditional knowledge of a trust network among users and can                            already exist. Collaborative Filtering [6] methods make rec-
+better deal with cold start users, since users only need to                          ommendations based on the ratings of item i by a set of
+be simply connected to the trust network. On the other                               users whose rating profiles are most similar to that of user
+hand, the sparsity of the user item ratings forces the trust-                        u. With the advent of online social networks, the trust-based
+based approach to consider ratings of indirect neighbors that                        approach to recommendation has emerged. This approach
+are only weakly trusted, which may decrease its precision.                           assumes a trust network among users and makes recommen-
+In order to find a good trade-off, we propose a random walk                          dations based on the ratings of the users that are directly or
+model combining the trust-based and the collaborative filter-                        indirectly trusted by u.
+ing approach for recommendation. The random walk model                                  Collaborative Filtering is most effective when users have
+allows us to define and to measure the confidence of a rec-                          expressed enough ratings to have common ratings with other
+ommendation. We performed an evaluation on the Epinions                              users, but it performs poorly for so-called cold start user.
+dataset and compared our model with existing trust-based                             Cold start users are new users who have expressed only a
+and collaborative filtering methods.                                                 few ratings. Using similarity based approaches, it is unlikely
+                                                                                     to find similar users since the cold start users only have a
+                                                                                     few ratings. Trust-based recommenders, however, can make
+Categories and Subject Descriptors                                                   recommendations as long as a new user is connected to a
+H.2.8.d [Information Technology and Systems]: Database                               large enough component of the trust network.
+Applications - Data Mining                                                              Using a trust network therefore improves the coverage of
+                                                                                     recommendations. However, when we go far from the source
+                                                                                     user u in the trust network, the trust between these users
+General Terms                                                                        and the source user will become fairly weak and their ratings
+Algorithms, Design, Experimentation, Measurement                                     will be noisy and unreliable. Therefore, we have to use the
+                                                                                     ratings expressed by users in the neighborhood close to the
+Keywords                                                                             user u. But, in this case the probability of finding a rating
+                                                                                     expressed on the item will be very low and we will not be
+Trust, Recommendation, Random Walk                                                   able to compute a prediction.
+                                                                                        In order to consider enough ratings without suffering from
+1.     INTRODUCTION                                                                  noisy data, we propose a random walk method (TrustWalker)
+  With the rapidly growing amount of information available                           which combines trust-based and item-based recommenda-
+on the WWW, it becomes necessary to have tools to help                               tion. TrustWalker considers not only ratings of the target
+users to select the relevant part of online information. To                          item, but also those of similar items. The probability of us-
+                                                                                     ing the rating of a similar item instead of a rating for the
+                                                                                     target item increases with increasing length of the walk. Our
+                                                                                     framework contains both trust-based and item-based collab-
+Permission to make digital or hard copies of all or part of this work for            orative filtering recommendations as special cases. Most tra-
+personal or classroom use is granted without fee provided that copies are            ditional recommender systems do not provide confidence in
+not made or distributed for profit or commercial advantage and that copies           their predictions. The random walk model allows us to com-
+bear this notice and the full citation on the first page. To copy otherwise, to
+republish, to post on servers or to redistribute to lists, requires prior specific   1
+                                                                                       http://www.netflix.com
+permission and/or a fee.                                                             2
+KDD’09, June 28–July 1, 2009, Paris, France.                                           http://www.amazon.com
+                                                                                     3
+Copyright 2009 ACM 978-1-60558-495-9/09/06 ...$5.00.                                   http://www.last.fm
+pute the confidence in our predictions. Also our system is          sults of [4] and of similar work confirm that a social network
+able to explain and justify its results.                            provides an independent source of information which can be
+   The rest of the paper is organized as follows: Section 2 de-     exploited to improve the quality of recommendations.
+scribes the problem definition. Related works are discussed           Exploiting the trust network in recommenders does not
+in section 3. We discuss the details of our proposed model in       necessarily enhance the precision of system, but it allows
+section 4. In section 5 we introduce some desirable proper-         to compute the recommendation for more pairs of (u, i)
+ties of our model. The experimental results and comparison          which leads to better coverage. Coverage is the percent-
+with existing methods are discussed in section 6. Finally we        age of < user, item > pairs in the test set for which we
+conclude the paper in section 7 and introduce some direc-           can compute a recommendation. This information can in
+tions for future research.                                          particular help to produce recommendations for cold start
+                                                                    users. Moreover, using a trust network will protect the rec-
+2.     PROBLEM DEFINITION                                           ommender system against attacks like fake profiles. As faked
+                                                                    profiles are not being trusted, they can not affect the rec-
+   In recommender systems we have a set of users U =                ommender.
+{u1 , ... uN } and a set of items I = {i1 , ... iM }. Each user u    Figure 1 illustrates the trust-based recommendation prob-
+rates a set of items RIu = {iu1 , ... iuk }. The rating of user u
+on item i is denoted by ru,i . ru,i can be any real number, but
+often ratings are integers in the range [1, 5]. In a trust-based
+system, we also have a trust network among users. If u trusts
+v, then tu,v denotes the value of this trust as a real num-
+ber in [0, 1]. Zero means no trust and one means full trust.
+Binary trust networks are the most common trust networks
+(Amazon4 , eBay5 , ...). We define T Uu = {v ∈ U | tu,v = 1}
+where T Uu denotes the set of users directly trusted by u.
+   The trust network can now be defined as a graph G =<
+U, T U > where T U = {(u, v)| u ∈ U, v ∈ T Uu }. There is a
+node corresponding to each user, and an edge corresponding
+to each trust statement.
+   The task of a recommender is as follows: Given a user            Figure 1: Illustration of a social network including rat-
+u ∈ U and an item i ∈ I for which ru,i is unknown, predict          ings expressed by users. The ratings are shown below
+the rating for u on item i. We call u the source user and           the item icon beside the user.
+i the target item. The predicted rating is denoted by rbu,i .       lem. As shown in this figure, we have a social (trust) network
+Normally, users rate only a very small percentage of the            of users. Each user has rated some items. The source user u
+items, and ru,i is unknown for most pairs of (u,i).                 wants a prediction on the target item i (the green diamond).
+   Traditional recommenders[6] estimate rbu,i based on rat-         Normally just a few users have rated the target item. Other
+ings expressed by similar users. Basically, they find a neigh-      users have ratings on other items which may include items
+borhood of raters (users who have rated target item i) who          already rated by u or items similar to the target item i.
+have a rating profile similar to the source user, and aggre-        The goal of the recommender is to predict unknown ratings
+gate their ratings. In trust-based recommenders, the trust          based on the ratings expressed by trusted friends.
+network will be used instead of rating similarities to define
+the neighborhood. To predict a rating we ask our directly
+trusted neighbors whether they know the rating for the item.        3.    RELATED WORKS
+If so, they return it, otherwise they recursively ask their di-        In this section, we review related work on trust-based rec-
+rect neighbors. The neighborhood in a trust based recom-            ommendations. We can distinguish two types of trust: Ex-
+mendation is defined as the set of raters trusted (directly or      plicit trust and Implicit trust. Explicit trust denotes the
+indirectly) by the source user. The ratings from these rates        trust values explicitly indicated by users, while implicit trust
+are aggregated to produce a recommendation.                         is the trust value inferred from some evidence such as feature
+   Trust-based recommendation works because of the effects          similarity of users or email exchange among two persons. In
+of selection and social influence that have been postulated         this paper we deal with the explicit trust indicated by users.
+by sociologists for a long time. Selection means that peo-          In the case of explicit trust, we have direct trust and indi-
+ple tend to relate to people with similar attributes, and due       rect trust. Direct trust is the trust value explicitly indicated
+to social influence related people in a social network influ-       by users, but indirect trust is the trust inferred from direct
+ence each other to become more similar[16]. The increasing          trust using transitivity of trust. how to compute indirect
+availability of online social network data has finally allowed      trust is one of the main issues of trust models. Two dif-
+a verification of these sociological models. [4] experimen-         ferent approaches can be distinguished for trust computa-
+tally verified that people are similar to their neighbors in        tion: Model-based[13][9] and Memory-based[10][5][18][8]. In
+a social network for these reasons. They had a network of           Model-based approaches, a model with its parameters will
+people having social interactions and a similarity network in       be learnt to compute indirect trust. But, in Memory-based
+which users are connected to their most similar users. It was       approaches, no model is being learnt and normally explo-
+shown that the social interaction and similarity graphs have        ration and heuristics are being used.
+little overlap, sharing fewer than 15% of their edges. The re-         TidalTrust[5] performs a modified breadth first search in
+                                                                    the trust network to compute a prediction. Basically, it finds
+4
+    www.amazon.com                                                  all raters with the shortest path distance from the source
+5
+    www.ebay.com                                                    user and aggregates their ratings weighted by the trust be-
+tween the source user and these raters. To compute the             their ratings become. Our approach to find a good trade-off
+trust value between user u and v who are not directly con-         is based on the following observation. Ratings expressed by
+nected, TidalTrust aggregates the trust value between u’s          strongly trusted friends on similar items are more reliable
+direct neighbors and v weighted by the direct trust values         than ratings expressed by weakly trusted far neighbors on
+of u and its direct neighbors. Since TidalTrust only uses in-      the exact target item. This motivates us to combine the
+formation from raters at the nearest distance, it may loose        trust-based and item-based approach.
+a lot of valuable ratings from users a little further apart in        We propose a random walk model, called TrustWalker,
+the network.                                                       which considers not only ratings of the target item, but also
+   [10] introduces MoleTrust. The ideas used in MoleTrust          those of similar items. The probability of using the rating
+and TidalTrust are similar. But MoleTrust considers all            of a similar item instead of a rating for the target item in-
+raters up to a maximum-depth given as an input. maximum-           creases with increasing length of the walk. Basically, our
+depth is independent of any specific user and item. Also, to       model consists of two major components: the random walk
+compute the trust value between u and v in MoleTrust, we           on the trust network and the probabilistic item selection.
+perform a backward exploration. It means that the trust            The random walk performs the search in the trust network,
+value from u to v is the aggregation of trust values between       and the item selection part considers ratings on similar items
+u and users directly trusting v weighted by the direct trust       to avoid going too deep in the network. So our model im-
+values.                                                            proves the precision by preferring raters at a nearer distance
+   The Advogato[8] maximum flow trust metric has been              and improves the coverage by considering similar items as
+proposed in order to discover which users are trusted by           well as the exact target item.
+members of an online community. The input for Advogato                To recommend a rating for a source user u0 on target
+is given by an integer number n, the number of members             item i, we perform random walks on the trust network, each
+to trust. To assign capacities to the edges of the network,        starting at u0 to find a user having expressed rating for
+they need to transform the network, so it needs to know the        i or items similar to i. The details of the random walks
+whole structure of the network. Moreover, it only computes         will be discussed later in this section. Each random walk
+the nodes to trust and does not compute different degrees          returns a rating. We perform several random walks, and
+of trust. Since the number of users to trust is independent        the aggregation of all ratings returned by different random
+of users and items and there is no distinction between the         walks are considered as the predicted rating rbu0 ,i .
+trusted users, this approach is not appropriate for trust-            In the following subsections, we will discuss the details of
+based recommendation.                                              our random walk model. In our notations, we use symbols
+   AppleSeed has been proposed in [18]. The basic intuition        u, v, w, ... for users, i, j, ... for items, and k for the step of a
+of AppleSeed is motivated by spreading activation models.          random walk. Table 1 lists all notations used in our model.
+Source node u is activated through an injection of energy e,
+                                                                      Notation    Description
+which is then fully propagated to other nodes along edges
+proportional to the weight of the edge. AppleSeed considers            φu,i,k     probability of stopping the random walk at
+                                                                                  node u in step k.
+the trust to be additive. If there are many weakly trusted
+                                                                         Xu,i,k   RV for being at node v in k steps starting from
+paths between two users, this pair of users will obtain a high                    u
+trust value, which is not intuitive.                                     Xu,i     RV for being at node v at some steps starting
+   [1] presents a set of axioms for trust-based recommender                       from node u
+systems and analyzes which combination of these axioms can                Su      RV for selecting a user v out of members of set
+be satisfied simultaneously. In the context of this discussion,                   T Uu .
+a simple random walk method for binary (+1,-1) ratings is                 Yu,i    RV for selecting item j amongst items rated
+                                                                                  by u
+presented, which can be formulated as a special case of our
+                                                                         XYu,i    RV for stopping at node v and selecting item
+model. [1] does not perform any experimental evaluation or                        j rated by v, while starting from u.
+comparison to other methods.                                              ru,i    The rating expressed by u on item i
+   Trust has been defined and used in a different way by [12].            r̂u,i   The predicted rating of user u on i
+They extract the social network from the similarity of users’             tu,v    The trust value among users u and v
+profiles, which is not providing additional information as
+is provided by trust network. They have two definitions for        Table 1: Notations used in TrustWalker. RV stands
+trust: profile level trust, which is a global reputation metric;   for Random Variable. All the notations have index
+and item level trust, which measures the trustworthiness of        i denoting target item i.
+a user according to his recommendations for an item rather
+than a user-user local trust metric. They use the trust values     4.1     A Single Random Walk
+to filter raters, and they aggregate the ratings weighted by a       Starting from source user u0 , we perform our random
+combination of trust and similarity values. Moreover, they         walk. At each step k of a random walk, we are at a cer-
+do not use the transitivity of trust, but only directly trusted    tain node u. If u already has the rating on target item i,
+users. This method is not a trust-based recommendation             then we stop our random walk and return ru,i as the result
+method in the sense in which we use this term in this paper.       of random walk. If u does not have a rating on i, then we
+                                                                   have two options:
+4.   TRUSTWALKER MODEL
+                                                                      • With probability φu,i,k , we don’t continue the random
+  The main challenge in trust-based recommendation is to                walk. We stay at node u and randomly select one of
+decide how far to go in exploring the network. There is a               the items (j) similar to i rated by u and return ru,j .
+trade-off between precision and coverage: the further you
+go, the more likely to find raters, but the less trust-worthy         • With probability 1 − φu,i,k , we continue our random
+     walk and walk to another user v who is one of u’s direct                      U Ci,j is the set of common users who have rated both
+     trusted neighbors (v ∈ T Uu ).                                             items i and j, and ru denotes the average of ratings ex-
+                                                                                pressed by u. corr(i, j) denotes the correlation of items i,j.
+If we decide to continue the random walk at node u, we have                        The size of the set of common users is also important. For
+to select one of directly trusted neighbors of u to continue                    example, if corr(i, j) = corr(i, l), but |U Ci,j | > |U Ci,l |, then,
+the random walk to that user. We define Su as the random                        since i and j have been rated by more common users, so the
+variable for selecting a user v from T Uu :                                     correlation between them is stronger and sim(i, j) should be
+                                   tu,v                 1                       greater than sim(i, l). We consider |U Ci,j | in the similarity
+             P (Su = v) = P                    =                         (1)    measure as follows:
+                               w∈T Uu tu,w           |T Uu |
+  Now, we have:                                                                                                   1
+                                                                                              sim(i, j) =             |U Ci,j |
+                                                                                                                                  × corr(i, j)   (7)
+                                                                                                                  −
+                                                                                                            1+e           2
+                                  g
+  P (Xu0 ,i,k+1 = v|Xu0 ,i,k = u, Ru,i ) =
+                                                                  1                We used the sigmoid function to avoid favoring the size
+           (1 − φu,i,k ) × P (Su = v)) = (1 − φu,i ) ×                   (2)    of U Ci,j too much and to keep the similarity value in the
+                                                               |T Uu |
+                                                                                range [0,1]. If the size of the set of common users is big
+                                                                                enough, then the first part of equation 7 would converge to
+   Here, Xu0 ,i,k denotes the random variable for being at                      1, but for small sets of common users, the factor would be
+node v in step k while looking for a prediction on target                       0.6. The number 2 in the denominator of the exponent is
+item i for source user u0 . Details of computing P (Xu,i,k = v)                 because we wanted to have a factor of greater than .9 if the
+are discussed later. Also we have a condition that the user                     size is greater than 5.
+u in step k-1 does not have the rating for item i (denoted
+by Rgu,i ). The probability of walking from user u to v is                      4.1.2     Termination of a Single Random Walk
+independent of previous steps. But, since φu,i,k depends on                        At each user u, we have a probability φu,i,k of staying at u
+the step k, it is not independent of the step of the random                     to select one of his items at step k of the random walk, while
+walk.                                                                           we are looking for a prediction on target item i. This prob-
+   With probability φu,i,k , if we decide to stay at a user u,                  ability should be related to the similarities of items rated by
+we select one of the items rated by u which is similar to                       u and the target item i. similarity values are real numbers
+the target item i. The idea is that we define a similarity                      in [0, 1], so they can also be considered as probabilities. We
+measure between items, and for each item j ∈ RIu , we assign                    consider the maximum similarity of items rated by u with
+a probability of selecting proportional to the similarity of i                  target item i as the probability of staying at node u.
+andj. We’ll discuss the details of the similarity metric later.                    Furthermore, ratings on target item i from users far away
+                                      sim(i, j)                                 from source user u0 are noisy, but ratings expressed by
+                P (Yu,i = j) = P                                         (3)    trusted users nearby in the network are more reliable. So,
+                                    l∈RIu sim(i, l)
+                                                                                the deeper we go into the network, the probability of contin-
+   In this equation Yu,i denotes the random variable for se-                    uing our random walk should decrease and so φu,i,k should
+lecting item j amongst items rated by u while looking for an                    increase.
+item similar to target item i. We return ru,j as the result of                     To inject the factor k in φu,i,k , we should use a function
+this random walk.                                                               f (k) which gives value 1 for big values of k, and a small value
+   To define the whole probability distribution, we define the                  for small values of k. Since the sigmoid function satisfies our
+probabilities for conditions where Ru,i is true, or for items                   constraints for f (k), we consider a sigmoid function of the
+not rated by u as follows:                                                      k as another factor affecting φu,i,k .
+                                                                                                                                       1
+        ∀v 6= u P (Xu0 ,i,k+1 = v|Xu0 ,i,k = u, Ru,i ) = 0               (4)                   φu,i,k = max sim(i, j) ×                    k
+                                                                                                                                                 (8)
+                                                                                                        j∈RIu
+                                                                                                                                   1 + e− 2
+                  ∀j.j ∈
+                       / RIu P (Yu,i = j) = 0                            (5)    Each random walk has three alternatives to stop:
+
+                                                                                   1. Reaching a node which has expressed a rating on the
+4.1.1    Item Similarities                                                            target item i.
+   In content-based recommendation, the similarity of items
+can be computed using their features. However in collabo-                          2. At some user node u, we decide to stay at the node
+rative filtering, the only information available about items is                       and select one of the items rated by u and return the
+their ratings. Hence, to compute the similarity of two items,                         rating for that item as the result of random walk.
+we use the Pearson Correlation of ratings expressed for both                       3. There is chance for a single random walk to continue
+items, as used in [15]. Values of the Pearson correlation are                         for ever. To avoid such a case in our implementation
+in the range [-1,1]. Negative correlations mean that the rat-                         of random walk, we terminate the random walk when
+ings expressed for two items are in opposite directions, so                           we go very far from the source user (k > max-depth).
+these items are not useful for our purpose. Therefore, we                             Based on the idea of ”six-degrees of separation”[11], we
+only consider items with positive correlation.                                        set max-depth = 6.
+                      P
+                        u∈U Ci,j (ru,i − r u )(ru,j − r u )
+                                                                                4.2     Recommendation
+  corr(i, j) = qP                              qP                         (6)     In TrustWalker, we have the probability of selecting items
+                                             2                       2
+                    u∈U Ci,j (ru,i − r u )          u∈U (ru,i − r u )           rated by different users and returning that rating as the
+                                                                                result of a random walk. These items could be either the
+exact target item i, or another item. The estimated rating                 for each item i and step k. Φk,i is a |U | × |U | matrix con-
+for source user u on target item i would be the expected                   taining 1 − φu,i,k in its diagonal elements. In other words,
+value of ratings returned by different random walks.                       Φk,i u,u = 1 − φu,i,k .
+                         X                                                   It is easy to check that the elements of Φ1,i P are the
+           rbu,i =                   P (XYu,i = (v, j)) rv,j         (9)   probabilities of reaching from u to v in step 1. We can also
+                     {(v,j)|Rv,j }                                         define a closure on the Φk,i P as follows:
+  In the above equation, XYu,i is the random variable for                                 K
+                                                                                        ∞ Y
+                                                                                        X
+stopping the random walk at node v and selecting item j                         P∗i =             Φk,i P
+rated by v, while we start the random walk from source user                             K=1 k=1
+u looking for target item i. Notice that the value for XY                           = Φ1,i P + Φ1,i PΦ2,i P + Φ1,i PΦ2,i PΦ3,i P + ...
+are ordered pairs. As used before, Rv,j is a boolean variable                                    = Φ1,i P(I + Φ2,i P(I + Φ3,i P(...)))       (13)
+denoting whether v has a rating on item j. Now we have:                     QK
+                                                                              k=1 Φd,i P is the matrix containing P (Xu,i,K ) = v in its
+  P (XYu,i = (v, j)) =                                                     cells. In the above equation, k denotes the current step of
+                                                                          each single random walk and K denotes then number of
+             P (Xu,i = v)φu,i P (Yv,i = j)         v 6= u;i 6= j
+           
+                                                                                                                               b i (cor-
+                                                                          steps each random walk has. Now, we can compute P
+              P (Xu,i = v)                          v 6= u;i = j    (10)   responding to equation 12) which is the probability matrix
+           
+           
+           
+                                                                          containing P (Xu,i = v) in its elements as follows:
+              φv,i,1 P (Yv,i = j),                  v = u;i 6= j
+                                                                                                            b i = Ci P∗
+                                                                                                            P                                (14)
+                                                                                                                      i
+ In this equation, Xu,i is the random variable for being at
+node v at some step in a random walk starting from source                     Here, Ci is an N × N diagonal matrix used for normaliza-
+                                                                                                                               1
+user u looking for item i. Notice that in above formula,                   tion. The values of the diagonal are Ci u,u = P      P∗
+                                                                                                                                     .
+                                                                                                                                      w∈U   i u,w
+we used φu,i instead of φu,i,k for the first case. Since we                                  b i to compute P (Xu,i = v) in equation 12.
+                                                                           Now we can use P
+don’t know the number of steps needed to reach v, we don’t
+                                                                             If, we do not consider step k as a factor in φu,i , it can be
+consider the factor k (Actually φu,i = φu,i,∞ ). It should be
+                                                                           proved that P∗i has a closed formula solution, and this closed
+noted that if we actually perform random walks, we can con-
+                                                                           formula is (I − Φi P)−1 Φi P. In this formula, Φi is the same
+sider the step k in the first case. But to have a closed form
+                                                                           as Φk,i ignoring the factor k. The proof of convergence of
+formula, we ignore the factor k at the last user v which gives
+                                                                           equation 13 is a straightforward application of the Perron-
+us a pretty good approximation of the probability. Also, we
+                                                                           Frobenius theorem6 , and the lemma that all eigenvalues of
+should note that the case v = u and i = j is trivial since the
+                                                                           Φi P are strictly less than one.
+user himself has the rating on the target item.
+                                                                             Since matrices Φk,i are different for different k values, we
+   A random walk starting from u can reach v using differ-
+                                                                           can not find a closed formula for P∗i . We propose two alter-
+ent number of steps. As mentioned before, we use random
+                                                                           natives to compute equation 13.
+variable Xu,i,k for being at node v in k steps
+                     X                                                           • Performing the random walks. This way, we can see
+ P (Xu,i,k = v) =          P (Xu,i,k−1 = w)(1 − φw,i,k )P (Sw = v)                 the results in action and the estimated value would be
+                     w∈U
+                                                                                   the aggregation of results of different random walks.
+                                                                    (11)
+                                                                                 • Based on the idea of ”six degrees of separation” [11],
+   Also we have P (Xu,i,0 = u) = 1 as the base for the above                       most nodes would be reachable with a walk of length at
+equation. Since the random
+                         P       walks have a probability of                       most 6. So, we can have a pretty good approximation
+stopping at each step,     v∈U P (Xu,i,k = v) 6= 1. To make                        of P∗i by
+P (Xu,i,k = v) a probability distribution, we define a dead
+                                                                                                                     K
+                                                                                                                   6 Y
+                                                                                                                   X
+state ⊥ to which all users go after deciding to terminate that                                             P∗i =             Φk,i P          (15)
+random walk. So, we have                                                                                           K=1 k=1
+                                         X                                 This formula can be easily computed. But, there is a prob-
+           P (Xu,i,k = ⊥) = 1 −               P (Xu,i,k = v)
+                                        v∈U
+                                                                           lem with the second approach. We have to store P∗i associ-
+                                                                           ated with each item, which is expensive. For example if we
+   This state ⊥ will be added to U for convenience in formal-              have 10K items and 40K users, and each cell of the matrix
+ization of our method, but we don’t consider this state in                 occupies just one byte, then each matrix P∗i would occupy
+any actual random walk. Now, we can compute P (Xu,i = v)                   almost 1.6GB memory. To store all matrices we would need
+as follows:                                                                16T B of memory, which is not feasible. This issue motivates
+                                 P∞                                        performing actual random walk and aggregate the results
+                                   k=1 P (Xu,i,k = v)
+         P (Xu,i = v) = P           P∞                              (12)   of different random walks. Moreover, computing this ma-
+                                w∈U   k=1 P (Xu,i,k = w)
+                                                                           trix needs a global information on the whole network, but
+                                                                           TrustWalker can be computed in in a local manner.
+4.3   Matrix Notation of TrustWalker                                          Notice that there are major differences between our ran-
+  Similar to any random walk model, we can represent Trust-                dom walk model and existing random walk approaches such
+Walker using matrix notations. We consider a probability                   as [3] and [17]. In PageRank [3], there is a random walk
+matrix P in which Pu,v = P (Su = v) = |N1u | for all users                 on the links among WebPages, which correspond to users.
+                                                                           But there is no item in PageRank and walks do not depend
+u and v for which tu,v = 1. To formulate the values of
+                                                                           6
+φu,i,k in matrix notation, we define a diagonal matrix Φk,i                    http://en.wikipedia.org/wiki/Perron-Frobenius theorem
+on the step of the random walk. Moreover, PageRank is a          TrustWalker, in one of its extreme cases, can be considered
+global reputation metric. These differences make PageRank        as an ideal trust-based recommender.
+simpler than TrustWalker to find the closed form solution.
+Nevertheless, they do not compute the closed formula be-         5.2    Confidence in Recommendation
+cause of the scale of network. In [17], they have an item           As discussed in the introduction, most existing recom-
+graph on which they perform the random walk. This graph          menders do not give users the confidence in their predictions.
+is independent of users, and hence they do not perform ran-      However, users of a recommender like to know how confident
+dom walks on users. Also, unlike TrustWalker, their walks        the predicted ratings are. [2] defines a confidence score using
+are independent of step k of the random walk. Having a           the error function for its prediction. Basically, they consider
+simpler model, they are able to compute the closed formula       the squared error as the confidence. Their experiments show
+for walking on the item graph.                                   that predictions with better confidence have higher quality.
+                                                                 Our random walk model also has the advantage that it can
+4.4   Termination of the Overall Method                          compute the confidence.
+   The results of performing actual random walks approxi-           We can use the variance σ 2 to compute our confidence in
+mate the results given by equation 13. We perform several        the predicted rating. The lower the variance σ 2 , the more
+random walks to be able to get a more reliable prediction.       confident we are in our results. To convert this σ 2 into a
+We need to be able to decide when we have done enough            value representing the degree of confidence, we employ the
+random walks to have a precise estimate of rbu,i .               following formula:
+   We compute the variance in the results of all the walks as                                          σ2
+follows:                                                                          conf idence = 1 −                        (16)
+                         PT                                                                           maxσ 2
+                                        2
+                           i=1 (ri − r)                          where maxσ 2 is the maximum possible variance for the re-
+                    σ2 =
+                                T                                sults and is used to normalize the variance values. If the
+  Here, ri is the result of ith random walk, and r denotes       rating values are in a finite range and the size of this range
+                                                                                                                         2
+the average of the ratings returned by random walks. T is        is Range, then it is easy to prove that maxσ 2 = Range4
+                                                                                                                           .
+the number of random walks we perform to compute the                Two other factors may also potentially affect the confi-
+prediction. We also define σi2 as the variance in the results    dence: the average number of steps in each random walk k,
+of the first i random walks. Since the values of ratings are     and the number of random walks. Including k seems to make
+in finite range of [1,5], it can be proved7 that σ 2 converges   sense, but our experiments showed that it doesn’t make any
+to a constant value. So we can terminate TrustWalker if          difference in the precision of results. In other words, the
+  2
+|σi+1 − σi2 | ≤ ².                                               error for predictions with lower k is not much better than
+  It should be noted that we have a constant threshold           the overall error. Regarding the number of random walks,
+of 10000 for the maximum number of unsuccessful random           more random walks can lead to more information and more
+walks, and after that we consider the pair <user,item> as        confidence, but can also indicate more noise since it took
+non-covered.                                                     longer for the results to converge.
+                                                                    Using equation 16, if the results of the random walks are
+                                                                 the same, then the variance would be zero, and the confi-
+5.    PROPERTIES OF TRUSTWALKER                                  dence would be 100%. On the other side, if the variance is
+  Our random walk model has some desirable properties,           very high, then the confidence will be close to 0%.
+which include generality of the model, confidence in the re-
+sult, and explainability of predictions.                         5.3    Explainability of Recommendations
+                                                                    Explainability means that the recommender system is able
+5.1   Special Cases of TrustWalker                               to explain how it predicted the rating. There is now a grow-
+   Our model includes Item-based Collaborative Filtering         ing recognition that recommender systems must be able to
+and pure Trust-based Recommendation as its extreme spe-          explain and justify the recommendations in order to help
+cial cases. If φu,i = 1 for all u ∈ U , then our random walk     users to understand why particular items have been sug-
+will never start, and it will return the rating expressed by     gested.
+the source user u0 on one of its rated items. Since the prob-       In our model, to predict rbu,i , we compute P (Xu,i = v) for
+ability of selecting an item is proportional to its similarity   all users v. The results of different random walks are from
+to the target item i, the expected value of the recommended      different user. The most frequent users are user with high
+rating would be the weighted average of the ratings on items     probability of P (Xu,i = v). We can output these users as
+in RIu0 with weights proportional to the similarities of these   users whose ratings are most influential on the prediction.
+items to the target item i. This is the same as the result of       Also considering ratings on some items are more frequently
+Item-based collaborative filtering proposed in [15].             used in the results of different random walks. These items
+   On the other hand, if we set φu,i = 0 for all u ∈ U , then    are items with high values of P (XYu,i = (v, j)).
+all random walks will continue until they have found a rat-         Now we can use these most frequent users and items to
+ing for the exact target item i. The recommended rating          explain why we predicted the rating with rbu,i . We can ex-
+would be the aggregation of ratings expressed by users hav-      plain to users that this prediction is based on ratings from
+ing the rating on i weighted by the probability of reaching      these trusted users and these similar items.
+these users from u0 . Existing methods [5][10] try to approx-
+imate these probabilities by simplifying the problem. So our     6.    EXPERIMENTS
+7
+ Proof of this claim and convergence of equation 13 are avail-     This section reports our experimental results on a real life
+able in www.sfu.ca/s̃ja25/trustwalker-proofs.pdf                 data set comparing various versions of TrustWalker against
+state of the art methods for trust based and item based rec-          son correlation as similarity metric. The results of this
+ommendation. We implemented TrustWalker as well as the                version are denoted by TrustWalker0-pure.
+MoleTrust based recommendation proposed by Massa[10]
+                                                                   • TrustWalker. This is our full TrustWalker method.
+and TidalTrust proposed by Golbeck[5]. We also imple-
+                                                                     We also have TrustWalker-pure.
+mented standard User based Collaborative Filtering [6] and
+Item based Collaborative Filtering [15] as two fundamental        We set ² = 0.0001 for our termination condition.
+similarity based recommendation methods.
+                                                                6.2    Evaluation Metrics
+6.1    Experimental Design                                        Typically, the leave-one-out method is used to evaluate
+   Most data sets for recommendation have no social network     recommendation systems [5][10][15]. In the leave-one-out
+among users. To best of our knowledge, Epinions’8 data set      method, we withhold a rating and try to predict it using the
+is the only data set publicly available which has both trust    trust network and the remaining ratings.
+network and ratings expressed by users.                           As used in the most recent research papers [17] [7], we use
+   We used the version of the Epinions’ data set9 published     the Root Mean Squared Error (RMSE) to measure the error
+by the authors of [14]. This data set is very sparse. The       in recommendation:
+data set contains 49k users with at least one rating, out of                        vP
+which 24k users are cold start users. We consider users with                        u
+                                                                                    u (u,i)|R (ru,i − rbu,i )2
+                                                                            RM SE = t
+                                                                                             u,i
+less than 5 ratings as cold start users (similar to [10]). We                                                              (17)
+                                                                                          |{(u, i)|Ru,i }|
+also have 104k items with 575k ratings expressed for them.
+Finally, we have 508k trust statements among pairs of users.      In the above equation, Ru,i is a boolean showing whether
+As mentioned above, 49% of users are cold start users which     u has a rating on i in our data set, and ru,i and rbu,i de-
+is a huge portion of users. So, considering the performance     note the actual and recommended rating respectively. The
+of the recommendation for cold start users is very impor-       smaller the value of RMSE, the more precise a recommen-
+tant. The distribution of the number of ratings per users       dation. But, as we discussed before, the purpose of using
+follows a power law. Notice that there exists another ver-      trust is mostly enhancing the coverage without sacrificing
+sion of the Epinions data set10 prepared and published by       the precision. So we define a coverage metric to measure
+Paolo Massa[10]. We also ran experiments on this data set       the percentage of pairs of <user,item> for which we can
+with very similar results. The data set we used in our ex-      predict a rating.
+periments has additional features which may be helpful for        To combine RMSE and coverage into a single evaluation
+future works.                                                   metric, we compute the FMeasure (Coverage has been al-
+   We implemented TrustWalker and the other methods in          ready defined in section 2). For this purpose, we have to
+Java. We used an Intel Core2 Duo 2.2 GHz CPU with 2GB           convert RMSE into a precision metric in the range [0,1]. So
+RAM to run our experiments on an XP system.                     we define precision as follows:
+   In our experiments, we compare the results for different
+methods. Following is the description of labels we use to                                             RM SE
+                                                                                   P recision = 1 −                        (18)
+denote each of these algorithms:                                                                        4
+    • TidalTrust. This is the trust-based approach of [5].       In this equation, 4 is the maximum possible error since the
+                                                                values of ratings are in the range [1, 5].
+    • MoleTrust. This is the approach used in [10]. It should
+                                                                                          2 × P recision × Coverage
+      be noted that we use max − depth = 6 for ModelTrust                  F M easure =                                    (19)
+      as well.                                                                              P recision + Coverage
+
+    • CF Pearson. We implemented the user based collab-           If none of the random walks can find a prediction on the
+      orative filtering [6], with the Pearson Correlation as    rating, then we say that the recommender can not cover this
+      similarity measure.                                       pair of <user,item>.
+    • Item based. We also implemented the item based col-       6.3    Experimental Results
+      laborative filtering [15] using Pearson Correlation as
+                                                                   In this subsection, we present the results of our experi-
+      the item similarity metric.
+                                                                ments, first for cold-start users and then for all users.
+    • Random Walk This is one of the special cases of Trust-       Table 2 shows the RMSE, Coverage, and F-Measure for
+      Walker with φu,i,k = 0 for all (u, i, k). Also we set     all comparison partners for cold start users. Figures 2 and 3
+      different thresholds on the number of steps a random      show the charts comparing the results of different methods
+      walk. Random Walk 1 represents the case in which we       according to each of three evaluation measures separately.
+      just walk for one step, and in Random Walk 6 each            As shown in figure 2, TrustWalker has lower error than all
+      random walk could continue until 6 steps.                 the other methods except for RandomWalk1. But accord-
+                                                                ing to table 2, RandomWalk1 has extremely low coverage
+    • TrustWalker0. This method is the version of our Trust-
+                                                                (12%). The comparison between TrustWalker and Trust-
+      Walker in which φu,i is independent of k. Our item
+                                                                Walker0 shows that considering the step k in φu,i reduces
+      similarity metric considers the size of the set of com-
+                                                                the error. Also comparing the RMSE of TrustWalker and
+      mon users in computing the similarities. We also per-
+                                                                TrustWalker-pure shows that considering the size of the set
+      formed experiments in which we only considered Pear-
+                                                                of common users in the item similarity metric reduces the
+8
+   www.epinions.com                                             error.
+9
+   http://alchemy.cs.washington.edu/data/epinions/                 Figure 3 shows the F-Measure together with precision and
+10
+   http://www.trustlet.org/wiki/Epinions dataset                coverage for all methods. It shows that all four versions of
+        Method           RMSE     Coverage(%)     F-Measure
+      Tidal Trust        1.216       60.92          0.650
+      Mole Trust         1.430       57.75          0.608
+      CF Pearson         1.495       17.94          0.279
+    RandomWalk 6         1.206       61.74          0.655
+    RandomWalk 1         1.084       12.77          0.217
+      Item based         1.520       23.19          0.338
+   TrustWalker0-pure     1.293       72.08          0.698
+     TrustWalker0        1.263       74.22          0.712
+   TrustWalker-pure      1.259       72.08          0.703
+      TrustWalker        1.192       74.22          0.722
+
+      Table 2: Results for COLD START users.
+                                                                    Figure 3: Comparison of Coverage and Precision to-
+                                                                    gether with F-Measure for different methods on COLD
+                                                                    START users.
+
+
+
+
+Figure 2: Comparison of RMSE for different methods
+on COLD START users.
+
+TrustWalker outperform all other methods according to the
+combination of precision and coverage. Notice that Tidal-
+Trust[5] outperforms all versions of our model in terms of          Figure 4: Comparison of evaluation measures for differ-
+precision except for the full TrustWalker which has a slightly      ent methods on ALL users.
+lower error. However, TrustWalker’s coverage is 13% more            the exact target item. TrustWalker also clearly outperforms
+than that of TidalTrust, which makes TrustWalker better in          Collaborative Filtering (both user-based and item-based) in
+terms of F-Measure.                                                 terms of coverage because of exploiting the trust-network
+   The results for all users are shown in table 3. Figure           in its random walks. Moreover, TrustWalker clearly out-
+4 shows the results of different methods according to each          performs Collaborative Filtering methods in terms of pre-
+of the three evaluation measures on all users. We observe           cision due to the restriction to ratings from highly trusted
+similar relative performance of all methods as for cold start       users. Since cold start users have only a few ratings, the
+users. It should be noted that all methods perform signif-          improvement of coverage using trust-based approaches (spe-
+icantly better over all users since there is less information       cially TrustWalker) compared to Collaborative Filtering is
+available for cold start users. TrustWalker outperforms all         much more for cold start users than for all users.
+other methods in terms of F-Measure, although the gain for             For example, TrustWalker’s coverage is 74% for cold start
+all users is less than the gain for cold start users. Notice that   users while Collaborative Filtering approaches have coverage
+the errors of both TidalTrust and MoleTrust for All users           of 18% and 23%. But in case of all users, TrustWalker’s cov-
+are very close to TrustWalker, but TrustWalker clearly has          erage is 95% while Collaborative Filtering approaches have
+a better coverage.                                                  coverage of 71%. TidalTrust and MoleTrust have coverage
+                                                                    of 84% and 82% respectively for cold start users while their
+        Method           RMSE     Coverage(%)     F-Measure
+                                                                    coverage is 61% and 57% in case of all users.
+       TidalTrust        1.096       84.87          0.783
+       MoleTrust         1.093       82.13          0.771
+                                                                       To evaluate the meaningfulness of our definition of con-
+      CF Pearson         1.327       71.63          0.691           fidence, we compare the error of TrustWalker for different
+    RandomWalk 6         1.089       87.19          0.793           percentiles of most confident predictions (for both Cold Start
+    RandomWalk 1         1.154       30.62          0.428           and All users) in figure 5. As shown in this figure, the more
+      Item based         1.244       70.69          0.698           confident the predictions are the more precise the results
+   TrustWalker0-pure     1.158       95.29          0.814           will be and hence the lower the RMSE. For example, the
+     TrustWalker0        1.112       95.36          0.822           difference between the RMSE of the top 50% confident pre-
+   TrustWalker-pure      1.109       95.29          0.822           dictions and all predictions is 0.18 for cold start users. As an
+      TrustWalker        1.077       95.36          0.827           evidence for the significance of these RMSE reductions, note
+                                                                    that in the Netflix prize competition11 , there is a $1 Million
+    Table 3: Experimental results for ALL users.                    reward for a reduction of the RMSE by 10% (around 0.1).
+   In summary, TrustWalker substantially improves the cov-          7.      CONCLUSION
+erage of existing trust-based approaches while maintaining                Recommender systems are emerging as tools of choice to
+the same or even slightly better precision. This improvement
+                                                                    11
+is achieved by considering ratings for similar items as well as          http://www.netflixprize.com
+                                                                  8.   ACKNOWLEDGEMENT
+                                                                    We are very grateful to Samaneh Moghaddam for her use-
+                                                                  ful comments and for proof reading this paper.
+
+                                                                  9.   REFERENCES
+                                                                   [1] R. Andersen, C. Borgs, J. Chayes, U. Feige,
+                                                                       A. Flaxman, A. Kalai, V. Mirrokni, and
+                                                                       M. Tennenholtz. Trust-based recommendation
+                                                                       systems: an axiomatic approach. In WWW 2008.
+                                                                   [2] R. M. Bell, Y. Koren, and C. Volinsky. Modeling
+Figure 5: The effect of confidence on the precision
+                                                                       relationships at multiple scales to improve accuracy of
+of recommendations. The horizontal axis shows per-
+                                                                       large recommender systems. In KDD 2007.
+centile of most confident predictions from dataset.
+                                                                   [3] S. Brin and L. Page. The anatomy of a large-scale
+                                                                       hypertextual web search engine. Computer Networks
+select the online information relevant to a given user. Col-           and ISDN Systems, 30(1), 1998.
+laborative filtering is the most popular approach to building      [4] D. Crandall, D. Cosley, D. Huttenlocher, J. Kleinberg,
+recommender systems and has been successfully employed                 and S. Suri. Feedback effects between similarity and
+in many applications. However, it cannot make recommen-                social influence in online communities. In KDD 2008.
+dations for so-called cold start users that have rated only a      [5] J. Golbeck. Computing and Applying Trust in
+very small number of items. Collaborative filtering meth-              Web-based Social Networks. PhD thesis, University of
+ods are rather vulnerable to attacks that insert fraudulent            Maryland College Park, 2005.
+user profiles into the database. Finally, these methods do         [6] D. Goldberg, D. Nichols, B. M. Oki, and D. Terry.
+not know how confident they are in their recommendations.              Using collaborative filtering to weave an information
+Trust-based recommender systems can better deal with cold              tapestry. Communications of the ACM, 35(12), 1992.
+start users, since users only need to be simply connected to       [7] Y. Koren. Factorization meets the neighborhood a
+the trust network. The trust-based approach is also much               multifaceted collaborative filtering model. In KDD
+more robust to fraudulent attacks.                                     2008.
+   On the other hand, the sparsity of the user item ratings
+                                                                   [8] Levien and Aiken. Advogato’s trust metric. online at
+forces the trust-based approach to consider ratings of in-
+                                                                       http://advogato.org/trust-metric.html, 2002.
+direct neighbors that are only weakly trusted, which may
+                                                                   [9] H. Ma, H. Yang, M. R. Lyu, and I. King. Sorec: social
+decrease its precision. In order to address this problem, we
+                                                                       recommendation using probabilistic matrix
+proposed the random walk model TrustWalker to combine
+                                                                       factorization. In CIKM ’08, 2008.
+the trust-based and the item-based collaborative filtering ap-
+proach to recommendation. TrustWalker considers not only          [10] P. Massa and P. Avesani. Trust-aware recommender
+ratings of the target item, but also those of similar items,           systems. In ACM Recommender Systems Conference
+with probability increasing with increasing length of the              (RecSys), USA, 2007.
+walk. As another contribution, TrustWalker allows us to de-       [11] S. Milgram. The small world problem. Psychology
+fine and to measure the confidence of a recommendation. We             Today, 2, 1967.
+performed an evaluation on the Epinions dataset, demon-           [12] J. O’Donovan and B. Smyth. Trust in recommender
+strating that TrustWalker outperforms both collaborative               systems. In 10th international conference on
+filtering methods and purely trust-based methods specially             Intelligent user interfaces, USA, 2005.
+in terms of coverage. Also TrustWalker has a slightly better      [13] A. Rettinger, M. Nickles, and V. Tresp. A statistical
+precision compared to other Trust-based approaches while               relational model for trust learning. In AAMAS ’08:
+clearly outperforming Collaborative Filtering approaches in            7th international joint conference on Autonomous
+terms od precision. We also showed that highly confident               agents and multiagent systems, 2008.
+recommendations are of even greater quality.                      [14] M. Richardson and P. Domingos. Mining
+   This work suggests several interesting directions for future        knowledge-sharing sites for viral marketing. In KDD
+work. We want to evaluate TrustWalker on other data sets               2002.
+as soon as they become available. Besides the problem of          [15] B. Sarwar, G. Karypis, J. Konstan, and J. Riedl.
+predicting a rating for a given item, recommending a list of           Item-based collaborative filtering recommendation
+items to a user is also a natural task for recommenders. We            algorithms. In WWW 2001.
+plan to investigate the extension of the TrustWalker model        [16] S. Wasserman and K. Faust. Social Network Analysis.
+for this task. In this paper and in the related work, the              Cambridge Univ. Press, 1994.
+ratings are assumed to be stored in a centralized repos-          [17] H. Yildirim and M. S. Krishnamoorthy. A random
+itory. However, applications such as mobile phone-based                walk method for alleviating the sparsity problem in
+social networks require a distributed recommender, and a               collaborative filtering. In ACM Conference on
+random walk model is a promising approach for such sce-                Recommender Systems (RecSys), Switzerland, 2008.
+narios. The trust concept we considered in this paper is          [18] C. N. Ziegler. Towards Decentralized Recommender
+context independent. However, people may trust other peo-              Systems. PhD thesis, University of Freiburg, 2005.
+ple in some context while they do not trust those people in
+other contexts. Investigating context-based trust models for
+recommendations is also an interesting direction for future
+work.
+

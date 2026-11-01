@@ -1,0 +1,41 @@
+{
+  "data": "C:\\Users\\86134\\Desktop\\大四上\\社交网络实验二\\实验二实验代码\\data\\cnn_stories_tokenized",
+  "output": "C:\\Users\\86134\\Desktop\\大四上\\社交网络实验二\\实验二实验代码\\results",
+  "limit": 0,
+  "sentences": 3,
+  "damping": 0.85,
+  "seed": 42,
+  "study": false,
+  "python": "3.12.7",
+  "numpy": "1.26.4",
+  "files_found": 5000,
+  "evaluated": 4996,
+  "skipped_ids": [
+    "00465603227f7f56fcd37e10f4cd44e57d7647d8",
+    "07bca124a8b784800aa38e6237524eb756792c7c",
+    "09ac649da7f5ae27d3a7ef47eeb9b8ea4cbd799c",
+    "0de44dd3a66327f990e4f21b2c672424a07dbfb7"
+  ],
+  "reference": "all highlights joined into one reference",
+  "metrics": "lowercase word tokens; no stemming or stopword removal; macro ROUGE P/R/F1; whole-summary LCS; corpus BLEU-4 unsmoothed; scale 0..1",
+  "configs": [
+    [
+      "lead-3",
+      "lead",
+      3,
+      0.85
+    ],
+    [
+      "textrank-overlap",
+      "overlap",
+      3,
+      0.85
+    ],
+    [
+      "textrank-tfidf",
+      "tfidf",
+      3,
+      0.85
+    ]
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "algorithm": "Handwritten multinomial Naive Bayes",
+  "features": "Unigram token counts; vocabulary fitted on train only",
+  "alpha": 1.0,
+  "data_source": "aclImdb_v1.tar.gz",
+  "train_counts": {
+    "neg": 12500,
+    "pos": 12500
+  },
+  "vocabulary_size": 79713,
+  "test_count": 25000,
+  "correct": 20312,
+  "accuracy": 0.81248,
+  "confusion_matrix_actual_then_predicted": {
+    "neg": {
+      "neg": 10962,
+      "pos": 1538
+    },
+    "pos": {
+      "neg": 3150,
+      "pos": 9350
+    }
+  },
+  "training_seconds": 12.475,
+  "evaluation_seconds": 15.901
+}

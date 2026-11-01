@@ -1,0 +1,1246 @@
+            NL ⇒ Schedule: Evaluate Multitask Scheduling Capability of Large
+                                  Language Models
+
+                 Wenrui Liao1 Weihong Du1 Yi Li1 Hongru Liang2 * Wenqiang Lei1
+                           1
+                             College of Computer Science, Sichuan University, China
+                         2
+                           School of Artificial Intelligence, Sichuan University, China
+                            {liaowenrui, duweihong, liyi2}@stu.scu.edu.cn
+                                  {lianghongru, wenqianglei}@scu.edu.cn
+
+
+                              Abstract
+            Automated schedule generation for multitask
+            from natural language descriptions has huge po-
+            tential in modern industry. While classic meth-
+            ods bypass language complexities by using pre-
+            formatted matrices, and recent LLM+solver
+            approaches introduce new fragilities by rely-
+            ing on solver-specific code generation. This
+            raises critical questions: Can large language
+            models (LLMs) solve this NL ⇒ Schedule task
+            end-to-end well (RQ1)? If the answer is "no",
+            where do they fall short (RQ2)? And how
+            can their capabilities be enhanced (RQ3)? To
+            answer these questions, we introduce NL ⇒
+                                                                         Figure 1: An example of multitask schedule.
+            Schedule, the first benchmark for this task,
+            equipped with a dataset of 240 description-
+            schedule pairs constructed from real-world ma-             Here, we call attention to a vital task, NL ⇒
+            terials and a rigorous evaluation suite. Our eval-      Schedule. In this task, given a natural language
+            uation of nine state-of-the-art LLMs reveals
+                                                                    multitask problem description (e.g. Figure 1 (a)
+            the limitations of different LLMs in procedure
+            grounding and the strengths of advanced LLMs
+                                                                    left), a model is required to generate a feasible
+            in global planning via local analysis. To ad-           schedule (e.g. Figure 1 (b)). It seems like a
+            dress these shortcomings, we propose M ANS,             NL2SQL task (Lei et al., 2020) but more challeng-
+            a novel multi-agent framework. Extensive ex-            ing. This task is not merely extraction, translation
+            periments show that M ANS achieves more ro-             or summarization of the description, it requires
+            bust performance comparable to six state-of-            the model to understand multi goals, identify con-
+            the-art LLM+solver methods. We hope NL ⇒                straints, and reason over multi steps, so that to
+            Schedule and M ANS will serve as a solid foun-
+                                                                    induce (⇒) a feasible schedule.
+            dation for automatic scheduling. The code and
+            dataset are available in https://github.com/               However, most existing researches oversimplify
+            SCUNLP/NL2Schedule                                      this task (Da Col and Teppan, 2019; Shady et al.,
+    1       Introduction                                            2022; Zhang et al., 2020; Liu et al., 2024b). In-
+                                                                    stead of the natural language, they directly input
+    Scheduling, arranging multitask under the con-                  synthetic instances formatted in matrices (e.g. Fig-
+    straint of limited resources , is critical to the ef-           ure 1 (a) right). This creates a big research gap
+    ficiency of modern manufacturing and service in-                between NL ⇒ Schedule and Matrix2Schedule,
+    dustries (Conway, 1967; Pinedo, 2022). Auto-                    as the former is an inductive reasoning task, the
+    mated generation of schedules for multitask thus                latter reduces to a mathematical NP-hard optimiza-
+    has huge potential, as it reduces the reasoning work-           tion problem. And there also remains a signif-
+    load of human experts. However, most existing                   icant gap between real-world scenarios and syn-
+    methods rely on experts who possess both schedul-               thetic scenarios. To mitigate these gaps, a recent
+    ing skills and domain knowledge, resulting in high              line of work has begun exploring the LLM+solver
+    costs (Powell and Riccardi, 2025).                              paradigm (Xiao et al., 2024; AhmadiTeshnizi et al.,
+        *     Corresponding author                                  2024; Huang et al., 2025) on optimization modeling
+                                                                 35620
+Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 35620–35640
+                                 July 2-7, 2026 ©2026 Association for Computational Linguistics
+task. These methods follow a three-stage pipeline:       world scenarios. In summary, our contributions are
+model formulation, to abstract the text into a math-     as follows.
+ematical model (e.g. variables, constraints, ob-
+                                                             • We highlight a critical task in manufacturing
+jectives); code generation, to translate the math-
+                                                               and service industries, i.e., NL ⇒ Schedule. It
+ematical model into solver-compatible code; and
+                                                               requires the model to arrange multitask under
+external solving, where a separate solver computes
+                                                               limited resources.
+the final schedule. However, this design introduces
+new fragilities: the mathematical model and gen-             • We benchmark NL ⇒ Schedule with a well-
+erated code highly depend on the requirements                  aligned dataset, carefully designed metrics
+of different solvers, including but not limited to             and nine baselines.
+specific API formats, constraints (matrix shape,             • We systematically test the baselines in an end-
+etc.). This largely hinders the robust deployment              to-end manner, revealing their failure in han-
+of these methods in real world NL ⇒ Schedule                   dling procedures.
+scenarios. Recent LLMs have shown advantages
+                                                             • We propose a multi-agent framework, M ANS,
+in language understanding (Achiam et al., 2023),
+                                                               which suggests more robust performance can
+information extraction (Dagdelen et al., 2024), and
+                                                               be achieved by integrated reasoning methods
+planning (Valmeekam et al., 2023). These develop-
+                                                               compared with pipeline baselines.
+ments bring new hope to the NL ⇒ Schedule task
+— whether LLMs can well solve this problem in an         2     Related Work
+end-to-end manner (RQ1), instead of relying on the
+fragile pipeline. If the answer is "no", we are inter-   2.1    Multitask Scheduling Problem
+ested in where do current LLMs fall short (RQ2).         The Multitask Scheduling Problem is a fundamen-
+Moreover, how can we improve LLMs to serve as a          tal NP-hard combinatorial optimization challenge.
+more reliable tool for NL ⇒ Schedule (RQ3).              Existing methods range from fast but often subopti-
+   To answer the above questions, we benchmark           mal Priority Dispatching Rules (PDRs) (Panwalkar
+NL ⇒ Schedule with a novel dataset constructed           and Iskander, 1977; Holthaus and Rajendran, 1997;
+from real-world materials, a systematical evalua-        Shady et al., 2022), and exact solvers (MIP/CP)
+tion paradigm, and a series of state-of-the-art base-    that guarantee optimality but face scalability lim-
+lines. Specifically, we compose 240 description-         its (Ribeiro et al., 2015; Da Col and Teppan,
+schedule pairs from manufacturing, construction,         2019), to recent DRL-based approaches that learn
+pharmaceuticals and cooking. Each pair is well-          scheduling strategies but may lack feasibility guar-
+aligned through a three-stage data2text process.         antees (Zhang et al., 2020; Song et al., 2022; Liu
+We also design three metrics to measure the step         et al., 2024b). A critical limitation shared by these
+completeness, task completeness and feasibility          methods is their reliance on structured, matrix-
+of the generated schedules, respectively. Further,       formatted inputs, which contrasts with real-world
+as replies to RQ1 and RQ2, we test nine state-of-        needs often described in natural language (Sarsur
+the-art LLMs on NL ⇒ Schedule and conduct in-            et al., 2024).
+depth analysis, revealing the limitations of different      To address this disconnect, we introduce NL
+LLMs in procedure grounding and the strengths of         ⇒ Schedule, the first benchmark for automated
+advanced LLMs in global planning via local anal-         schedule generation from natural language, provid-
+ysis (e.g., identify the bottleneck etc.). As a reply    ing problem descriptions with corresponding task
+to RQ3, we propose a novel Multi-Agent frame-            graphs and optimal schedules to evaluate the com-
+work for NL ⇒ Schedule, called M ANS. It collabo-        pleteness and feasibility of generated solutions.
+rates multiple agents to progressively reason about
+procedures and construct the final schedule. We          2.2    LLM for Optimization Modeling
+then compare M ANS against six LLM+solver ap-            Recent research has investigated using LLMs to
+proaches, demonstrating the priority of M ANS over       translate optimization problem descriptions into ex-
+the LLM+solver approaches on generating near-            ecutable solver code. For instance, (Xiao et al.,
+optimal feasible schedules in more stable runtime.       2024) proposed a multi-agent framework where
+We hope NL ⇒ Schedule and M ANS will serve as            specialized agents (e.g., modeler, programmer)
+a solid foundation for automatic scheduling, and         solve problems via forward and backward rea-
+offer insights for complex problem planning in real-     soning. (AhmadiTeshnizi et al., 2024) utilizes
+                                                    35621
+                                  Figure 2: The dataset construction process.
+
+a modular structure to iteratively improve math-         derstanding(Achiam et al., 2023), information
+ematical models and code, enabling it to handle          extraction (Dagdelen et al., 2024), and plan-
+long and complex problem descriptions. Differ-           ning (Valmeekam et al., 2023). Moreover, reason-
+ently, (Huang et al., 2025) introduced a data synthe-    ing LLMs have demonstrated expert-level perfor-
+sis framework to train and customize open-source         mance in mathematics and coding(OpenAI Team,
+LLMs specifically for optimization modeling and          2025b; Guo et al., 2025; Comanici et al., 2025;
+code generation.                                         Yang et al., 2025). However, whether LLMs can
+   This three-stage pipeline requires prior knowl-       solve the inductive reasoning tasks like multitask
+edge of the solver to be used, tightly coupling the      scheduling remains poorly understood. To this end,
+system to specific solver interfaces and capabilities.   we provides the first comprehensive investigation
+This largely hinders the robust deployment of these      in multitask scheduling. We introduce the NL ⇒
+methods in real world NL ⇒ Schedule scenarios.           Schedule to systematically evaluate state-of-the-
+   To address this, we investigated another              art LLMs and propose our M ANS framework, and
+paradigm where the LLM functions as an end-to-           compare M ANS with pipeline-based methods.
+end solver. Our evaluation of state-of-the-art LLMs
+revealed both remarkable global planning potential       3     Dataset Construction
+and limitations in procedures grounding.                 Collecting large-scale scheduling problem descrip-
+                                                         tions and solutions is challenging, as such data
+2.3 Datasets
+                                                         often exist in private industrial cases. To this end,
+Traditional multitask scheduling datasets (Muth,         we take an alternative approach: instead of rely-
+1963; Lawrance, 1984; Adams et al., 1988; Apple-         ing on annotated real-world corpora, we first com-
+gate and Cook, 1991; Taillard, 1993) consist solely      pose real-world tasks into scheduling instances and
+of formatted matrices embedding problem infor-           generate corresponding natural language descrip-
+mation and the instances are typically generated         tions via a data2text pipeline inspired by (Du et al.,
+randomly or via rule-based procedures, making            2024).
+them statistically different from real-world schedul-       Formally, we define each instance by a set of
+ing distributions. Recent studies (Xiao et al., 2024;    tasks T = {T1 , . . . , Tn } and a set of machines
+Huang et al., 2025) introduce datasets with natu-        M = {M1 , . . . , Mm }. Each task Ti consists of
+ral language descriptions, but they contain only a       a directed acyclic graph of steps, where each step
+handful of toy examples of multitask scheduling          Oij is characterized by a required machine mij ∈
+tasks.                                                   M and a processing duration pij . The objective
+   To address these limitations, we build a dataset in   is to find a feasible schedule that minimizes the
+which each scheduling instance includes a problem        makespan (Cmax ), the completion time of the last
+description, a task graph, and a optimal schedule.       step, subject to precedence and machine capacity
+The dataset spans six problem scales and four real-      constraints.
+world scenarios. To our knowledge, we are the               As shown in Figure 2 we construct our dataset
+first to construct a large-scale dataset of this kind,   via following three-stage pipeline.
+specifically designed to bridge natural language
+descriptions with formal, executable schedules.          3.1    Data Crawling and Formalization
+                                                         First, we crawl a wide variety of data from pub-
+2.4 Progress in LLMs                                     lic sources across four scenarios: manufacturing,
+In recent years, LLMs have advanced rapidly              construction, pharmaceuticals, and cooking. We
+and demonstrated excellent performance across            identified 135 basic tasks and represent each task
+a wide range of tasks, including language un-            as a directed acyclic graph where nodes represent
+                                                    35622
+Table 1: Details of tasks collected from public data.      scriptions, we summarize 10 templates per domain
+#Task represents the task quantity of the scenario. #Ma-   based on domain-specific documents such as pro-
+chine represents the unique machine types in the tasks.    cess manuals and recipe instructions(Bień et al.,
+#Avg_Step represents the average step quantity in all      2020; Niazi, 2019). Details are shown in Appendix
+tasks.                                                     A.3 Structured sentence fragments are first gener-
+      Scenario       #Task    #Machine    #Avg Step        ated via template filling. These fragments are then
+    Manufacturing     28        32          5.07           aggregated and refined using GPT-4(Achiam et al.,
+    Construction      29        44          8.69           2023) to produce coherent and fluent paragraphs.
+   Pharmaceuticals    32        12          4.12              Our final dataset consists of 240 scheduling in-
+      Cooking         46        20          7.42           stances with task graphs, optimal schedule and
+                                                           problem description, covering four real-world sce-
+steps annotated with description, machine require-
+                                                           narios and six problem size (5-10 tasks). We also
+ment and processing duration and edges indicate
+                                                           conduct both automatic and human evaluations and
+precedence constraints between steps. The detailed
+                                                           include statistical analysis to ensure its high quality,
+statistical summaries are shown in Table 1, with
+                                                           shown in Appendix A.4 and A.5.
+data sources listed in Appendix A.1.
+   At this stage, we obtain a task pool consisting of      4     Experiment
+135 tasks. Only structured graph data is collected,
+as it is rare to find natural language descriptions        We conduct systematic experiments to answer three
+that comprehensively specify all the information           research questions raised in Sec. 1. For RQ1, we
+involved in a task.                                        introduce three metrics to evaluate nine state-of-
+                                                           the-art LLMs in NL ⇒ Schedule. For RQ2, we
+3.2 Scheduling Instance Composition                        conduct in-depth analysis of the failure modes and
+                                                           potential, showing their limitations in procedure
+To ensure our scheduling instances are both realis-
+                                                           grounding and strengths in global planning. For
+tic and challenging, we develop a two-stage com-
+                                                           RQ3, we propose a multi-agent framework called
+position process. First, we group individual tasks
+                                                           M ANS and compare with 6 LLM+solver methods,
+into 13 "workshops" based on shared machine re-
+                                                           revealing comparable performance and more stable
+quirements, using the Jaccard similarity metric and
+                                                           runtime.
+K-Medoids clustering. Second, each final schedul-
+ing instance is generated by sampling a number             4.1    Evaluating LLMs on NL ⇒ Schedule (RQ1)
+of tasks—ranging from 5 to 10—exclusively from
+                                                           4.1.1 Model Choice
+within a single pre-defined workshop. We gener-
+ate 10 distinct instances for each scenario and task       We evaluate nine state-of-the-art LLMs across
+quantity, resulting a total of 240 unique schedul-         two key dimensions: accessibility (open-source
+ing instances. The optimal schedules are annotated         vs. closed-source) and reasoning capability (non-
+by OR-Tools. This two-stage approach guarantees            reasoning vs. reasoning). Non-reasoning mod-
+that the tasks in every scheduling instance heavily        els include: Open-source: Qwen3-235B-A22B-
+compete for a limited set of resources. Details are        nothinking (Yang et al., 2025), Llama-4-Maverick
+shown in Appendix A.2.                                     (Meta AI Llama Team, 2025), DeepSeek-V3 (Liu
+   At this stage, we obtain 240 scheduling instances       et al., 2024a); Closed-source: GPT-4.1 (OpenAI
+with task graphs and their optimal schedule.               Team, 2025a), Gemini-2.5-Flash-nothinking (Co-
+                                                           manici et al., 2025). Reasoning models include:
+3.3 Problem Description Generation                         Open-source: Qwen3-235B-A22B (Yang et al.,
+                                                           2025), DeepSeek-R1 (Guo et al., 2025); Closed-
+For each schedule instance, we generate a compre-
+                                                           source: o4-mini (OpenAI Team, 2025b), Gemini-
+hensive natural language description composed of
+                                                           2.5-Pro (Comanici et al., 2025).
+two parts: scheduling requirements overview, and
+procedures of each task.                                   4.1.2 Evaluation Metrics
+  Following the methodology in (Du et al., 2024),          To evaluate the completeness and feasibility of
+we adopt a data2text generation process. We curate         schedules generated by LLMs, we introduce fol-
+20 scheduling requirement templates from publicly          lowing three metrics.
+available contracts(TemplateLab, 2025) and order
+dialogues(Rubino et al., 2022). For procedure de-              • Overall Steps Execution Rate (SER) The
+                                                      35623
+Table 2: Model performance under different task combination settings in NL ⇒ Schedule. We report Overall Steps
+Execution Rate (SER), Average Task Completion Rate (TCR), Schedule Feasibility Rate (SFR). #Task=n
+represents that the scheduling instance contains n tasks. Higher values indicate better performances. The best results
+are bolded, and the second best ones are underlined. The dashed line separates no-thinking models (above) from
+thinking models (below).
+                                              #Task=5                  #Task=6                    #Task=7
+               Model
+                                         SER   TCR SFR            SER   TCR SFR              SER    TCR SFR
+   Qwen3-235B-A22B-nothinking            0.298 0.215   -          0.299 0.221   -            0.188  0.082   -
+   Llama4-Maverick                       0.350 0.230 0.025        0.389 0.254   -            0.324  0.214   -
+   DeepSeek-V3                           0.383 0.280 0.050        0.354 0.271 0.050          0.300  0.204 0.025
+   GPT-4.1                               0.422 0.315 0.050        0.499 0.400 0.225          0.374  0.260 0.050
+   Gemini-2.5-Flash-nothinking           0.547 0.410 0.200        0.454 0.313  0.1           0.479  0.350 0.100
+   Qwen3-235B-A22B-thinking              0.279 0.195   -          0.243 0.158   -            0.167  0.082   -
+   DeepSeek-R1                           0.612 0.455 0.250        0.594 0.450 0.175          0.505  0.343 0.125
+   o4-mini                               0.614 0.495 0.325        0.625 0.475 0.250          0.532  0.368 0.225
+   Gemini-2.5-Pro                        0.634 0.490 0.325        0.653 0.463 0.275          0.596  0.425 0.250
+                                              #Task=8                  #Task=9                    #Task=10
+               Model
+                                         SER TCR SFR              SER TCR SFR                SER TCR SFR
+   Qwen3-235B-A22B-nothinking            0.158 0.106   -          0.153 0.097   -            0.118 0.070    -
+   Llama4-Maverick                       0.272 0.166   -          0.299 0.192   -            0.182 0.088 0.025
+   DeepSeek-V3                           0.307 0.209   -          0.224 0.144   -            0.187 0.118    -
+   GPT-4.1                               0.312 0.225 0.025        0.288 0.156   -            0.311 0.193 0.025
+   Gemini-2.5-Flash-nothinking           0.434 0.309 0.125        0.361 0.233 0.050          0.322 0.220 0.075
+   Qwen3-235B-A22B-thinking              0.186 0.116   -          0.173 0.106   -            0.106 0.050    -
+   DeepSeek-R1                           0.558 0.416 0.125        0.527 0.353 0.100          0.528 0.343 0.050
+   o4-mini                               0.637 0.491 0.250        0.524 0.414 0.200          0.515 0.385 0.125
+   Gemini-2.5-Pro                        0.667 0.525 0.200        0.597 0.419 0.200          0.601 0.425 0.175
+
+     percentage of correctly executed steps across                executable:
+     all tasks in all schedules:
+                                                                                              |Sf |
+                        1 X 1 X |Ojc |                                               SFR =                        (3)
+              SER =                                  (1)                                       |S|
+                       |S| |Ts | |Oj |
+                            s∈S         t∈Ts
+
+     where S denotes the set of all generated sched-              where Sf ⊆ S denotes the feasible schedules
+     ules, and s ∈ S denotes a schedule in the                    subset of all schedules S.
+     schedules set, Ts denotes the set of all tasks
+     in s, t ∈ Ts denotes a task in task sets, Oj
+     denotes the set of all steps in t, and Ojc ⊆ Oj         4.1.3   Main Results
+     denotes the subset of tasks in j that are exe-
+                                                             As shown in Table 2, our findings reveal a core
+     cuted successfully.
+                                                             contradiction: LLMs excel at semantic comprehen-
+   • Average Task Completion Rate (TCR) The                  sion but are deficient in procedural grounding and
+     percentage of successfully completed tasks              logical reasoning. A clear performance hierarchy
+     across all schedules, even when full feasibility        emerges, with top-tier models exhibiting superior
+     of the schedule isn’t achieved:                         inductive reasoning. However, the universally low
+                                                             SFR, rarely exceeding 0.3 even for these models,
+                              1 X |Tsc |
+                  TCR =                              (2)     pinpoints the primary bottleneck: generating a log-
+                             |S|  |Ts |
+                                  s∈S                        ically coherent and conflict-free schedule. Perfor-
+                                                             mance also consistently degrades with increasing
+     where Tsc ⊆ Ts denotes the subset of tasks in           problem scale, highlighting a critical weakness in
+     s that are completed.                                   handling combinatorial complexity. Furthermore,
+   • Schedule Feasibility Rate (SFR) The per-                we observe that chain-of-thought reasoning can be
+     centage of generated schedules that are fully           detrimental for weaker models.
+                                                       35624
+                                                          4.2.2 Potential Analysis
+                                                          To evaluate the efficiency of feasible schedules, we
+                                                          introduce the Average Relative Makespan Devi-
+                                                          ation (RMD) metric. This approach isolates the
+                                                          assessment of schedule quality from feasibility fail-
+                                                          ures, providing a clear measure of the model’s po-
+                                                          tential to minimize makespan independently of its
+                                                          ability to satisfy hard constraints. It is defined as:
+                                                                           1 X Ms − Msg
+                                                                    RMD =                                   (4)
+                                                                          |Sf |  Msg
+                                                                                    s∈Sf
+
+                                                          where Ms denotes the makespan of generated
+Figure 3: The error distribution across schedule, task,   schedule s, Msg denotes the makespan of ground
+step, and constraint level.                               truth schedule.
+                                                             As shown in Figure 4, we found that schedules
+                                                          generated by LLMs are not only valid but highly
+                                                          efficient, achieving an RMD comparable to the
+                                                          best-performing Priority Dispatching Rule (PDR)
+                                                          baselines. This suggests LLMs adopt a holistic,
+                                                          adaptive strategy rather than a single simple rule.
+                                                             We conduct a deeper analysis of the reasoning
+                                                          tokens from DeepSeek-R1 and thought summary
+                                                          from Gemini-2.5-Pro. As shown in B.2, their suc-
+                                                          cess is not based on a single heuristic but on a so-
+                                                          phisticated, human-like workflow that dynamically
+                                                          integrates a portfolio of advanced strategies.
+Figure 4: The makespan deviation generated schedules
+                                                             We found consistent evidence of three key cog-
+compared with PDRs. Lower value means better effi-
+ciency.                                                   nitive abilities: 1) Global Planning, where mod-
+                                                          els identify critical bottlenecks to guide the over-
+                                                          all schedule, a hallmark of human experts; 2) Lo-
+4.2 Analysis of Failure and Potential (RQ2)
+                                                          cal Optimization, applying greedy heuristics like
+4.2.1 Failure Analysis                                    the Earliest Start Time rule to make efficient step-
+                                                          by-step decisions; and 3) Self-Correction, where
+To systematically diagnose model failures, we con-        they actively detect conflicts and use backtracking
+duct a four-level analysis (schedule, task, step, and     to revise the schedule. Furthermore, models like
+constraint), inspired by (Feitelson et al., 1997),        Gemini-2.5-Pro demonstrated even more complex
+with detailed category definitions in Appendix B.1.       reasoning, such as formulating parallel execution
+The results for three representative models are           and applying the Critical Path Method (CPM).
+shown in Figure 3 and reveal a clear hierarchy of            In summary, these cognitive traces show that
+errors. Weaker models like Qwen3 fail at the high-        advanced LLMs construct a global plan by synthe-
+est level, with severe task omission in 78.7% of          sizing the results of distinct local analysis. This
+schedules. In contrast, top-tier models like Gem-         ability to integrate multiple strategies is the key to
+ini 2.5 Pro are robust in identifying tasks (87.9%        their impressive performance on this problem.
+accuracy) but still struggle with finer details, fre-
+                                                          4.3   Mitigating LLM Limitations with the
+quently generating incomplete step sequences and
+                                                                M ANS Framework (RQ3)
+mismatching machines. Constraint adherence is the
+ultimate bottleneck; while Gemini 2.5 Pro correctly       4.3.1 Overall Performance
+handles nearly 70% of steps, weaker models are            We designed M ANS, a framework that decomposes
+plagued by resource conflicts and dependency vio-         NL ⇒ Schedule into a structured workflow of
+lations. In summary, robust procedural grounding          specialized agents as shown in 5. This architec-
+remains a major hurdle for all models.                    ture is engineered to mitigate LLMs limitations
+                                                     35625
+Table 3: M ANS and LLM+solver performace on NL ⇒ Schedule. We report Overall Step Execution Rate
+(SER), Average Task Completion Rate (TCR) and Schedule Feasibility Rate (SFR). #Task=n represents that the
+scheduling instance contains n tasks. Higher values indicate better performances. The best results are bolded, and
+the second best ones are underlined.
+                                       #Task=5                     #Task=6                    #Task=7
+            Method
+                                  SER   TCR SFR               SER   TCR SFR             SER    TCR SFR
+     CoE + MOPNR                  0.691 0.555 0.375           0.665 0.513 0.350         0.626  0.521 0.250
+     CoE + OR Tools               0.675 0.535 0.350           0.665 0.508 0.300         0.614  0.539 0.250
+     CoE + FJSP DRL               0.449 0.305   -             0.404 0.267   -           0.432  0.254   -
+     Optimus + MOPNR              0.651 0.515 0.400           0.521 0.508 0.350         0.597  0.426 0.275
+     Optimus + OR Tools           0.602 0.525 0.400           0.493 0.489 0.350         0.547  0.416 0.275
+     Optimus + FJSP DRL           0.528 0.315   -             0.487 0.258   -           0.456  0.257   -
+     M ANS (ours)                 0.702 0.560 0.400           0.690 0.521 0.325         0.608  0.443 0.250
+                                       #Task=8                     #Task=9                   #Task=10
+            Method
+                                  SER TCR SFR                 SER TCR SFR               SER TCR SFR
+     CoE + MOPNR                  0.701 0.525 0.275           0.674 0.401 0.225         0.587 0.465 0.225
+     CoE + OR Tools               0.691 0.525 0.250           0.670 0.398 0.225         0.587 0.465 0.250
+     CoE + FJSP DRL               0.485 0.347   -             0.419 0.314   -           0.422 0.275    -
+     Optimus + MOPNR              0.687 0.531 0.300           0.532 0.394 0.175         0.575 0.458 0.225
+     Optimus + OR Tools           0.633 0.525 0.300           0.532 0.394 0.175         0.535 0.435 0.225
+     Optimus + FJSP DRL           0.517 0.369   -             0.363 0.239   -           0.468 0.263    -
+     M ANS (ours)                 0.697 0.550 0.275           0.582 0.417 0.225         0.682 0.543 0.275
+
+                                                              This agent embeds planning instructions to guide
+                                                              the model, scaffolding its reasoning with strategies
+                                                              observed in successful traces.
+                                                                 While frameworks like Chain of Ex-
+                                                              perts(CoE) (Xiao et al., 2024) and OptiMUS
+                                                              (AhmadiTeshnizi et al., 2024) introduce multi-
+                                                              agent collaboration, they operate under a "Pipeline
+                                                              Paradigm," using LLMs merely as translators
+                                                              to generate code for external solvers. This
+                                                              dependency creates fragility, where syntax errors
+                                                              lead to failure. M ANS shifts the paradigm from
+                                                              "LLM-as-Translator" to "LLM-as-Solver." Instead
+Figure 5: M ANS decomposes NL ⇒ Schedule into four
+                                                              of delegating computation, M ANS internalizes
+distinct stages. (a) Seeker extracts the full task set from   algorithmic reasoning. This end-to-end approach
+text. (b) Weaver parses steps for each task. (c) Verifier     eliminates reliance on external runtime envi-
+checks the extracted structure for fidelity. (d) Architect    ronments. Detailed comparison is shown in
+schedules the verified tasks.                                 AppendixB.4.
+                                                                 We compare M ANS with CoE (Xiao et al., 2024)
+in procedures grounding and amplify the models                and Optimus(AhmadiTeshnizi et al., 2024). CoE
+global planning strengths. More details are shown             and Optimus are two state-of-the-art methods for
+in Appedix B.6. M ANS consists of four agents:                natural language optimization modeling. And we
+Seeker: Focuses solely on identifying the full task           pair these methods with three distinct scheduling
+set, reducing cognitive load and ensuring a correct           solvers: MOPNR (Holthaus and Rajendran, 1997),
+understanding of the problem scope. Weaver: Re-               OR Tools(Google, 2023) and FJSP DRL(Song
+ceives the task list from the Seeker and focuses on           et al., 2023). So finally we get six LLM+solver
+extracting each task’s steps, machines, durations,            baselines. We provide more details and the im-
+and execution order. Verifier: Serves as a quality            plementation of above methods in Appendix B.4.
+check, turning the framework into a self-correcting           For a fair and efficient comparison, we adopt
+system that catches structural errors. Architect:             Gemini-2.5-Flash-nothinking as the LLM back-
+                                                         35626
+Table 4: M ANS and LLM+solver performace on            Table 5: Ablation study of the M ANS framework.’w/o’
+Worst-case Run Time(WRT) and Average Relative          denotes the removal of the specified agent.
+Makespan Deviation(RMD). Lower values indicate
+                                                                                          #Task=5
+better performances.                                               Method
+                                                                                    SER    TCR SFR
+            Method           WRT(s)     RMD                    M ANS                0.702  0.560 0.400
+      CoE + MOPNR            128.42     0.192                  M ANS w/o seeker     0.612  0.485 0.200
+      CoE + OR Tools         154.44     0.023                  M ANS w/o weaver     0.665  0.535 0.375
+      CoE + FJSP DRL            -         -                    M ANS w/o verifier   0.648  0.495 0.300
+      Optimus + MOPNR        121.63     0.185                                            #Task=10
+      Optimus + OR Tools     133.70     0.022                      Method
+                                                                                    SER TCR SFR
+      Optimus + FJSP DRL        -         -                    M ANS                0.682 0.543 0.275
+      M ANS (ours)            79.59     0.085                  M ANS w/o seeker     0.482 0.315 0.075
+                                                               M ANS w/o weaver     0.637 0.468 0.225
+bone. We evaluate the completeness and feasibil-               M ANS w/o verifier   0.594 0.425 0.150
+ity of these methods, and the metrics is consistent
+with Sec.4.1.2. We also present experimental re-       4.3.2     Ablation Study
+sults with other models as the backbone in Ap-         To validate the contribution of each specialized
+pendix B.5. To further investigate the practical       agent within the M ANS, we further conducted ab-
+performance, we introduce RMD to evaluate the          lation studies on #Task=5 and #Task=10 in Table
+efficency of the generated feasible schedules and      10. The results demonstrate that each agent serves
+Worst-case Run Time(WRT) to evaluate stability         a critical and indispensable function. Notably, the
+in practical execution. The results in Table3 and 4    removal of the Seeker causes the most catastrophic
+demonstrate M ANS not only matches or exceeds          failure, particularly on complex 10-task instances.
+the LLM+solver methods in generating complete          This confirms that establishing the correct problem
+and feasible schedules but also offers more stable     scope at the outset is the most critical step in the en-
+performance profile. And we have following ob-         tire workflow. The substantial performance drops
+servations: 1) M ANS achieves a WRT of 79.59s—         from removing the Weaver and Verifier likewise
+40–50% faster than the best LLM+solver methods         validate their essential roles in parsing detailed con-
+and achieves a strong average deviation of 0.085.      tent and ensuring structural fidelity, respectively.
+This indicates that M ANS maintains high-quality
+scheduling without sacrificing stability or speed.     5   Conclusion and Future Work
+   2) Both CoE+FJSP DRL and Optimus+FJSP
+                                                       We benchmark NL ⇒ Schedule task with a novel
+DRL fail to generate any feasible schedules, due
+                                                       dataset constructed from real-world materials, a
+to poor generalization of the DRL solver to unseen
+                                                       systematical evaluation paradigm, and a series of
+data in realistic data.
+                                                       state-of-the-art baselines. Experimental results
+   3) LLM+solver methods suffer cascading errors.      and in-depth analysis of nine LLMs in the NL ⇒
+We noticed that 45% of the cases that LLMs gen-        Schedule reveal the limitations of different LLMs
+erate incorrect code related to the solver, which      in procedure grounding and the strengths of ad-
+requires iterative correction based on code execu-     vanced LLMs in global planning via local analysis.
+tion errors. And in some cases, the code com-          To mitigate the main challenge and strengthen the
+piles successfully but ultimately fails to produce     strengths in global planning, we design a novel
+a valid solution due to other logic errors. This       multi-agent framework M ANS to empower the
+fragmented pipeline introduces multiple failure        LLMs ability in procedures grounding and ampli-
+points that M ANS, with its unified reasoning pro-     fying the models emergent reasoning strength. The
+cess, avoids entirely.                                 results suggests more robust performance can be
+   4) Much of the high WRT in LLM+solver se-           achieved by M ANS compared with LLM+solver
+tups stems from repeated cycles of code genera-        baselines.
+tion, execution failure, and debugging. Although          Future work will focus on three directions. First,
+solvers like OR-Tools perform well when invoked        incorporating authentic real-world data: we aim
+correctly, accessing that power depends on the brit-   to integrate raw industrial logs via anonymization
+tle success of earlier stages.                         and data desensitization to bridge the simulation-
+                                                  35627
+to-reality gap. Second, enhancing scenario com-          (No.62576230        and     No.U25B201508          and
+plexity: extending NL ⇒ Schedule to include dy-          No.62272330);
+namic constraints like resource availability win-
+dows, sequence-dependent setup times, and non-
+sequential workflows. Finally, delving into the na-      References
+ture of LLMs’ emergent "algorithmic thinking" to         Josh Achiam, Steven Adler, Sandhini Agarwal, Lama
+further unlock AI-driven optimization discovery.           Ahmad, Ilge Akkaya, Florencia Leoni Aleman,
+                                                           Diogo Almeida, Janko Altenschmidt, Sam Altman,
+                                                           Shyamal Anadkat, and 1 others. 2023. Gpt-4 techni-
+6   limitations                                            cal report. arXiv preprint arXiv:2303.08774.
+While this work establishes a foundational bench-        Joseph Adams, Egon Balas, and Daniel Zawack. 1988.
+mark for the NL ⇒ Schedule task, we acknowledge            The shifting bottleneck procedure for job shop
+several limitations that offer avenues for future re-       scheduling. Management science, 34(3):391–401.
+search.                                                  Ali AhmadiTeshnizi, Wenzhi Gao, and Madeleine Udell.
+   First, our dataset is constructed through a semi-       2024. Optimus: scalable optimization modeling with
+synthetic process. Due to the significant chal-            (mi)lp solvers and large language models. In Pro-
+                                                           ceedings of the 41st International Conference on Ma-
+lenge of obtaining large-scale, real-world data—           chine Learning, ICML’24. JMLR.org.
+which is often proprietary and exists in unstruc-
+tured formats—we opted for a data2text approach          David Applegate and William Cook. 1991. A compu-
+                                                           tational study of the job-shop scheduling problem.
+that composes scheduling instances from authentic          ORSA Journal on computing, 3(2):149–156.
+materials. While this methodology ensures a high
+                                                         Michał Bień, Michał Gilski, Martyna Maciejewska, Wo-
+degree of realism and control, the ultimate goal
+                                                           jciech Taisner, Dawid Wisniewski, and Agnieszka
+for the community is to collect and curate truly or-       Lawrynowicz. 2020. RecipeNLG: A cooking recipes
+ganic datasets of natural language requests paired         dataset for semi-structured text generation. In Pro-
+with their resultant schedules. We hope our work           ceedings of the 13th International Conference on
+stimulates such data collection efforts, despite their     Natural Language Generation, pages 22–28, Dublin,
+                                                           Ireland. Association for Computational Linguistics.
+inherent difficulty.
+   Second, as the first benchmark in this domain,        Paul Bratley, Michael Florian, and Pierre Robillard.
+                                                           1971. Scheduling with earliest start and due date
+we deliberately constrained the problem’s com-
+                                                           constraints. Naval Research Logistics Quarterly,
+plexity to establish a tractable baseline for eval-        18(4):511–519.
+uation. Our dataset does not yet encompass the full
+                                                         Gheorghe Comanici, Eric Bieber, Mike Schaekermann,
+spectrum of real-world challenges, such as larger
+                                                           Ice Pasupat, Noveen Sachdeva, Inderjit Dhillon, Mar-
+problem scales, stochastic durations, sequence-            cel Blistein, Ori Ram, Dan Zhang, Evan Rosen, and
+dependent setup times, or dynamic resource avail-          1 others. 2025. Gemini 2.5: Pushing the frontier with
+ability. Future iterations of the benchmark will           advanced reasoning, multimodality, long context, and
+be dedicated to systematically incorporating these         next generation agentic capabilities. arXiv preprint
+                                                           arXiv:2507.06261.
+more complex constraints to better reflect the intri-
+cacies of industrial scheduling.                         Richard Walter Conway. 1967. " theory of scheduling,”.
+                                                           Addison Wesley.
+   Finally, the evaluation of schedule generation
+from natural language is still in its nascent stage,     Giacomo Da Col and Erich C Teppan. 2019. Industrial
+and a standardized set of metrics has yet to emerge.       size job shop scheduling tackled by present day cp
+                                                           solvers. In International Conference on Principles
+The metrics we proposed—focusing on complete-
+                                                           and Practice of Constraint Programming, pages 144–
+ness, feasibility, and efficiency—provide a solid          160. Springer.
+foundation but may not capture all facets of a
+                                                         John Dagdelen, Alexander Dunn, Sanghoon Lee,
+"good" schedule, such as robustness or fairness.
+                                                           Nicholas Walker, Andrew S Rosen, Gerbrand Ceder,
+The development of a more comprehensive and                Kristin A Persson, and Anubhav Jain. 2024. Struc-
+widely accepted evaluation protocol is a crucial           tured information extraction from scientific text with
+next step for the field.                                   large language models. Nature communications,
+                                                           15(1):1418.
+Acknowledgement                                          Weihong Du, Wenrui Liao, Hongru Liang, and Wen-
+                                                          qiang Lei. 2024. PAGED: A benchmark for proce-
+This work was supported in part by the Na-                dural graphs extraction from documents. In Proceed-
+tional Natural Science Foundation of China                ings of the 62nd Annual Meeting of the Association
+                                                    35628
+  for Computational Linguistics (Volume 1: Long Pa-          Aixin Liu, Bei Feng, Bing Xue, Bingxuan Wang,
+  pers), pages 10829–10846, Bangkok, Thailand. As-             Bochao Wu, Chengda Lu, Chenggang Zhao, Chengqi
+  sociation for Computational Linguistics.                     Deng, Chenyu Zhang, Chong Ruan, and 1 others.
+                                                               2024a. Deepseek-v3 technical report. arXiv preprint
+Juliette Faille, Albert Gatt, and Claire Gardent. 2021.        arXiv:2412.19437.
+   Entity-based semantic adequacy for data-to-text gen-
+   eration. In Findings of the Association for Computa-      Chien-Liang Liu, Chun-Jan Tseng, and Po-Hao Weng.
+   tional Linguistics: EMNLP 2021, pages 1530–1540.            2024b. Dynamic job-shop scheduling via graph atten-
+   Association for Computational Linguistics.                  tion networks and deep reinforcement learning. IEEE
+                                                               Transactions on Industrial Informatics, 20(6):8662–
+Dror G Feitelson, Larry Rudolph, Uwe Schwiegelshohn,           8672.
+  Kenneth C Sevcik, and Parkson Wong. 1997. Theory
+  and practice in parallel job scheduling. In Workshop       Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Man-
+  on job scheduling strategies for parallel processing,        dar Joshi, Danqi Chen, Omer Levy, Mike Lewis,
+  pages 1–34. Springer.                                        Luke Zettlemoyer, and Veselin Stoyanov. 2019.
+                                                               Roberta: A robustly optimized bert pretraining ap-
+Robert Bosch GmbH. 2022. Automotive handbook.                  proach. arXiv preprint arXiv:1907.11692.
+  John Wiley & Sons.
+                                                             Meta AI Llama Team. 2025. Llama 4 Scout and Maver-
+Google. 2023. OR-Tools. Version 9.9, https://                  ick: Mixture-of-Experts Multimodal Models. https:
+  developers.google.com/optimization.                         //github.com/meta-llama/llama-models/
+                                                               blob/main/models/llama4/MODEL_CARD.md.
+Mikell P Groover. 2010. Fundamentals of modern man-           Accessed: 2025-07-24.
+  ufacturing: materials, processes, and systems. John
+  Wiley & Sons.                                              Carolyn R Miller. 1979. A humanistic rationale for
+                                                               technical writing. College English, 40(6):610–617.
+Daya Guo, Dejian Yang, Haowei Zhang, Junxiao
+  Song, Ruoyu Zhang, Runxin Xu, Qihao Zhu, Shi-              J Muth. 1963. Probabilistic learning combinations of lo-
+  rong Ma, Peiyi Wang, Xiao Bi, and 1 others. 2025.             cal job-shop scheduling rules. Industrial scheduling.
+  Deepseek-r1: Incentivizing reasoning capability in
+  llms via reinforcement learning. arXiv preprint            Sarfaraz K Niazi. 2019. Handbook of pharmaceutical
+  arXiv:2501.12948.                                            manufacturing formulations: Volume two, uncom-
+                                                               pressed solid products. CRC press.
+Oliver Holthaus and Chandrasekharan Rajendran. 1997.
+  Efficient dispatching rules for scheduling in a job        OpenAI Team. 2025a. GPT-4.1. https://platform.
+  shop. International Journal of Production Eco-               openai.com/docs/models/gpt-4.1.     Accessed:
+  nomics, 48(1):87–105.                                        2025-07-24.
+
+                                                             OpenAI Team. 2025b. O4-mini. https://openai.
+Chenyu Huang, Zhengyang Tang, Shixi Hu, Ruoqing
+                                                               com/index/introducing-o3-and-o4-mini/. Ac-
+  Jiang, Xin Zheng, Dongdong Ge, Benyou Wang, and
+                                                               cessed: 2025-05-10.
+  Zizhuo Wang. 2025. Orlm: A customizable frame-
+  work in training large models for automated optimiza-      Shrikant S Panwalkar and Wafik Iskander. 1977. A
+  tion modeling. Operations Research.                          survey of scheduling rules. Operations research,
+                                                               25(1):45–61.
+Paul Jaccard. 1901. Étude comparative de la distribution
+  florale dans une portion des alpes et des jura. Bull       Michael L. Pinedo. 2022. Scheduling: Theory, Algo-
+  Soc Vaudoise Sci Nat, 37:547–579.                            rithms, and Systems. Springer International Publish-
+                                                               ing, Cham.
+Terry K Koo and Mae Y Li. 2016. A guideline of
+  selecting and reporting intraclass correlation coeffi-     Cheyenne Powell and Annalisa Riccardi. 2025. Generat-
+  cients for reliability research. Journal of chiropractic     ing textual explanations for scheduling systems lever-
+  medicine, 15(2):155–163.                                     aging the reasoning capabilities of large language
+                                                               models. Journal of Intelligent Information Systems,
+S Lawrance. 1984. Resource constrained project                 pages 1–51.
+  scheduling: an experimental investigation of heuris-
+  tic scheduling techniques. GSIA, Carnegie Mellon           LKPJ Rdusseeun and P Kaufman. 1987. Clustering by
+  University.                                                  means of medoids. In Proceedings of the statisti-
+                                                               cal data analysis based on the L1 norm conference,
+Wenqiang Lei, Weixin Wang, Zhixin Ma, Tian Gan,                neuchatel, switzerland, volume 31, page 28.
+ Wei Lu, Min-Yen Kan, and Tat-Seng Chua. 2020.
+ Re-examining the role of schema linking in text-to-         Maria SFO de C Ribeiro and 1 others. 2015. Compar-
+ SQL. In Proceedings of the 2020 Conference on                ing mixed & integer programming vs. constraint pro-
+ Empirical Methods in Natural Language Processing             gramming by solving job-shop scheduling problems.
+ (EMNLP), pages 6943–6954, Online. Association for            Independent Journal of Management & Production,
+ Computational Linguistics.                                   6(1):211–238.
+                                                        35629
+Melanie Rubino, Nicolas Guenon des Mesnards, Uday            An Yang, Anfeng Li, Baosong Yang, Beichen Zhang,
+ Shah, Nanjiang Jiang, Weiqi Sun, and Konstan-                 Binyuan Hui, Bo Zheng, Bowen Yu, Chang
+ tine Arkoudas. 2022. Cross-TOP: Zero-shot cross-              Gao, Chengen Huang, Chenxu Lv, and 1 others.
+ schema task-oriented parsing. In Proceedings of the           2025. Qwen3 technical report. arXiv preprint
+ Third Workshop on Deep Learning for Low-Resource              arXiv:2505.09388.
+ Natural Language Processing, pages 48–60, Hybrid.
+ Association for Computational Linguistics.                  Cong Zhang, Wen Song, Zhiguang Cao, Jie Zhang,
+                                                               Puay Siew Tan, and Xu Chi. 2020. Learning to dis-
+Norman Sadeh, Katia Sycara, and Yalin Xiong. 1995.             patch for job shop scheduling via deep reinforcement
+  Backtracking techniques for the job shop schedul-            learning. Advances in neural information processing
+  ing constraint satisfaction problem. Artificial intelli-     systems, 33:1621–1632.
+  gence, 76(1-2):455–480.
+
+Daniel Sarsur, Patrícia N Pena, and Ricardo HC Taka-
+  hashi. 2024. Automatic translation of blocking flexi-
+  ble job shop scheduling problems to automata using
+  the supervisory control theory. Journal of Control,
+  Automation and Electrical Systems, 35(1):12–23.
+
+Salama Shady, Toshiya Kaihara, Nobutada Fujii, and
+  Daisuke Kokuryo. 2022. A novel feature selection for
+  evolving compact dispatching rules using genetic pro-
+  gramming for dynamic job shop scheduling. Interna-
+  tional Journal of Production Research, 60(13):4025–
+  4048.
+
+Patrick E Shrout and Joseph L Fleiss. 1979. Intraclass
+  correlations: uses in assessing rater reliability. Psy-
+  chological bulletin, 86(2):420.
+
+Nanua Singh. 1996. Systems approach to computer-
+  integrated design and manufacturing.
+
+Wen Song, Xinyang Chen, Qiqiang Li, and Zhiguang
+ Cao. 2022.     Flexible job-shop scheduling via
+ graph neural network and deep reinforcement learn-
+ ing. IEEE Transactions on Industrial Informatics,
+ 19(2):1600–1610.
+
+Wen Song, Xinyang Chen, Qiqiang Li, and Zhiguang
+ Cao. 2023. Flexible job shop scheduling via
+ graph neural network and deep reinforcement learn-
+ ing. IEEE Transactions on Industrial Informatics,
+ 19(2):1600–1610.
+
+Eric Taillard. 1993. Benchmarks for basic scheduling
+  problems. european journal of operational research,
+  64(2):278–285.
+
+TemplateLab. 2025. 18 free purchase order templates
+  in word, excel, pdf. https://templatelab.com/
+  purchase-order-templates/. Accessed: 2025-
+  07-28.
+
+Karthik Valmeekam, Matthew Marquez, Sarath Sreed-
+  haran, and Subbarao Kambhampati. 2023. On the
+  planning abilities of large language models-a criti-
+  cal investigation. Advances in Neural Information
+  Processing Systems, 36:75993–76005.
+
+Ziyang Xiao, Dongxiang Zhang, Yangjun Wu, Lilin
+  Xu, Yuan Jessica Wang, Xiongwei Han, Xiaojin Fu,
+  Tao Zhong, Jia Zeng, Mingli Song, and 1 others.
+  2024. Chain-of-experts: When llms meet complex
+  operations research problems. In ICLR.
+                                                        35630
+A    Details of Dataset                                        number of unique machines across all tasks
+                                                               in a scenario. An element vi is 1 if the task
+A.1 Dataset Source
+                                                               graph requires machine Mi , and 0 otherwise.
+To construct a benchmark that reflects the com-
+plexity and nuance of real-world scheduling prob-            • Similarity Metric: We used the Jaccard Dis-
+lems, we adopted a synthetic, multi-source data                tance(Jaccard, 1901) to measure the similarity
+collection methodology. A single source, such as a             between any two task vectors, va and vb . The
+handbook or a website, rarely provides a complete,             Jaccard Distance is well-suited for this pur-
+self-contained description of a complex task with              pose as it measures the similarity of sparse
+all its requisite stepal details, resource constraints,        sets:
+and durations. Therefore, instead of relying on in-                                       P
+                                                                             |va ∩ vb |       min(vai , vbi )
+dividual sources, we composed each complete task               J(va , vb ) =            = Pi
+                                                                             |va ∪ vb |     i max(vai , vbi )
+description by synthesizing and cross-referencing
+information from multiple, varied sources. For                 A higher Jaccard Distance indicates that two
+example, the fundamental process flow and prece-               tasks share a larger proportion of their re-
+dence constraints for a manufacturing task might               quired machines.
+be derived from an engineering handbook, while
+the specific machine names and realistic processing          • Clustering Algorithm: Using the pairwise
+times could be informed by industry websites or                Jaccard similarity matrix, we applied K-
+technical documentation. This synthetic approach               Medoids Clustering(Rdusseeun and Kaufman,
+allowed us to create rich, detailed, and coherent              1987) to group the task graphs from each
+task graphs that are more representative of real-              scenario. Each resulting cluster represents a
+world industrial challenges than any single source             workshop where the constituent tasks heavily
+could provide alone. The primary sources that in-              compete for a common set of machines. Fi-
+formed this synthesis process are detailed in Table            nally we get 13 workshops that listed in Table
+6.                                                             7
+
+A.2 Details of Scheduling Instance                        A.2.2 Resource-Centric Instance Composition
+    Composition
+                                                          With the workshop clusters defined, we generate
+We compose complete schedule instances by com-            each final scheduling instance using a deterministic,
+bining multiple task graphs. A simple random com-         cluster-based composition rule:
+bination would fail to generate challenging or re-
+alistic scenarios. The core difficulty in scheduling         • Select a Core Cluster: To generate a new
+arises from resource contention, where multiple                scheduling instance of size n, we first select
+tasks compete for the shared, limited machines.                one of the 13 workshop clusters to serve as
+   To ensure that the scheduling instances in NL ⇒             the core workshop.
+Schedule are both realistic and computationally
+challenging, we developed a principled, two-stage            • Intra-Cluster Task Sampling: We then sam-
+process for composing instances from our pool of               ple n unique task graphs exclusively from
+individual task graphs. This process is designed               within this selected core cluster.
+to maximize resource contention, which is the pri-           This deterministic, intra-cluster sampling strat-
+mary driver of scheduling complexity.                     egy guarantees that every generated instance is
+A.2.1 Machine Overlap Clustering                          composed of tasks that have a high degree of ma-
+                                                          chine overlap. This, in turn, ensures high resource
+First, we sought to identify natural workshop sce-
+                                                          contention, which is the primary driver of schedul-
+narios where a specific set of machines is frequently
+                                                          ing complexity. By preventing the inclusion of
+used together. This was achieved through a formal
+                                                          tasks from outside the cluster, we create focused,
+clustering process based on machine usage pat-
+                                                          non-trivial scheduling problems that rigorously test
+terns.
+                                                          a model’s ability to resolve conflicts and manage
+    • Vector Representation: Each unique task             shared resources effectively. This principled com-
+      graph in our pool was represented as a binary       position method is critical to the quality and chal-
+      vector v ∈ {0, 1}|M | , where |M | is the total     lenge of the NL ⇒ Schedule dataset.
+                                                     35631
+         Table 6: Details of the public data sources used for constructing the NL ⇒ Schedule benchmark.
+
+ Source Name                                    Source Type        Reference / Link
+ Scheduling: Theory, Algorithms, and                Book           (Pinedo, 2022)
+ Systems
+ Systems approach to computer-                      Book           (Singh, 1996)
+ integrated design and manufacturing
+ Fundamentals of modern manufactur-                 Book           (Groover, 2010)
+ ing: materials, processes, and systems
+ Automotive handbook                                Book           (GmbH, 2022)
+ SAE Books                                        Website          https://www.sae.org/publications/books
+ DMG MORI                                         Website          https://en.dmgmori.com/
+                                                                   news-and-media/news/
+                                                                   dmg-mori-technology-excellence-automotive
+ TOYOTA VIRTUAL PLANT TOUR                        Website          https://global.toyota/en/company/
+                                                                   plant-tours/stamping
+ Overcooked! 2                                  Video Game         https://store.steampowered.com/app/
+                                                                   728880/Overcooked_2/
+ Big Pharma                                     Video Game         https://store.steampowered.com/app/
+                                                                   344850/Big_Pharma/
+ Construction Simulator                         Video Game         https://store.steampowered.com/app/
+                                                                   1273400/Construction_Simulator/
+
+         Table 7: Details of the public data sources used for constructing the NL ⇒ Schedule benchmark.
+
+         Scenario        Number                                     Worshop
+     Manufacturing           7       Brake_Shop, Chassis_Shop, Stamping_Shop, Engine_Shop, Cool-
+                                     ing_Shop, Electrical_Shop, Transmission_Shop
+        Construction         4       Residential_Community, Campus, Commercial_Complex, Indus-
+                                     trial_Park
+    Pharmaceuticals          1       -
+       Cooking               1       -
+
+A.3 Dataset Template                                       common phrasing, request structures, and objective
+                                                           statements. We then synthesized these recurring
+To generate the realistic natural language schedul-
+                                                           patterns into 20 distinct scheduling requirement
+ing problem descriptions for NL ⇒ Schedule, we
+                                                           templates.
+developed a template-based approach to ensure that
+the resulting texts exhibit both structural consis-
+tency and linguistic diversity, mirroring the style of     A.3.2   Procedure Description Templates
+real-world documents.                                      Similarly, to ensure the procedural instructions for
+   We curated two distinct sets of templates by first      each task were realistic, we scraped a diverse set
+collecting and then summarizing real-world data.           of public procedural documents from manufactur-
+                                                           ing, construction, pharmaceuticals, and cooking
+A.3.1     Scheduling Requirement Templates                 domains (Bień et al., 2020; Niazi, 2019).By ana-
+To create realistic high-level problem descrip-            lyzing these texts, we identified common linguistic
+tions, we began by scraping a corpus of authen-            patterns for describing sequential steps, machine
+tic order and dialogue data from public web-               usage, and processing times. These patterns were
+sites(TemplateLab, 2025) and datasets(Rubino               then distilled into 10 distinct procedure description
+et al., 2022). From this raw data, we analyzed             templates per domain.
+                                                    35632
+Figure 6: Automatic Evaluation results of ours dataset.   Figure 7: Human Evaluation results of the variant and
+                                                          ours dataset.
+A.4 Dataset Analysis
+                                                          goal of this evaluation is to validate the necessity
+We analyze our datasets to investigate whether the
+                                                          and effectiveness of our generation&refinement
+generated order texts are consistent with the origi-
+                                                          process. Inspired by (Miller, 1979), we ask three
+nal scheduling instances, whether the texts are qual-
+                                                          workers to score the document from 1 to 5 on five
+ified according to human standards Therefore, we
+                                                          criteria: readability, the quality of the document
+conduct both automatic and human evaluations to
+                                                          to be understood easily; accuracy, the quality of
+the dataset constructed by our three-stage pipeline.
+                                                          the document accurately describing the informa-
+A.4.1 Automatic Evaluation                                tion in the procedure graph; clarity, the quality of
+To evaluate the generated documents, we employ 2          the document expressing the complex execution
+standard Data2Text metrics, FINE and ESA (Faille          of actions logically; simplicity, the quality of the
+et al., 2021). FINE uses a natural language infer-        document not containing redundant information;
+ence model(Liu et al., 2019) to check for factual         usability, the quality of the document aiding users
+inconsistencies, specifically identifying hallucina-      in accomplishing this procedure. To ensure the
+tions and omissions. ESA, in turn, quantifies the         reliability of human evaluation, we hire three do-
+coverage of key entities and actions. For both met-       main experts to evaluate the generated documents
+rics, higher values denote superior quality. The          and calculate the ICC (Intraclass Correlation Co-
+central goal of applying these metrics is to quan-        efficient) (Shrout and Fleiss, 1979) score between
+titatively verify the semantic equivalence between        different experts. The higher ICC score indicates
+our ground-truth task graphs and the final schedul-       higher consistency between different experts and
+ing problem descriptions. This automated evalua-          higher reliability of the evaluation. Generally an
+tion provides a rigorous, objective measure of how        ICC of 0.75 or higher indicates that the evaluation
+effectively our generation pipeline preserves the         is reliable (Koo and Li, 2016). ICC is calculated as
+informational integrity of the source data.               follows:
+   The results presented in Figure 6 provide strong                        MSbetween − MSwithin
+quantitative evidence for the high quality and faith-         ICC =
+                                                                       MSbetween + (k − 1) × MSwithin
+fulness of our generated documents. Specifically,
+the exceptionally high scores on the FINE met-            where MSbetween is the mean square for between
+ric confirm that our generation process is factually      groups variability, MSwithin is the mean square for
+grounded, exhibiting a minimal rate of both halluci-      within groups variability and k is the number of
+nations and omissions. This is further corroborated       groups. And we ensure that the ICC scores for all
+by the excellent performance on the ESA metric,           of our evaluations are ≥ 0.75.
+which demonstrates that nearly all key entities and          The results is shown in 7, it confirms the high
+actions from the source task graphs are successfully      quality of our generated dataset and validate our
+preserved in the final text.                              generation&refinement process. The concatenation
+                                                          scored exceptionally well in Accuracy and Usabil-
+A.4.2 Human Evaluation                                    ity, indicating that our underlying template-filling
+we created a variant of documents for compari-            method successfully preserves the factual integrity
+son: concatenation, which directly concatenates all       and core utility of the source data. Furthermore,
+template-filling sentences as the final description.      ours data demonstrated a significant improvement
+No LLM-based polishing was performed. A central           across all five metrics, with particularly notable
+                                                      35633
+gains in Readability, Clarity, and Simplicity. This       These metrics collectively demonstrate that the
+proves that the LLM refinement stage is crucial           dataset provides a rigorous benchmark for eval-
+for transforming the factually correct but poten-         uating a model’s ability to perform complex combi-
+tially rigid text into a coherent, natural, and easily    natorial reasoning under strict resource limitations.
+digestible narrative.
+                                                          B     Details of Experiments
+A.5 Statistical Analysis
+                                                          B.1    Details of Failure Analysis
+The statistical results in Table 8 demonstrate that
+                                                          B.1.1 Definition of Error Category
+the dataset is highly diverse, challenging, and rep-
+resentative of real-world industrial scenarios from       To systematically diagnose model failures, we con-
+three key perspectives:                                   duct a four-level analysis inspired by (Feitelson
+                                                          et al., 1997) aligned with the hierarchical struc-
+   • Linguistic Variability: While intra-domain           ture of a schedule: schedule level, task level, step
+     embedding similarity (EmbSim) remains rel-           level, and constraint level. At the schedule level,
+     atively high (0.60–0.75) due to the necessary        we evaluate whether the set of tasks included in
+     use of domain-specific technical terminology         each generated schedule matches the ground truth.
+     (e.g., "Excavator" in Construction), the overall     Each case is categorized as task matched (all re-
+     global similarity drops significantly to 0.4150.     quired tasks are present), task missing (some tasks
+     This sharp contrast indicates that the dataset       are omitted), or task hallucinated (irrelevant or spu-
+     covers a broad semantic spectrum across the          rious tasks are introduced). At the task level, we
+     four workshops. This low inter-domain simi-          examine each task in the task matched set to as-
+     larity ensures that models cannot rely on mem-       sess whether its full sequence of steps is correctly
+     orizing simple linguistic templates and must         specified. A task is labeled as step matched, step
+     generalize across vastly different lexical and       missing, or step hallucinated similar with sched-
+     contextual environments.                             ule level. Only tasks with fully matched steps are
+                                                          passed to the next level. At the step level, we check
+   • Task Complexity: The dataset features var-
+                                                          whether each step has the correct attribute assign-
+     ied task structures across domains. The Con-
+                                                          ments. Steps are marked as attribute matched, ma-
+     struction workshop represents "Deep Logic"
+                                                          chine mismatch (assigned to the wrong machine),
+     scenarios with the highest number of steps
+                                                          or duration inadequate (assigned a shorter-than-
+     (8.67±1.48) and machine diversity (8.34), re-
+                                                          required duration). Finally, at the constraint level,
+     quiring models to handle long-chain tempo-
+                                                          we analyze steps with correct attributes for viola-
+     ral dependencies. Conversely, the Pharma-
+                                                          tions of fundamental scheduling rules, including
+     ceuticals workshop represents high-frequency,
+                                                          dependency violations (incorrect step order) and
+     short-cycle tasks. The high standard deviation
+                                                          machine conflicts (overlapping steps on the same
+     in workloads and steps (e.g., Cooking range:
+                                                          machine). A step that passes all four levels without
+     3–12 steps) further ensures that the scheduling
+                                                          error is counted as a perfect step.
+     algorithms are tested against highly heteroge-
+     neous task distributions.                            B.1.2 Full results about failure analysis
+                                                          We list the other six models failure modes distribu-
+   • Inter-task Resource Constraints: The diffi-
+                                                          tion in 8.
+     culty of the scheduling problem is evidenced
+                                                             We can draw similar conclusion with 4.2.1. We
+     by intense resource competition. The Cook-
+                                                          observe the same consistent patterns and perfor-
+     ing domain reaches a Max Resource Load of
+                                                          mance hierarchies:
+     1.00, indicating a zero-idle bottleneck where
+     resources are utilized to their theoretical limit,       • Macro-Level Fidelity: The trend holds true
+     leaving no room for scheduling errors. The                 that non-reasoning models consistently strug-
+     Manufacturing domain exhibits the highest                  gle to identify the correct set of tasks, exhibit-
+     Task Overlap Ratio (80.49%) and Sharing De-                ing high rates of both tasks missing and tasks
+     gree (5.98 tasks per machine), forcing the                 hallucinated. Reasoning models mirror the
+     scheduler to resolve severe conflicts among                strong performance of Gemini 2.5 Pro, demon-
+     nearly identical resource requirements across              strating a significantly more robust ability to
+     multiple tasks.                                            correctly grasp the overall problem scope.
+                                                     35634
+Table 8: Statistical Analysis of the Dataset: Linguistic Variability, Task Complexity, and Inter-task Resource
+Constraints. EmbSim measures semantic closeness between instances (lower values indicate higher linguistic
+diversity); Steps (Avg) represents the mean number of sequential operations within a task; Workload denotes
+the total processing time required to complete a task; Mach. Div. indicates the variety of unique machine types
+required per task; Sharing Deg. reflects the average number of tasks competing for the same resource; Max Load
+(Bottleneck Index) is the ratio of the most utilized machine’s workload to the total makespan; Overlap % represents
+the probability of two tasks requiring identical sets of machines.
+ Scenario          Linguistic          Task Complexity (per Task)                Inter-task Resource Constraints
+                   EmbSim ↓     Steps (Avg)     Workload       Mach. Div.   Sharing Deg.     Max Load     Overlap %
+ Construction        0.7559     8.67 ± 1.48   51.36 ± 11.63       8.34      4.02 (Max 10)       0.77        54.98%
+ Cooking             0.7326     7.19 ± 2.03    24.85 ± 9.37       3.16      2.98 (Max 10)       1.00        48.36%
+ Manufacturing       0.6056     5.05 ± 0.22    23.30 ± 7.77       4.28      5.98 (Max 10)       0.96        80.49%
+ Pharmaceuticals     0.6819     4.17 ± 1.06     7.19 ± 2.81       4.14      4.65 (Max 10)       0.93        64.06%
+ All Combined        0.4150     6.27 ± 2.31   26.68 ± 17.52       4.98        4.41 (Avg)    0.915 (Avg)     61.97%
+
+   • Micro-Level Content: The challenge of pars-                 This statement shows that LLM does not
+     ing fine-grained details is universal. For nearly           blindly apply rules; it simulates the outcome
+     every model evaluated, machine mismatch                     of its decisions and actively checks for con-
+     is confirmed as the single most dominant at-                straint violations. When a potential conflict
+     tribute error, often accounting for the majority            is detected, it triggers a backtracking search
+     of all micro-level failures.                                (Sadeh et al., 1995), returns to previous deci-
+                                                                 sion points and adjust the solution path.
+   • Scheduling Logic: The models’ underlying
+     reasoning strategies are also consistent. non-        B.3    Details of Priority Dispatching Rules
+     reasoning models are almost exclusively de-           To provide strong, established baselines for our
+     feated by global resource conflicts. Reasoning        makespan deviation analysis, we implemented four
+     models, however, consistently demonstrate a           widely-used Priority Dispatching Rules (PDRs).
+     more balanced and effective capability.               These rules are heuristics that make a local, greedy
+B.2    Details of Potential Analysis                       decision whenever a machine becomes free and has
+                                                           one or more steps waiting in its queue. Below are
+Several key snippet from reasoning tokens from
+                                                           the detailed descriptions of each rule employed in
+DeepSeek-R1 and thought summary from Gemini-
+                                                           our study.
+2.5-Pro:
+                                                           B.3.1 Shortest Processing Time (SPT)
+   • "We note that the RA [Robot Arm] is heavily
+                                                           This rule prioritizes the step that can be completed
+     used. We must sequence the RA steps appro-
+                                                           the fastest. When a machine becomes available, it
+     priately."
+                                                           examines the queue of all steps waiting for it. It
+      This statement shows the model identifying           selects and processes the step with the minimum
+      the Robot Arm as a bottleneck—a strategy             (shortest) processing duration. SPT is a classic
+      typical of expert human schedulers (Adams            heuristic known for its effectiveness in reducing av-
+      et al., 1988). It suggests the model adopts a        erage task flow time and work-in-process inventory.
+      global plan that prioritizes managing critical       It is a highly localized, greedy strategy that aims to
+      resources to guide downstream decisions.             free up machines as quickly as possible. Its primary
+   • "Task1 steps: step0: RA (1) → step1: CS (6)           weakness is that it can "starve" steps with long pro-
+     → (because after step0, we can start step1 at         cessing times, potentially delaying the completion
+     1) step2: F (12) → (because after step1, we           of certain tasks indefinitely if a continuous stream
+     can start step2 at 7)"                                of shorter tasks is available.
+      This statement reveals a greedy use of the           B.3.2 Most steps Remaining (MOPNR)
+      Earliest Start Time rule (Bratley et al., 1971),     This rule prioritizes the task that has the longest
+      placing each step as early as possible.              sequence of steps still to be completed. When a
+   • "This is a conflict! We have two steps on CS          machine becomes available, it considers the par-
+     at the same time... We must fix this."                ent tasks of all waiting steps. It selects the step
+                                                      35635
+                                                          heuristic that effectively prioritizes larger, more
+                                                          demanding tasks.
+
+                                                          B.3.4    First Due Date / Work Remaining
+                                                                   (FDD/WKR)
+                                                          This rule prioritizes tasks based on their urgency,
+                                                          using remaining work as a tie-breaker. When a ma-
+                                                          chine becomes available, it selects the step belong-
+                                                          ing to the task with the earliest assigned due date.
+                                                          In the case where multiple waiting tasks share the
+                                                          same earliest due date, the tie is broken by apply-
+                                                          ing the MWKR rule. In classic JSSP benchmarks
+                                                          where explicit due dates are not provided, a com-
+                                                          mon practice is to estimate a pseudo due date for
+                                                          each task, often calculated as a multiple of its total
+                                                          processing time. Our implementation follows this
+                                                          approach to simulate an urgency-based scheduling
+                                                          environment. This rule therefore tests the ability to
+                                                          schedule based on a measure of overall task com-
+                                                          pletion targets.
+
+                                                          B.4     Details of LLM+solver Implementation
+                                                          To create robust and fair comparisons against the
+                                                          mediated solving paradigm, we adapted two state-
+                                                          of-the-art frameworks, Chain-of-Experts (CoE)
+                                                          (Xiao et al., 2024) and Optimus (AhmadiTeshnizi
+                                                          et al., 2024), to the NL ⇒ Schedule task. Our
+Figure 8: The failure analysis of the other six models.
+The dashed line separates non-reasoning models (above)    adaptation philosophy was to preserve the core col-
+from reasoning models (below).                            laborative intelligence of these frameworks while
+                                                          ensuring a fair informational basis for comparison
+belonging to the task that has the highest number         against our M ANS.
+of steps remaining in its process plan. MOPNR
+                                                          B.4.1    Adaptation of CoE
+is a lookahead heuristic designed to prevent com-
+plex, multi-step tasks from being left until the end.     The CoE framework utilizes a team of specialized
+By prioritizing tasks that are "further from comple-      agents to collaboratively solve optimization prob-
+tion," it attempts to ensure that all tasks progress      lems. To adapt it for our task under fair conditions,
+through the system in a balanced manner. It fo-           we made one primary modification to its agent ros-
+cuses on the structural complexity of a task rather       ter:
+than the duration of its individual steps.                   We deliberately removed the Terminology Inter-
+                                                          preter, Modeling Knowledge Supplement Expert,
+B.3.3 Most Work Remaining (MWKR)                          LP File Generation and the Programming Example
+This rule prioritizes the task that has the largest       Provider from the agent team. In the original frame-
+amount of total processing time left. Similar to          work, these agents leverage external knowledge
+MOPNR, this rule considers the parent tasks of            bases (e.g., GAMS modeling examples, Gurobi
+waiting steps. For each task, it calculates the sum       code snippets) to provide expert-level shortcuts and
+of the durations of all its remaining steps. It then      pre-canned solutions. Removing them was crucial
+selects the step belonging to the task with the high-     for fairness, as it ensures that the CoE baseline,
+est total work remaining. MWKR is a more refined          like M ANS, must derive its solution based solely
+version of MOPNR. Instead of simply counting              on the provided natural language text and its gen-
+the number of future steps, it accounts for their         eral world knowledge, rather than relying on an
+duration, providing a more accurate measure of the        external library of optimization tricks or code ex-
+"work content" left in a task. It is a robust global      amples. And we modify the Modeling Expert and
+                                                     35636
+                                                  Iterative       Structured        Solver         Intrinsic
+        Framework
+                                                Collaboration      Context       Independence     Reasoning
+        ORLM (Huang et al., 2025)                    ✗                 ✗               ✗               ✗
+        CoE (Xiao et al., 2024)                      ✓                 ✗               ✗               ✗
+        OptiMUS (AhmadiTeshnizi et al., 2024)        ✓                 ✓               ✗               ✗
+        M ANS (Ours)                                 ✓                 ✓               ✓               ✓
+
+                       Table 9: Comparison of M ANS with state-of-the-art frameworks.
+
+Programming Expert since it provides Gurobi Ref-         provides an upper bound on solution quality. FJSP
+erence knowledge, which is not used in our solver.       DRL represents the AI-driven approach, which
+   All other agents were retained with slight modi-      uses Deep Reinforcement Learning to train a
+fications to preserve the framework’s core collabo-      scheduling policy.
+rative reasoning capabilities.                              This required creating three specialized versions
+                                                         of the final code generation logic.
+B.4.2 Adaptation of Optimus
+The Optimus framework employs a highly struc-                • Adaptation for Google OR-Tools The
+tured, modular workflow that strictly separates the            programming agents’ primary task was
+mathematical formulation of a problem from its                 to generate a complete and syntacti-
+final implementation in code. Our primary adapta-              cally correct python script that uses the
+tion focused on aligning its core formulation logic            ortools.sat.python.cp_model API1 .
+with the nature of the Job Shop Scheduling Prob-
+                                                             • Adaptation for MOPNR Since MOPNR is
+lem.
+                                                               a heuristic, not a solver that accepts a formal
+   The original Optimus is hard-coded to guide
+                                                               model, the programming agents’ task was re-
+its Formulation Generation agent to produce mod-
+                                                               defined. They were required to write a Python
+els in Mixed-Integer Linear Programming form.
+                                                               script that implements the MOPNR schedul-
+Given that text-to-schedule is often more naturally
+                                                               ing logic from scratch.
+and efficiently modeled using Constraint Program-
+ming(CP), we modified the core prompts for the               • Adaptation for FJSP DRL For the DRL
+Formulation Generation and Formulation Fixing                  backend, the agents’ task was to act as a
+agents. Instead of instructing them to produce lin-            "tool-user" that prepares the correct input for
+ear equations, the modified prompts guide them to              a pre-trained model. This involved generating
+define the problem in terms of core CP concepts:               a python script that interfaces with the pro-
+decision variables (e.g., the start and end times of           vided DRL library. The agents were provided
+times), their domains, and the logical constraints             with a curated API documentation page (de-
+that govern them (e.g., precedence and no-overlap              rived from the original paper’s repository2 )
+resource constraints).                                         and were instructed to write code to load the
+   The core modular workflow of management, for-               pre-trained DRL policy model and translate
+mulation, coding, and debugging was otherwise                  the structured task graph information into the
+preserved with slight modifications.                           precise JSON-based state representation re-
+                                                               quired by the model’s inference function.
+B.4.3 Solver-Specific Adaptations for
+      Programming Agents                                   Detailed prompt template implementations for
+After the problem has been understood and mod-           CoE:
+eled by the upstream agents in both the CoE and
+Optimus frameworks, the final stage is to gener-            Modeling Expert:
+ate an executable program for a backend solver.                You are a modeling expert specialized in the
+We adapted the "programmer" agents within both              field of Job Shop Scheduling problem. Your
+frameworks to target our three distinct solver back-        expertise lies in Constraint Programming(CP)
+ends.                                                       models, and you possess an in-depth under-
+   MOPNR is the highest-performing PDR in Sec.
+4.2.2, a fast but myopic heuristic. OR Tools rep-           1
+                                                                https://developers.google.com/optimization/scheduling/job_shop
+resents the industrial-strength "gold standard." It         2
+                                                                https://github.com/songwenas12/fjsp-drl
+
+                                                    35637
+Table 10: Ablation study of the M ANS framework.’w/o’         ({clausType}) of a Job Shop Scheduling Prob-
+denotes the removal of the specified agent.                   lem (JSSP) using a Constraint Programming
+                                                              (CP) formulation.
+                               #Task=5
+          Method                                                 Here is a {clausType} we need you to model:
+                          SER    TCR SFR
+                                                              {targetDescription}
+     M ANS                0.702  0.560 0.400
+                                                                 Here is some context on the problem: {back-
+     M ANS w/o seeker     0.612  0.485 0.200
+                                                              ground}
+     M ANS w/o weaver     0.665  0.535 0.375
+                                                                 Here is the list of available decision variables
+     M ANS w/o verifier   0.648  0.495 0.300
+                                                              (e.g., step start/end times): {variables}
+                               #Task=10
+          Method                                                 And finally, here is the list of input parame-
+                          SER TCR SFR
+                                                              ters (e.g., step durations): {parameters}
+     M ANS                0.682 0.543 0.275
+                                                                 First, take a deep breath and explain how
+     M ANS w/o seeker     0.482 0.315 0.075
+                                                              we should define the {clausType} for this JSSP.
+     M ANS w/o weaver     0.637 0.468 0.225
+                                                              Feel free to define new decision variables if
+     M ANS w/o verifier   0.594 0.425 0.150
+                                                              you think it is necessary.
+  standing of various modeling techniques within
+  the realm of operations research. At present,
+  you are given an Job Shop Scheduling problem,               Formulation generation prompt
+  alongside additional insights provided by other                You are a mathematical formulator working
+  experts. The goal is to holistically incorporate            with a team of optimization experts. The objec-
+  these inputs and devise a comprehensive model               tive is to tackle a complex Job Shop Scheduling
+  that addresses the given production challenge.              problem, and your role is to fix a previously
+  Now the origin problem is as follow: {prob-                 modelled {target}. Recall that the {target} you
+  lem}. And the modeling is as follow: {com-                  modelled was {constraint} and your formula-
+  ments} Give your model of this                              tion you provided was {formulation} The error
+                                                              message is {error} Here are the variables you
+                                                              have so far defined: {variables} Here are the
+  Programming Expert:                                         parameters of the problem {parameters} Your
+     You are a Python programmer in the field                 task is carefully inspect the old {target} and
+  of Job Shop Scheduling problem. Your pro-                   fix it when you find it actually wrong. After
+  ficiency in utilizing third-party libraries such            fixing it modify the formulation. Please return
+  as {solver} is essential. In addition to your               the fixed JSON string for the formulation. The
+  expertise in {solver}, it would be great if you             current JSON is {json} Take a deep breath and
+  could also provide some background in related               solve the problem step by step.
+  libraries or tools, like NumPy, SciPy, or. You
+  are given a specific problem and comments              B.5      Backbone Comparison Experiment
+  by other experts. You aim to develop an effi-          B.6      Details of M ANS
+  cient Python program that addresses the given
+  problem. Now the origin problem is as fol-             Below are the prompts of M ANS.
+  low: problem And the experts along with there
+  comment are as follow: comments Give your                   Seeker prompt:
+  Python code directly.                                         You are the Seeker, an expert in identifying
+                                                              high-level objectives from complex documents.
+                                                              Your sole task is to read the provided schedul-
+  Detailed prompt template implementations for
+                                                              ing problem description and identify the com-
+Optimus:
+                                                              plete and accurate set of all tasks that need to
+                                                              be completed.
+  Formulation generation prompt
+                                                                The full order text is as follows: {schedul-
+     You are an expert mathematical formulator
+                                                              ing_problem_description}
+  and an optimization professor at a top univer-
+                                                                Your instructions are:
+  sity. Your task is to model a specific constraint
+
+
+                                                      35638
+Table 11: Performance of different LLM backbones on NL ⇒ Schedule across varying problem sizes. We report
+Overall Step Execution Rate (SER), Average Task Completion Rate (TCR), and Schedule Feasibility Rate
+(SFR). #Task=n represents that the scheduling instance contains n tasks. Higher values indicate better performances.
+The best results are bolded, and the second best ones are underlined.
+                                            #Task=5                     #Task=6                      #Task=7
+            Backbone
+                                       SER   TCR SFR               SER   TCR SFR               SER    TCR SFR
+  Qwen3-235B-A22B-nothinking           0.346 0.232   -             0.299 0.247   -             0.234  0.129   -
+  Llama4-Maverick                      0.532 0.324 0.050           0.574 0.336 0.025           0.428  0.274   -
+  DeepSeek-V3                          0.597 0.336 0.050           0.534 0.369 0.025           0.400  0.324 0.075
+  GPT-4.1                              0.638 0.423 0.200           0.692 0.532 0.250           0.596  0.378 0.125
+  Gemini-2.5-Flash-nothinking          0.702 0.560 0.400           0.690 0.521 0.325           0.608  0.443 0.250
+                                            #Task=8                     #Task=9                     #Task=10
+            Backbone
+                                       SER TCR SFR                 SER TCR SFR                 SER TCR SFR
+  Qwen3-235B-A22B-nothinking           0.177 0.131   -             0.142 0.117   -             0.121 0.096    -
+  Llama4-Maverick                      0.412 0.305   -             0.296 0.184   -             0.209 0.097    -
+  DeepSeek-V3                          0.399 0.294   -             0.334 0.221   -             0.216 0.163    -
+  GPT-4.1                              0.588 0.515 0.075           0.426 0.314 0.025           0.352 0.275 0.050
+  Gemini-2.5-Flash-nothinking          0.697 0.550 0.275           0.582 0.417 0.225           0.682 0.543 0.275
+
+     Focus exclusively on identifying the tasks.              Verifier prompt:
+  Extract their names or unique identifiers as de-               You are the Verifier, a meticulous quality
+  scribed in the text.                                        assurance expert. Your task is to perform a
+     Handle quantities. If a task needs to be per-            rigorous audit of the structured data extracted
+  formed multiple times (e.g., "produce 3 wid-                from a problem description, ensuring it is 100%
+  gets"), create a unique entry for each instance             faithful to the original text.
+  (e.g., widget_1, widget_2, widget_3).                          The original, ground-truth text is: schedul-
+     Crucially, you must IGNORE all other de-                 ing_problem_description
+  tails. Do not extract the steps, machines, or                  The extracted task and step structure you
+  durations. That is not your responsibility. This            must verify is: {task_list_from_seeker} {struc-
+  focus is critical to ensure the overall scope of            tured_data_from_weaver}
+  the problem is captured correctly.                             Your instructions are to perform a complete
+                                                              check and then output a corrected version:
+                                                                 Verify task Completeness: Does the number
+ Weaver prompt:                                               of tasks in the structured data exactly match the
+    You are the Weaver, a specialist in parsing               number of tasks described in the text?
+ detailed procedural workflows from text. Your                   Verify step Completeness: For each task,
+ task is to take a list of pre-identified tasks and           does the number of steps in the structured data
+ extract the precise sequence of steps required               exactly match what is described in the text?
+ for each one.                                                   Verify Attribute Accuracy: For every single
+    The full order text for context is: {schedul-             step, cross-reference the text to confirm that the
+ ing_problem_description}                                     assigned machine and duration are completely
+    The list of tasks you must process is:                    accurate.
+ {task_list_from_seeker}                                         Correct any discrepancies.
+    Your instructions are:
+     For every task in the provided list, find its
+ description in the text and extract its sequence             Architect prompt:
+ of steps.                                                       You are the Architect, an expert scheduling
+     For each step, you must extract its execution            strategist. Your task is to take a perfectly struc-
+ order (e.g., step 1, step 2), the specific machine           tured and verified problem definition and cre-
+ it requires, and its processing duration.                    ate an optimal, conflict-free schedule that com-
+
+
+                                                      35639
+pletes all tasks in the shortest possible time
+(minimizes makespan).
+   The verified problem structure is: veri-
+fied_task_graphs
+   To create your schedule, you must follow the
+Scheduling Strategy Guide below, using it to
+inform your step-by-step deliberation process.
+   Scheduling Strategy Guide:
+   Identify Bottlenecks: Before scheduling, an-
+alyze all steps to identify the most heavily con-
+tended machines. The efficient sequencing of
+tasks on these bottleneck resources is critical
+to achieving an optimal makespan.
+   Think Ahead: Avoid purely greedy decisions.
+A choice that seems best locally (e.g., starting
+a short task on an idle machine) may create a
+major delay for a more critical task later.
+   Allow Strategic Idling: Do not be afraid to
+leave a machine idle if it is waiting for an step
+that is part of the critical path. A short, strategic
+wait can prevent a much longer delay later.
+
+
+
+
+                                                        35640
+

@@ -1,0 +1,21 @@
+1/20 ('filmtrust', 'TrustSVD', 5, 0): RMSE=0.809291 MAE=0.622635 1.4s
+2/20 ('filmtrust', 'TrustSVD', 5, 1): RMSE=0.801606 MAE=0.616316 0.8s
+3/20 ('filmtrust', 'TrustSVD', 5, 2): RMSE=0.803959 MAE=0.623052 0.5s
+4/20 ('filmtrust', 'TrustSVD', 5, 3): RMSE=0.800827 MAE=0.621790 0.4s
+5/20 ('filmtrust', 'TrustSVD', 5, 4): RMSE=0.796322 MAE=0.613728 0.5s
+6/20 ('filmtrust', 'TrustSVD', 10, 0): RMSE=0.810875 MAE=0.622037 0.7s
+7/20 ('filmtrust', 'TrustSVD', 10, 1): RMSE=0.801088 MAE=0.617387 1.3s
+8/20 ('filmtrust', 'TrustSVD', 10, 2): RMSE=0.803257 MAE=0.618762 1.0s
+9/20 ('filmtrust', 'TrustSVD', 10, 3): RMSE=0.825611 MAE=0.635381 1.3s
+10/20 ('filmtrust', 'TrustSVD', 10, 4): RMSE=0.794729 MAE=0.626648 0.6s
+11/20 ('epinions', 'TrustSVD', 5, 0): RMSE=1.054005 MAE=0.813974 31.4s
+12/20 ('epinions', 'TrustSVD', 5, 1): RMSE=1.055645 MAE=0.816556 34.4s
+13/20 ('epinions', 'TrustSVD', 5, 2): RMSE=1.057873 MAE=0.818783 39.1s
+14/20 ('epinions', 'TrustSVD', 5, 3): RMSE=1.051355 MAE=0.816317 43.9s
+15/20 ('epinions', 'TrustSVD', 5, 4): RMSE=1.056012 MAE=0.811075 40.5s
+16/20 ('epinions', 'TrustSVD', 10, 0): RMSE=1.055386 MAE=0.816527 41.2s
+17/20 ('epinions', 'TrustSVD', 10, 1): RMSE=1.059144 MAE=0.813462 77.7s
+18/20 ('epinions', 'TrustSVD', 10, 2): RMSE=1.057793 MAE=0.815352 71.7s
+19/20 ('epinions', 'TrustSVD', 10, 3): RMSE=1.054021 MAE=0.812053 76.9s
+20/20 ('epinions', 'TrustSVD', 10, 4): RMSE=1.052104 MAE=0.811827 61.0s
+FINISHED 20 tasks, 0 failed; unavailable=[]

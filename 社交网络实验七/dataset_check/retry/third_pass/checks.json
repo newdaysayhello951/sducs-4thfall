@@ -1,0 +1,52 @@
+[
+  {
+    "file": "ciao_timestamp.txt",
+    "bytes": 3534370,
+    "head": "  1.0000000e+000  1.0000000e+000  1.0000000e+000  5.0000000e+000  1.0000000e+000  1.2988764e+009\r\n  1.0000000e+000  2.0000000e+000  1.0000000e+000  5.0000000e+000  2.0000000e+000  1.2889404e+009\r\n  1."
+  },
+  {
+    "file": "ciao_raw_tree.html",
+    "paths": [
+      "AUTHORS",
+      "LICENSE",
+      "README.md",
+      "data",
+      "data/proc_yelp.py",
+      "data/raw",
+      "data/raw/Ciao",
+      "data/raw/Ciao/catalog_ciao.txt",
+      "data/raw/Ciao/movie-ratings.txt",
+      "data/raw/Ciao/rating_with_timestamp.mat",
+      "data/raw/Ciao/trust.mat",
+      "data/raw/Ciao/trusts.txt",
+      "data/raw/Epinions",
+      "scripts",
+      "src"
+    ]
+  },
+  {
+    "file": "ciao_rest_tree.html",
+    "paths": [
+      "README.md",
+      "datasets",
+      "datasets/Ciao",
+      "datasets/Ciao/nbrs_dict.pkl",
+      "datasets/Ciao/rating_with_timestamp.mat",
+      "datasets/Ciao/trust.mat",
+      "datasets/Ciao/u_ir_seed27.pkl",
+      "datasets/Ciao/unexpo_dict_seed27_thresh3.pkl",
+      "datasets/Epinions",
+      "datasets/Yelp",
+      "exp.png",
+      "logs",
+      "models",
+      "run_rate",
+      "saved_models",
+      "utils"
+    ]
+  },
+  {
+    "file": "flixster_ubc_archive.json",
+    "error": "HTTP Error 503: Service Unavailable"
+  }
+]

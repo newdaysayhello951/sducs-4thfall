@@ -1,0 +1,49 @@
+[
+  {
+    "name": "ciao_original",
+    "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)>"
+  },
+  {
+    "name": "ciao_timestamp",
+    "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)>"
+  },
+  {
+    "name": "ciao_archive",
+    "url": "https://web.archive.org/cdx/search/cdx?url=www.cse.msu.edu/~tangjili/datasetcode/ciao*.zip&output=json&filter=statuscode:200&collapse=urlkey",
+    "status": 200,
+    "bytes": 3,
+    "preview": "[]\n"
+  },
+  {
+    "name": "flixster_archive",
+    "url": "https://web.archive.org/cdx/search/cdx?url=www.cs.sfu.ca/~sja25/personal/datasets/*&output=json&filter=statuscode:200&collapse=urlkey",
+    "status": 200,
+    "bytes": 248,
+    "preview": "[[\"urlkey\",\"timestamp\",\"original\",\"mimetype\",\"statuscode\",\"digest\",\"length\"],\n[\"ca,sfu,cs)/~sja25/personal/datasets\",\"20110415084158\",\"http://www.cs.sfu.ca:80/~sja25/personal/datasets/\",\"text/html\",\"200\",\"Q5UUJ6EADUNGVLOUYCC4RCBU7W2DY76W\",\"1564\"]]\n"
+  },
+  {
+    "name": "hf_flixster",
+    "url": "https://huggingface.co/api/datasets?search=flixster",
+    "status": 200,
+    "bytes": 2,
+    "datasets": []
+  },
+  {
+    "name": "hf_ciao",
+    "url": "https://huggingface.co/api/datasets?search=ciao",
+    "status": 200,
+    "bytes": 4584,
+    "datasets": [
+      "ciaochris/neuro2-neuroscience-datasets",
+      "patrickvonplaten/bella_ciao",
+      "ciaomandi/vassoi",
+      "ylacombe/bella_ciao",
+      "ciao10/01",
+      "ciaocicciquantum/ItalianConversationalDataset"
+    ]
+  },
+  {
+    "name": "github_data_tree",
+    "error": "HTTP Error 403: rate limit exceeded"
+  }
+]

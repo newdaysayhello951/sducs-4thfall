@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="475" height="198" preserveAspectRatio="xMinYMin meet" viewBox="0 0 475 198" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="475" height="198"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-198)" style="clip-path: url(#clip)">
+		<g transform="">
+			<text x="0" y="185" style="font-family: SimHei; font-size: 11px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,370) scale(1,-1)">图4 每周至少使用一次的服务或地点</text>
+			<path d="M 110,22 L 110,171 Z" style="stroke: rgb(90%,92%,95%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="108.0" y="8" style="font-family: SimSun; font-size: 8px;fill: rgb(41%,47%,54%); stroke:none;" transform="translate(0,16) scale(1,-1)">0</text>
+			<path d="M 243.181818,22 L 243.181818,171 Z" style="stroke: rgb(90%,92%,95%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="241.1818181818182" y="8" style="font-family: SimSun; font-size: 8px;fill: rgb(41%,47%,54%); stroke:none;" transform="translate(0,16) scale(1,-1)">5</text>
+			<path d="M 403,22 L 403,171 Z" style="stroke: rgb(90%,92%,95%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="399.0" y="8" style="font-family: SimSun; font-size: 8px;fill: rgb(41%,47%,54%); stroke:none;" transform="translate(0,16) scale(1,-1)">11</text>
+			<text x="75.0" y="159" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,318) scale(1,-1)">教学楼</text>
+			<rect x="110" y="157" width="293.0" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="408.0" y="159" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,318) scale(1,-1)">11（100.0%）</text>
+			<text x="75.0" y="141" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,282) scale(1,-1)">图书馆</text>
+			<rect x="110" y="139" width="266.3636363636364" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="381.3636363636364" y="141" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,282) scale(1,-1)">10（90.9%）</text>
+			<text x="66.0" y="123" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,246) scale(1,-1)">自习空间</text>
+			<rect x="110" y="121" width="266.3636363636364" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="381.3636363636364" y="123" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,246) scale(1,-1)">10（90.9%）</text>
+			<text x="47.99999999999999" y="105" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,210) scale(1,-1)">食堂或咖啡店</text>
+			<rect x="110" y="103" width="293.0" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="408.0" y="105" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,210) scale(1,-1)">11（100.0%）</text>
+			<text x="20.999999999999986" y="87" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,174) scale(1,-1)">校园班车或校内交通</text>
+			<rect x="110" y="85" width="133.1818181818182" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="248.1818181818182" y="87" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,174) scale(1,-1)">5（45.5%）</text>
+			<text x="66.0" y="69" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,138) scale(1,-1)">体育设施</text>
+			<rect x="110" y="67" width="239.72727272727275" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="354.72727272727275" y="69" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,138) scale(1,-1)">9（81.8%）</text>
+			<text x="38.99999999999999" y="51" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,102) scale(1,-1)">打印或行政服务</text>
+			<rect x="110" y="49" width="239.72727272727275" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="354.72727272727275" y="51" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,102) scale(1,-1)">9（81.8%）</text>
+			<text x="47.99999999999999" y="33" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,66) scale(1,-1)">快递或取件点</text>
+			<rect x="110" y="31" width="239.72727272727275" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="354.72727272727275" y="33" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,66) scale(1,-1)">9（81.8%）</text>
+		</g>
+	</g>
+</svg>

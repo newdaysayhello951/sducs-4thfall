@@ -1,0 +1,209 @@
+{
+  "3": {
+    "ptf": {
+      "n_stored": 463,
+      "n_dropped": 404,
+      "n_live": 59,
+      "capacity_per_order": 9,
+      "orders_used": 9,
+      "per_order": {
+        "0": 9,
+        "1": 9,
+        "2": 9,
+        "3": 9,
+        "4": 9,
+        "5": 7,
+        "6": 4,
+        "7": 2,
+        "8": 1
+      }
+    },
+    "n_samples": 9,
+    "mean_score_eq5": 0.24776784920625028,
+    "rows": [
+      {
+        "ts_hours_back": 48,
+        "score_eq5": 0.33043027414968706,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 96,
+        "score_eq5": 0.2462002949917507,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 144,
+        "score_eq5": 0.2751036833272007,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 192,
+        "score_eq5": 0.22033371228364076,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 240,
+        "score_eq5": 0.24027854528077927,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 288,
+        "score_eq5": 0.22385888699529718,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 336,
+        "score_eq5": 0.2005476293108571,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 384,
+        "score_eq5": 0.22287298653601556,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 432,
+        "score_eq5": 0.2702846299810246,
+        "n_len": 10
+      }
+    ]
+  },
+  "5": {
+    "ptf": {
+      "n_stored": 463,
+      "n_dropped": 308,
+      "n_live": 155,
+      "capacity_per_order": 33,
+      "orders_used": 9,
+      "per_order": {
+        "0": 33,
+        "1": 33,
+        "2": 33,
+        "3": 27,
+        "4": 15,
+        "5": 7,
+        "6": 4,
+        "7": 2,
+        "8": 1
+      }
+    },
+    "n_samples": 9,
+    "mean_score_eq5": 0.25389792291746754,
+    "rows": [
+      {
+        "ts_hours_back": 48,
+        "score_eq5": 0.329994005025269,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 96,
+        "score_eq5": 0.24976902643807622,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 144,
+        "score_eq5": 0.2460763185138397,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 192,
+        "score_eq5": 0.22160609305401247,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 240,
+        "score_eq5": 0.2664749404805721,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 288,
+        "score_eq5": 0.24234281738804744,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 336,
+        "score_eq5": 0.19807095127690397,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 384,
+        "score_eq5": 0.2635584604212055,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 432,
+        "score_eq5": 0.26718869365928183,
+        "n_len": 10
+      }
+    ]
+  },
+  "8": {
+    "ptf": {
+      "n_stored": 463,
+      "n_dropped": 0,
+      "n_live": 463,
+      "capacity_per_order": 257,
+      "orders_used": 9,
+      "per_order": {
+        "0": 233,
+        "1": 116,
+        "2": 58,
+        "3": 27,
+        "4": 15,
+        "5": 7,
+        "6": 4,
+        "7": 2,
+        "8": 1
+      }
+    },
+    "n_samples": 9,
+    "mean_score_eq5": 0.2505462602954253,
+    "rows": [
+      {
+        "ts_hours_back": 48,
+        "score_eq5": 0.329994005025269,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 96,
+        "score_eq5": 0.2501654473237937,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 144,
+        "score_eq5": 0.24525176689477313,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 192,
+        "score_eq5": 0.22494252232952242,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 240,
+        "score_eq5": 0.2571660985101154,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 288,
+        "score_eq5": 0.25009878239573413,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 336,
+        "score_eq5": 0.19166069690327164,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 384,
+        "score_eq5": 0.24349722357536335,
+        "n_len": 10
+      },
+      {
+        "ts_hours_back": 432,
+        "score_eq5": 0.26213979970098505,
+        "n_len": 10
+      }
+    ]
+  }
+}

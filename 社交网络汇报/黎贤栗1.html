@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NL ⇒ Schedule 论文汇报 — 黎贤栗</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; overflow:hidden; font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#fff; color:#1a1a2e; }
+  .slide { display:none; width:100%; height:100%; padding:48px 64px; position:relative; }
+  .slide.active { display:flex; flex-direction:column; }
+  .slide-num { position:absolute; bottom:20px; right:32px; font-size:12px; color:#999; }
+  .slide-tag { position:absolute; bottom:20px; left:64px; font-size:12px; color:#bbb; letter-spacing:1px; }
+
+  /* 封面 */
+  .cover { justify-content:center; align-items:flex-start; padding-left:96px; }
+  .cover .conf { font-size:14px; color:#2E4878; letter-spacing:2px; margin-bottom:24px; }
+  .cover h1 { font-size:40px; font-weight:700; line-height:1.3; margin-bottom:16px; color:#1a1a2e; }
+  .cover .sub { font-size:18px; color:#555; margin-bottom:48px; }
+  .cover .meta { font-size:15px; color:#777; line-height:1.8; }
+  .cover .bar { width:64px; height:4px; background:#2E4878; margin-bottom:32px; }
+
+  /* 目录 */
+  .toc-list { margin-top:32px; display:flex; flex-direction:column; gap:0; }
+  .toc-item { display:flex; align-items:baseline; padding:14px 0; border-bottom:1px solid #eee; }
+  .toc-num { font-size:22px; font-weight:700; color:#2E4878; width:48px; }
+  .toc-title { font-size:20px; font-weight:600; flex:1; }
+  .toc-desc { font-size:13px; color:#999; }
+
+  /* 通用内容页 */
+  h2.page-title { font-size:28px; font-weight:700; color:#1a1a2e; margin-bottom:8px; }
+  .page-sub { font-size:14px; color:#888; margin-bottom:28px; }
+  .accent-bar { width:40px; height:3px; background:#2E4878; margin-bottom:20px; }
+  .two-col { display:flex; gap:40px; flex:1; min-height:0; }
+  .col-left { flex:1.1; display:flex; flex-direction:column; justify-content:center; }
+  .col-right { flex:1; display:flex; align-items:center; }
+
+  .point { margin-bottom:18px; }
+  .point h4 { font-size:17px; font-weight:600; color:#2E4878; margin-bottom:6px; }
+  .point p { font-size:14.5px; line-height:1.7; color:#444; }
+  .point ul { padding-left:20px; }
+  .point li { font-size:14.5px; line-height:1.8; color:#444; }
+
+  .highlight-box { background:#f4f7fb; border-left:3px solid #2E4878; padding:16px 20px; margin:16px 0; }
+  .highlight-box p { font-size:14.5px; line-height:1.7; color:#333; }
+
+  table.data-table { width:100%; border-collapse:collapse; font-size:13px; }
+  table.data-table th { background:#2E4878; color:#fff; padding:8px 10px; text-align:center; font-weight:600; }
+  table.data-table td { padding:7px 10px; text-align:center; border-bottom:1px solid #eee; color:#333; }
+  table.data-table tr:nth-child(even) td { background:#f9fafc; }
+  table.data-table td.best { color:#2E4878; font-weight:700; }
+
+  .chart-box { width:100%; height:360px; }
+  .chart-box-tall { width:100%; height:400px; }
+
+  /* 流程示意 */
+  .flow-row { display:flex; align-items:center; justify-content:center; gap:12px; margin:20px 0; }
+  .flow-node { padding:12px 20px; border:1.5px solid #2E4878; border-radius:6px; font-size:14px; font-weight:600; color:#2E4878; background:#fff; text-align:center; min-width:100px; }
+  .flow-node.fill { background:#2E4878; color:#fff; }
+  .flow-node.green { border-color:#519D78; color:#519D78; }
+  .flow-node.green.fill { background:#519D78; color:#fff; }
+  .flow-arrow { font-size:20px; color:#aaa; }
+
+  /* MANS 架构 */
+  .mans-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+  .mans-card { border:1px solid #e0e0e0; border-radius:8px; padding:16px; background:#fff; }
+  .mans-card h4 { font-size:15px; color:#2E4878; margin-bottom:6px; }
+  .mans-card p { font-size:13px; color:#555; line-height:1.6; }
+
+  .quote-block { border-left:3px solid #519D78; padding:10px 16px; margin:10px 0; background:#f5faf7; }
+  .quote-block p { font-size:13.5px; color:#333; line-height:1.6; font-style:italic; }
+  .quote-block .label { font-size:12px; color:#519D78; font-weight:600; margin-bottom:4px; font-style:normal; }
+
+  .ending { justify-content:center; align-items:center; text-align:center; }
+  .ending h1 { font-size:48px; color:#2E4878; margin-bottom:20px; }
+  .ending p { font-size:18px; color:#666; }
+
+  .nav-hint { position:fixed; bottom:8px; left:50%; transform:translateX(-50%); font-size:11px; color:#ccc; }
+</style>
+</head>
+<body>
+
+<!-- ===== P1 封面 ===== -->
+<div class="slide cover active">
+  <div class="conf">ACL 2026 · Long Paper · 论文汇报</div>
+  <div class="bar"></div>
+  <h1>NL ⇒ Schedule:<br>Evaluate Multitask Scheduling Capability<br>of Large Language Models</h1>
+  <div class="sub">从自然语言到调度方案：大模型多任务调度能力评测与 MANS 多智能体框架</div>
+  <div class="meta">
+    原文：Wenrui Liao et al., Sichuan University<br>
+    汇报人：黎贤栗　|　社交网络分析课程汇报
+  </div>
+  <div class="slide-tag">NL ⇒ Schedule</div>
+  <div class="slide-num">01</div>
+</div>
+
+<!-- ===== P2 目录 ===== -->
+<div class="slide">
+  <h2 class="page-title">汇报目录</h2>
+  <div class="accent-bar"></div>
+  <div class="toc-list">
+    <div class="toc-item"><span class="toc-num">01</span><span class="toc-title">研究背景与问题</span><span class="toc-desc">调度任务、两条技术路线、三个 RQ</span></div>
+    <div class="toc-item"><span class="toc-num">02</span><span class="toc-title">NL ⇒ Schedule 数据集</span><span class="toc-desc">三阶段构造、240 实例、四个真实场景</span></div>
+    <div class="toc-item"><span class="toc-num">03</span><span class="toc-title">RQ1 / RQ2：LLM 能力评测与诊断</span><span class="toc-desc">9 个模型、失败分析、潜力分析</span></div>
+    <div class="toc-item"><span class="toc-num">04</span><span class="toc-title">RQ3：MANS 多智能体框架</span><span class="toc-desc">四 Agent 协作、与 LLM+solver 对比</span></div>
+    <div class="toc-item"><span class="toc-num">05</span><span class="toc-title">结论与展望</span><span class="toc-desc">贡献、局限、未来方向</span></div>
+  </div>
+  <div class="slide-tag">目录</div><div class="slide-num">02</div>
+</div>
+
+<!-- ===== P3 研究背景 ===== -->
+<div class="slide">
+  <h2 class="page-title">什么是多任务调度？</h2>
+  <div class="accent-bar"></div>
+  <div class="page-sub">在有限机器资源下，安排多个任务的工序顺序与时间，最小化总完工时间（makespan）</div>
+  <div class="two-col">
+    <div class="col-left">
+      <div class="point">
+        <h4>问题定义</h4>
+        <p>给定 n 个任务、m 台机器，每个任务由一组有先后约束的工序组成，每道工序需要特定机器和加工时长。求一个可行调度，使最后一道工序完成时间最短。</p>
+      </div>
+      <div class="point">
+        <h4>为什么重要</h4>
+        <p>制造业、建筑业、制药业、餐饮业的核心效率问题。传统上依赖人工专家排产，成本高、难规模化。</p>
+      </div>
+      <div class="highlight-box">
+        <p><strong>核心矛盾：</strong>真实世界是人用自然语言描述需求，而学术界 60 年来一直在"矩阵"这个数字格式里求解。</p>
+      </div>
+    </div>
+    <div class="col-right">
+      <div style="width:100%">
+        <div style="font-size:13px; color:#888; text-align:center; margin-bottom:8px;">传统路线：Matrix2Schedule</div>
+        <div class="flow-row" style="flex-direction:column; gap:8px;">
+          <div class="flow-node">自然语言描述</div>
+          <div class="flow-arrow">↓ 人工填表（专家）</div>
+          <div class="flow-node fill">矩阵 / DAG 结构化输入</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-node fill">OR-Tools / MIP / CP 求解</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-node">最优调度甘特图</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-tag">01 背景</div><div class="slide-num">03</div>
+</div>
+
+<!-- ===== P4 两条路线的困境 ===== -->
+<div class="slide">
+  <h2 class="page-title">现有两条路线都有硬伤</h2>
+  <div class="accent-bar"></div>
+  <div class="two-col" style="margin-top:8px;">
+    <div class="col-left">
+      <div class="point">
+        <h4>路线 A：经典 Matrix2Schedule</h4>
+        <p>直接输入矩阵，跳过语言理解。</p>
+        <ul>
+          <li>优点：成熟，求解器强</li>
+          <li>缺点：脱离真实场景，"人话 → 矩阵"靠人工</li>
+        </ul>
+      </div>
+      <div class="point">
+        <h4>路线 B：LLM + Solver 流水线</h4>
+        <p>LLM 读文本 → 生成数学模型 → 写代码 → 外部 solver 求解。</p>
+        <ul>
+          <li>优点：省去人工填表</li>
+          <li>缺点：代码高度依赖 solver API，一错全崩；级联失败多</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-right">
+      <div class="highlight-box" style="margin-top:0;">
+        <p style="font-size:16px; font-weight:600; color:#2E4878; margin-bottom:10px;">本文提出第三条路：</p>
+        <p style="font-size:15px;">让 LLM <strong>端到端</strong>直接从自然语言生成调度方案——不写代码、不依赖外部 solver，自己当 solver。</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-tag">01 背景</div><div class="slide-num">04</div>
+</div>
+
+<!-- ===== P5 三个 RQ ===== -->
+<div class="slide">
+  <h2 class="page-title">三个研究问题</h2>
+  <div class="accent-bar"></div>
+  <div style="display:flex; gap:24px; margin-top:24px; flex:1;">
+    <div style="flex:1; border-top:4px solid #2E4878; padding:24px; background:#f9fafc;">
+      <div style="font-size:36px; font-weight:700; color:#2E4878; margin-bottom:12px;">RQ1</div>
+      <p style="font-size:16px; line-height:1.7; color:#333;">LLM 能否<strong>端到端</strong>地从自然语言生成可行调度？</p>
+      <p style="font-size:13px; color:#888; margin-top:12px;">→ 评测 9 个 SOTA LLM</p>
+    </div>
+    <div style="flex:1; border-top:4px solid #519D78; padding:24px; background:#f5faf7;">
+      <div style="font-size:36px; font-weight:700; color:#519D78; margin-bottom:12px;">RQ2</div>
+      <p style="font-size:16px; line-height:1.7; color:#333;">如果不能，它<strong>差在哪里</strong>？又有什么潜力？</p>
+      <p style="font-size:13px; color:#888; margin-top:12px;">→ 四层错误诊断 + 思维链分析</p>
+    </div>
+    <div style="flex:1; border-top:4px solid #c97b3c; padding:24px; background:#fdf8f3;">
+      <div style="font-size:36px; font-weight:700; color:#c97b3c; margin-bottom:12px;">RQ3</div>
+      <p style="font-size:16px; line-height:1.7; color:#333;">如何<strong>增强</strong> LLM 的调度能力？</p>
+      <p style="font-size:13px; color:#888; margin-top:12px;">→ 提出 MANS 多智能体框架</p>
+    </div>
+  </div>
+  <div class="slide-tag">01 背景</div><div class="slide-num">05</div>
+</div>
+
+<!-- ===== P6 数据集构造 ===== -->
+<div class="slide">
+  <h2 class="page-title">数据集：三阶段构造流程</h2>
+  <div class="accent-bar"></div>
+  <div class="page-sub">从公开真实材料出发，半合成 240 个"描述-调度"对</div>
+  <div class="flow-row" style="margin:24px 0;">
+    <div class="flow-node" style="min-width:130px;">
+      <strong>① 爬取与形式化</strong><br>
+      <span style="font-size:12px; font-weight:400;">135 个真实任务<br>建成 DAG 任务图</span>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node" style="min-width:130px;">
+      <strong>② 组合调度实例</strong><br>
+      <span style="font-size:12px; font-weight:400;">Jaccard 聚类成 13 车间<br>每车间抽 5-10 任务</span>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node" style="min-width:130px;">
+      <strong>③ data2text 生成描述</strong><br>
+      <span style="font-size:12px; font-weight:400;">模板填充 + GPT-4 润色<br>自然语言问题描述</span>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node fill" style="min-width:130px;">
+      <strong>OR-Tools 标注最优解</strong><br>
+      <span style="font-size:12px; font-weight:400;">Ground-truth 调度<br>240 对数据</span>
+    </div>
+  </div>
+  <div class="two-col" style="margin-top:16px;">
+    <div class="point">
+      <h4>四个真实场景</h4>
+      <p>制造（28 任务）、建筑（29）、制药（32）、烹饪（46）。数据源包括专业手册、厂商网站，甚至《Overcooked 2》《Big Pharma》等调度类游戏。</p>
+    </div>
+    <div class="point">
+      <h4>规模覆盖</h4>
+      <p>4 场景 × 6 种任务规模（5/6/7/8/9/10 任务）× 10 实例 = <strong>240 个调度实例</strong>，每个都带任务图、最优调度和自然语言描述。</p>
+    </div>
+  </div>
+  <div class="slide-tag">02 数据集</div><div class="slide-num">06</div>
+</div>
+
+<!-- ===== P7 数据集统计 ===== -->
+<div class="slide">
+  <h2 class="page-title">数据集统计特征：四种"难"法不一样</h2>
+  <div class="accent-bar"></div>
+  <table class="data-table">
+    <tr>
+      <th>场景</th><th>平均工序数</th><th>每机被抢次数</th><th>瓶颈利用率</th><th>任务机器重叠度</th><th>难度特点</th>
+    </tr>
+    <tr><td>建筑</td><td class="best">8.67</td><td>4.02</td><td>0.77</td><td>55.0%</td><td>链式长依赖最深</td></tr>
+    <tr><td>烹饪</td><td>7.19</td><td>2.98</td><td class="best">1.00</td><td>48.4%</td><td>瓶颈卡到零空闲</td></tr>
+    <tr><td>制造</td><td>5.05</td><td class="best">5.98</td><td>0.96</td><td class="best">80.5%</td><td>资源竞争最激烈</td></tr>
+    <tr><td>制药</td><td>4.17</td><td>4.65</td><td>0.93</td><td>64.1%</td><td>高频短周期任务</td></tr>
+  </table>
+  <div style="margin-top:24px;" class="point">
+    <h4>设计意图</h4>
+    <p>不是一种难，而是四种难——建筑考长链推理、制造考资源冲突、烹饪考瓶颈调度、制药考高频切换。这迫使模型必须真正理解问题，而不是背模板。</p>
+  </div>
+  <div class="slide-tag">02 数据集</div><div class="slide-num">07</div>
+</div>
+
+<!-- ===== P8 评测指标 ===== -->
+<div class="slide">
+  <h2 class="page-title">三个评测指标：从粗到细</h2>
+  <div class="accent-bar"></div>
+  <div style="display:flex; gap:24px; margin-top:20px; flex:1;">
+    <div style="flex:1; border:1px solid #e0e0e0; border-radius:8px; padding:20px;">
+      <div style="font-size:14px; color:#888; margin-bottom:8px;">步骤级</div>
+      <div style="font-size:22px; font-weight:700; color:#2E4878; margin-bottom:10px;">SER</div>
+      <p style="font-size:14px; line-height:1.6; color:#444;">Overall Steps Execution Rate<br>所有工序中被正确执行的比例</p>
+    </div>
+    <div style="flex:1; border:1px solid #e0e0e0; border-radius:8px; padding:20px;">
+      <div style="font-size:14px; color:#888; margin-bottom:8px;">任务级</div>
+      <div style="font-size:22px; font-weight:700; color:#2E4878; margin-bottom:10px;">TCR</div>
+      <p style="font-size:14px; line-height:1.6; color:#444;">Average Task Completion Rate<br>整个任务被做完的比例（即使调度不完全可行）</p>
+    </div>
+    <div style="flex:1; border:1px solid #e0e0e0; border-radius:8px; padding:20px;">
+      <div style="font-size:14px; color:#888; margin-bottom:8px;">全局硬约束</div>
+      <div style="font-size:22px; font-weight:700; color:#c97b3c; margin-bottom:10px;">SFR</div>
+      <p style="font-size:14px; line-height:1.6; color:#444;">Schedule Feasibility Rate<br>完全无冲突的调度占比——最终瓶颈指标</p>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:20px;">
+    <p>补充指标 <strong>RMD</strong>（Average Relative Makespan Deviation）：在可行调度中，衡量 makespan 相对最优解的偏差，评估"排得好不好"。</p>
+  </div>
+  <div class="slide-tag">02 数据集</div><div class="slide-num">08</div>
+</div>
+
+<!-- ===== P9 RQ1 结果总览 ===== -->
+<div class="slide">
+  <h2 class="page-title">RQ1：9 个 LLM 端到端表现</h2>
+  <div class="accent-bar"></div>
+  <div class="page-sub">即使最强的 Gemini-2.5-Pro，SFR 也很难超过 30%——LLM 端到端调度能力仍有限</div>
+  <div id="chart-rq1" class="chart-box-tall"></div>
+  <div class="slide-tag">03 RQ1/RQ2</div><div class="slide-num">09</div>
+</div>
+
+<!-- ===== P10 RQ1 关键发现 ===== -->
+<div class="slide">
+  <h2 class="page-title">RQ1：四个关键发现</h2>
+  <div class="accent-bar"></div>
+  <div style="display:flex; flex-direction:column; gap:14px; margin-top:16px;">
+    <div class="point">
+      <h4>① SFR 普遍极低</h4>
+      <p>最强模型在 10 任务时 SFR 仅 17.5%。生成"逻辑无冲突"的调度是最大短板——LLM 能读懂，但排不顺。</p>
+    </div>
+    <div class="point">
+      <h4>② 规模越大越崩</h4>
+      <p>从 5 任务到 10 任务，所有模型指标显著下降。组合复杂度是硬伤。</p>
+    </div>
+    <div class="point">
+      <h4>③ CoT 对弱模型是毒药</h4>
+      <p>Qwen3-thinking 比 Qwen3-nothinking 表现还差——弱模型推理 token 引入噪声而非帮助。</p>
+    </div>
+    <div class="point">
+      <h4>④ 梯队明显</h4>
+      <p>Gemini-2.5-Pro ≈ o4-mini &gt; DeepSeek-R1 &gt; GPT-4.1 / Gemini-Flash &gt; Llama4 / DeepSeek-V3 &gt; Qwen3。</p>
+    </div>
+  </div>
+  <div class="slide-tag">03 RQ1/RQ2</div><div class="slide-num">10</div>
+</div>
+
+<!-- ===== P11 RQ2 失败分析 ===== -->
+<div class="slide">
+  <h2 class="page-title">RQ2：四层失败诊断</h2>
+  <div class="accent-bar"></div>
+  <div class="page-sub">从 schedule → task → step → constraint，逐层定位错误</div>
+  <div class="two-col">
+    <div class="col-left">
+      <div class="point">
+        <h4>弱模型（如 Qwen3）</h4>
+        <p>在最高层就崩：<strong>78.7% 的调度漏任务</strong>——连"要做哪些活"都没找全。</p>
+      </div>
+      <div class="point">
+        <h4>强模型（如 Gemini-2.5-Pro）</h4>
+        <p>任务识别还行（87.9%），但死在细节：<strong>步骤序列不完整、机器配错、资源冲突</strong>。</p>
+      </div>
+      <div class="highlight-box">
+        <p><strong>结论：</strong>约束遵守（机器冲突、顺序颠倒）是所有模型的最终瓶颈。</p>
+      </div>
+    </div>
+    <div class="col-right">
+      <div id="chart-failure" class="chart-box" style="height:320px;"></div>
+    </div>
+  </div>
+  <div class="slide-tag">03 RQ1/RQ2</div><div class="slide-num">11</div>
+</div>
+
+<!-- ===== P12 RQ2 潜力分析 ===== -->
+<div class="slide">
+  <h2 class="page-title">RQ2：但 LLM 有专家级潜力</h2>
+  <div class="accent-bar"></div>
+  <div class="page-sub">一旦生成了可行调度，makespan 效率接近经典 PDR——LLM 不是瞎排</div>
+  <div class="two-col">
+    <div class="col-left">
+      <div class="quote-block">
+        <div class="label">发现瓶颈</div>
+        <p>"We note that the RA [Robot Arm] is heavily used. We must sequence the RA steps appropriately."</p>
+      </div>
+      <div class="quote-block">
+        <div class="label">贪心局部优化</div>
+        <p>"step0: RA(1) → step1: CS(6) → because after step0, we can start step1 at 1..."</p>
+      </div>
+      <div class="quote-block">
+        <div class="label">自我纠错回溯</div>
+        <p>"This is a conflict! We have two steps on CS at the same time... We must fix this."</p>
+      </div>
+    </div>
+    <div class="col-right">
+      <div>
+        <div style="font-size:14px; font-weight:600; color:#2E4878; margin-bottom:12px;">LLM 展现的三种专家认知能力</div>
+        <div class="point"><h4>全局规划</h4><p>识别关键瓶颈、应用关键路径法（CPM）</p></div>
+        <div class="point"><h4>局部优化</h4><p>最早开始时间贪心规则，逐步推进</p></div>
+        <div class="point"><h4>自我纠错</h4><p>主动检测冲突、回溯重排</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-tag">03 RQ1/RQ2</div><div class="slide-num">12</div>
+</div>
+
+<!-- ===== P13 MANS 框架 ===== -->
+<div class="slide">
+  <h2 class="page-title">RQ3：MANS 多智能体框架</h2>
+  <div class="accent-bar"></div>
+  <div class="page-sub">从"LLM-as-Translator"转向"LLM-as-Solver"，四 Agent 分工补短板</div>
+  <div class="flow-row" style="margin:16px 0;">
+    <div class="flow-node green fill">Seeker<br><span style="font-size:11px; font-weight:400;">找全任务集合</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node green fill">Weaver<br><span style="font-size:11px; font-weight:400;">解析每步细节</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node green fill">Verifier<br><span style="font-size:11px; font-weight:400;">校验结构保真</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node fill">Architect<br><span style="font-size:11px; font-weight:400;">最终调度求解</span></div>
+  </div>
+  <div class="mans-grid">
+    <div class="mans-card"><h4>Seeker</h4><p>只做一件事：从文本中识别全部任务，明确问题范围。刻意忽略步骤/机器/时长，避免认知过载。</p></div>
+    <div class="mans-card"><h4>Weaver</h4><p>接收任务列表，逐个解析每道工序：执行顺序、所需机器、加工时长。</p></div>
+    <div class="mans-card"><h4>Verifier</h4><p>对比原文校验：任务数对不对？步骤数对不对？机器和时长准不准？输出修正后结构。</p></div>
+    <div class="mans-card"><h4>Architect</h4><p>拿到校验过的任务图，应用调度策略（找瓶颈、前瞻、允许战略性空转），输出最终甘特图。</p></div>
+  </div>
+  <div class="slide-tag">04 MANS</div><div class="slide-num">13</div>
+</div>
+
+<!-- ===== P14 MANS vs LLM+solver ===== -->
+<div class="slide">
+  <h2 class="page-title">MANS vs 6 种 LLM+Solver 方法</h2>
+  <div class="accent-bar"></div>
+  <div class="page-sub">性能打平甚至超越，且最差运行时间快 40-50%</div>
+  <div id="chart-compare" class="chart-box"></div>
+  <div style="display:flex; gap:24px; margin-top:12px;">
+    <div style="flex:1; font-size:13px; color:#555; line-height:1.6;">
+      <strong>WRT 最差运行时间：</strong>MANS 79.6s，比 CoE+OR-Tools（154.4s）快近一半。因为不用反复写代码→报错→调试。
+    </div>
+    <div style="flex:1; font-size:13px; color:#555; line-height:1.6;">
+      <strong>RMD 0.085：</strong>可行调度的 makespan 仅比最优解差 8.5%，质量扎实。
+    </div>
+  </div>
+  <div class="slide-tag">04 MANS</div><div class="slide-num">14</div>
+</div>
+
+<!-- ===== P15 消融 ===== -->
+<div class="slide">
+  <h2 class="page-title">消融实验：每个 Agent 都不可少</h2>
+  <div class="accent-bar"></div>
+  <div class="page-sub">去掉 Seeker 崩得最惨——第一步圈对问题范围最关键</div>
+  <div id="chart-ablation" class="chart-box"></div>
+  <div class="slide-tag">04 MANS</div><div class="slide-num">15</div>
+</div>
+
+<!-- ===== P16 结论 ===== -->
+<div class="slide">
+  <h2 class="page-title">结论与贡献</h2>
+  <div class="accent-bar"></div>
+  <div style="display:flex; flex-direction:column; gap:16px; margin-top:16px;">
+    <div class="point">
+      <h4>提出任务</h4>
+      <p>NL ⇒ Schedule——从自然语言直接生成多任务调度，区别于传统矩阵输入的 NP 优化问题。</p>
+    </div>
+    <div class="point">
+      <h4>建立 Benchmark</h4>
+      <p>240 个实例、4 个真实场景、6 种规模、3 个指标，首个系统评测 LLM 调度能力的基准。</p>
+    </div>
+    <div class="point">
+      <h4>深入诊断</h4>
+      <p>LLM 语义理解强、全局规划有潜力，但过程落地（步骤/约束）是短板；CoT 对弱模型有害。</p>
+    </div>
+    <div class="point">
+      <h4>提出 MANS</h4>
+      <p>四 Agent 协作框架，性能比肩 LLM+solver 流水线，但更鲁棒、运行更快——验证了 LLM-as-Solver 范式的可行性。</p>
+    </div>
+  </div>
+  <div class="slide-tag">05 结论</div><div class="slide-num">16</div>
+</div>
+
+<!-- ===== P17 局限与展望 ===== -->
+<div class="slide">
+  <h2 class="page-title">局限与未来方向</h2>
+  <div class="accent-bar"></div>
+  <div class="two-col">
+    <div class="col-left">
+      <div class="point">
+        <h4>当前局限</h4>
+        <ul>
+          <li>数据为半合成，真实工业日志待接入</li>
+          <li>问题规模仅 5-10 任务，未覆盖大规模</li>
+          <li>未考虑随机时长、动态资源窗口、序列相关准备时间</li>
+          <li>评测指标尚在早期，未涵盖鲁棒性、公平性</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-right">
+      <div class="point">
+        <h4>未来方向</h4>
+        <ul>
+          <li>接入真实工业数据（脱敏后）</li>
+          <li>扩展动态约束场景</li>
+          <li>深入研究 LLM 涌现的"算法思维"本质</li>
+          <li>推动 AI 驱动的优化问题自动发现</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-tag">05 结论</div><div class="slide-num">17</div>
+</div>
+
+<!-- ===== P18 Q&A ===== -->
+<div class="slide ending">
+  <h1>谢谢</h1>
+  <p>欢迎提问讨论</p>
+  <p style="margin-top:24px; font-size:14px; color:#aaa;">黎贤栗 · 社交网络分析课程汇报</p>
+</div>
+
+<div class="nav-hint">← → 方向键翻页</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let cur = 0;
+function show(i) {
+  slides[cur].classList.remove('active');
+  cur = Math.max(0, Math.min(slides.length-1, i));
+  slides[cur].classList.add('active');
+  // 懒加载图表
+  if (cur === 8 && !window._rq1) { initRQ1(); window._rq1 = true; }
+  if (cur === 10 && !window._fail) { initFail(); window._fail = true; }
+  if (cur === 13 && !window._cmp) { initCmp(); window._cmp = true; }
+  if (cur === 14 && !window._abl) { initAbl(); window._abl = true; }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') show(cur+1);
+  if (e.key === 'ArrowLeft') show(cur-1);
+});
+
+function initRQ1() {
+  const c = echarts.init(document.getElementById('chart-rq1'));
+  c.setOption({
+    tooltip: { trigger:'axis' },
+    legend: { bottom:0, textStyle:{fontSize:11} },
+    grid: { left:50, right:20, top:30, bottom:50 },
+    xAxis: { type:'category', data:['5任务','6任务','7任务','8任务','9任务','10任务'] },
+    yAxis: { type:'value', max:0.8, axisLabel:{formatter:v=>(v*100)+'%'} },
+    series: [
+      { name:'Gemini-2.5-Pro (SFR)', type:'line', data:[0.325,0.275,0.250,0.200,0.200,0.175], itemStyle:{color:'#2E4878'}, lineStyle:{width:3} },
+      { name:'o4-mini (SFR)', type:'line', data:[0.325,0.250,0.225,0.250,0.200,0.125], itemStyle:{color:'#519D78'} },
+      { name:'DeepSeek-R1 (SFR)', type:'line', data:[0.250,0.175,0.125,0.125,0.100,0.050], itemStyle:{color:'#c97b3c'} },
+      { name:'GPT-4.1 (SFR)', type:'line', data:[0.050,0.225,0.050,0.025,0,0.025], itemStyle:{color:'#999'} },
+    ]
+  });
+}
+function initFail() {
+  const c = echarts.init(document.getElementById('chart-failure'));
+  c.setOption({
+    tooltip:{},
+    grid:{left:80,right:20,top:20,bottom:30},
+    xAxis:{type:'value', max:100, axisLabel:{formatter:'{value}%'}},
+    yAxis:{type:'category', data:['约束违反\n(机器冲突/顺序)','步骤属性错\n(机器配错/时长)','步骤遗漏','任务遗漏']},
+    series:[{
+      type:'bar',
+      data:[
+        {value:65, itemStyle:{color:'#c97b3c'}},
+        {value:55, itemStyle:{color:'#c97b3c'}},
+        {value:30, itemStyle:{color:'#2E4878'}},
+        {value:10, itemStyle:{color:'#519D78'}}
+      ],
+      label:{show:true, position:'right', formatter:'{c}%'}
+    }]
+  });
+}
+function initCmp() {
+  const c = echarts.init(document.getElementById('chart-compare'));
+  c.setOption({
+    tooltip:{trigger:'axis'},
+    legend:{bottom:0, textStyle:{fontSize:11}},
+    grid:{left:50,right:20,top:30,bottom:50},
+    xAxis:{type:'category', data:['5任务','6任务','7任务','8任务','9任务','10任务']},
+    yAxis:{type:'value', max:0.75, axisLabel:{formatter:v=>(v*100)+'%'}},
+    series:[
+      {name:'MANS (ours) SER', type:'bar', data:[0.702,0.690,0.608,0.697,0.582,0.682], itemStyle:{color:'#519D78'}},
+      {name:'CoE+MOPNR SER', type:'bar', data:[0.691,0.665,0.626,0.701,0.674,0.587], itemStyle:{color:'#2E4878'}},
+      {name:'Optimus+MOPNR SER', type:'bar', data:[0.651,0.521,0.597,0.687,0.532,0.575], itemStyle:{color:'#aaa'}},
+    ]
+  });
+}
+function initAbl() {
+  const c = echarts.init(document.getElementById('chart-ablation'));
+  c.setOption({
+    tooltip:{trigger:'axis'},
+    legend:{bottom:0},
+    grid:{left:50,right:20,top:30,bottom:50},
+    xAxis:{type:'category', data:['完整 MANS','w/o Seeker','w/o Weaver','w/o Verifier']},
+    yAxis:{type:'value', max:0.75, axisLabel:{formatter:v=>(v*100)+'%'}},
+    series:[
+      {name:'5任务 SER', type:'bar', data:[0.702,0.612,0.665,0.648], itemStyle:{color:'#2E4878'}},
+      {name:'10任务 SER', type:'bar', data:[0.682,0.482,0.637,0.594], itemStyle:{color:'#519D78'}},
+      {name:'10任务 SFR', type:'bar', data:[0.275,0.075,0.225,0.150], itemStyle:{color:'#c97b3c'}},
+    ]
+  });
+}
+window.addEventListener('resize', () => {
+  window.dispatchEvent(new Event('resize'));
+});
+</script>
+</body>
+</html>

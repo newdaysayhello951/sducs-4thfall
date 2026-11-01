@@ -1,0 +1,17 @@
+{
+  "raw_rows": 284086,
+  "raw_users": 7375,
+  "raw_items": 105114,
+  "trust_edges": 111781,
+  "zero_ratings": 34,
+  "positive_rows": 284052,
+  "positive_unique_pairs": 282619,
+  "raw_duplicate_extra_rows": 1436,
+  "sha256_zip": "dee78c18b4a0843791e82b522f632a1166296e6048537b13b18c281a12e8f741",
+  "paper_counts": {
+    "users": 7375,
+    "items": 99746,
+    "ratings": 280391,
+    "trust_edges": 111781
+  }
+}

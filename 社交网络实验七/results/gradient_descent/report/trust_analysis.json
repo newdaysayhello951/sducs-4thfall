@@ -1,0 +1,14 @@
+{
+  "filmtrust": {
+    "valid_users": 411,
+    "mean_correlation": 0.18278459203671416,
+    "fraction_ge_05": 0.22627737226277372,
+    "fraction_ge_09": 0.0535279805352798
+  },
+  "epinions": {
+    "valid_users": 9214,
+    "mean_correlation": 0.4462926448903194,
+    "fraction_ge_05": 0.532559149120903,
+    "fraction_ge_09": 0.17115259387887996
+  }
+}

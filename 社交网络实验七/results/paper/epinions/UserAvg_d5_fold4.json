@@ -1,0 +1,59 @@
+{
+  "dataset": "epinions",
+  "model": "UserAvg",
+  "dim": 5,
+  "fold": 4,
+  "seed": 20265031,
+  "hyperparameters": {
+    "reg": 0.001,
+    "social": 1.0,
+    "alpha": 0.4
+  },
+  "n_train": 531860,
+  "n_test": 132964,
+  "status": "completed",
+  "data": {
+    "counts": [
+      40163,
+      139738,
+      664824,
+      487183
+    ],
+    "expected": [
+      40163,
+      139738,
+      664824,
+      487183
+    ],
+    "duplicate_pairs": 0,
+    "matches_paper": true,
+    "user_union": 49289,
+    "ratings_sha256": "6da14f79369cf882911a271efd5f4575bc4292d0497ccf3190b6421a6d198e42",
+    "trust_sha256": "7562075fdcc27d04cd1d88d592e04f4fa57e5d7043246187789d0ccc3e1985f0"
+  },
+  "optimizer": "L-BFGS-B",
+  "validation_fraction": 0.1,
+  "maxiter": 200,
+  "all": {
+    "n": 132964,
+    "mae": 0.929267500808265,
+    "rmse": 1.202867822736448
+  },
+  "cold_train_lt5": {
+    "n": 11129,
+    "mae": 1.0428054028591751,
+    "rmse": 1.4306307235327467
+  },
+  "cold_total_lt5": {
+    "n": 6756,
+    "mae": 1.0776664685839392,
+    "rmse": 1.495375280248248
+  },
+  "all_unclipped": {
+    "n": 132964,
+    "mae": 0.929267500808265,
+    "rmse": 1.202867822736448
+  },
+  "training": [],
+  "seconds": 1.5921366000002308
+}

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="475" height="154" preserveAspectRatio="xMinYMin meet" viewBox="0 0 475 154" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="475" height="154"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-154)" style="clip-path: url(#clip)">
+		<g transform="">
+			<text x="0" y="141" style="font-family: SimHei; font-size: 11px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,282) scale(1,-1)">图5 功能相对排序得分</text>
+			<path d="M 120,22 L 120,127 Z" style="stroke: rgb(90%,92%,95%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="118.00000000000001" y="8" style="font-family: SimSun; font-size: 8px;fill: rgb(41%,47%,54%); stroke:none;" transform="translate(0,16) scale(1,-1)">0</text>
+			<path d="M 261.5,22 L 261.5,127 Z" style="stroke: rgb(90%,92%,95%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="253.5" y="8" style="font-family: SimSun; font-size: 8px;fill: rgb(41%,47%,54%); stroke:none;" transform="translate(0,16) scale(1,-1)">17.5</text>
+			<path d="M 403,22 L 403,127 Z" style="stroke: rgb(90%,92%,95%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="399.0" y="8" style="font-family: SimSun; font-size: 8px;fill: rgb(41%,47%,54%); stroke:none;" transform="translate(0,16) scale(1,-1)">35</text>
+			<text x="40.0" y="115" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,230) scale(1,-1)">自习空间空位情况</text>
+			<rect x="120.00000000000001" y="113" width="274.9142857142857" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="399.9142857142857" y="115" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,230) scale(1,-1)">34分</text>
+			<text x="40.0" y="95" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,190) scale(1,-1)">实时食堂拥挤情况</text>
+			<rect x="120.00000000000001" y="93" width="242.57142857142856" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="367.57142857142856" y="95" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,190) scale(1,-1)">30分</text>
+			<text x="4.0" y="75" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,150) scale(1,-1)">结合下一项活动的路线推荐</text>
+			<rect x="120.00000000000001" y="73" width="145.54285714285714" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="270.54285714285714" y="75" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,150) scale(1,-1)">18分</text>
+			<text x="40.0" y="55" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,110) scale(1,-1)">校园交通运行状态</text>
+			<rect x="120.00000000000001" y="53" width="137.45714285714286" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="262.45714285714286" y="55" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,110) scale(1,-1)">17分</text>
+			<text x="58.00000000000001" y="35" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,70) scale(1,-1)">统一校园通知</text>
+			<rect x="120.00000000000001" y="33" width="88.94285714285714" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="213.94285714285715" y="35" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,70) scale(1,-1)">11分</text>
+		</g>
+	</g>
+</svg>

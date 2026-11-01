@@ -1,0 +1,20 @@
+[
+  "tests/test_math.py::test_average_cold_user_fallback",
+  "tests/test_math.py::test_duplicate_pairs_stay_in_one_fold",
+  "tests/test_math.py::test_exact_printed_trustsvd_objective",
+  "tests/test_math.py::test_explicit_trust_trains_a_user_without_ratings",
+  "tests/test_math.py::test_forward_matches_direct_neighbor_sums",
+  "tests/test_math.py::test_gradient_central_difference[PMF]",
+  "tests/test_math.py::test_gradient_central_difference[RSTE]",
+  "tests/test_math.py::test_gradient_central_difference[SVD++]",
+  "tests/test_math.py::test_gradient_central_difference[SoRec]",
+  "tests/test_math.py::test_gradient_central_difference[SoReg]",
+  "tests/test_math.py::test_gradient_central_difference[SocialMF]",
+  "tests/test_math.py::test_gradient_central_difference[TrustMF]",
+  "tests/test_math.py::test_gradient_central_difference[TrustSVD]",
+  "tests/test_math.py::test_held_out_rating_is_not_in_implicit_history_or_mean",
+  "tests/test_math.py::test_independent_gradient_descent_decreases_actual_objective",
+  "tests/test_math.py::test_metrics_and_empty_views",
+  "tests/test_math.py::test_soreg_pcc_averages_duplicate_values_instead_of_summing",
+  "tests/test_math.py::test_trustmf_trustee_gradient"
+]

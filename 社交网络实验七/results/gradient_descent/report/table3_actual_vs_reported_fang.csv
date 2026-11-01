@@ -1,0 +1,5 @@
+﻿dataset,dim,fang_mae_reported_only,fang_rmse_reported_only,trustsvd_actual_mae,trustsvd_actual_rmse,fang_executed
+filmtrust,5,0.616,0.793,0.6195042826743536,0.8024009999060476,False
+filmtrust,10,0.625,0.81,0.6240428539345871,0.8071118836053384,False
+epinions,5,0.806,1.047,0.8153407302589611,1.0549780849859811,False
+epinions,10,0.814,1.059,0.8138441790466047,1.0556895834165518,False

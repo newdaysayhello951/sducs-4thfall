@@ -1,0 +1,2 @@
+[["urlkey","timestamp","original","mimetype","statuscode","digest","length"],
+["edu,asu,public)/~jtang20/datasetcode/catalog_ciao.txt","20150427184447","http://www.public.asu.edu:80/~jtang20/datasetcode/catalog_ciao.txt","text/plain","200","B2XPKPODGT3CLROKUP5NBVINX4RPAEXU","549"]]

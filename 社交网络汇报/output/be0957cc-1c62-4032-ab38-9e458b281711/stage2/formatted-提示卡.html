@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="docx-page-size" content="A4">
+<title>NL ⇒ Schedule 汇报提示卡</title>
+<style>
+@page { @bottom-center { content: counter(page); } }
+
+:root {
+  --ff-heading: "微软雅黑", "Microsoft YaHei", sans-serif;
+  --ff-body: "宋体", SimSun, serif;
+  --fs-body: 11pt;
+  --fs-h1: 17pt;
+  --fs-h2: 13pt;
+  --fs-small: 10.5pt;
+  --fs-tiny: 9.5pt;
+  --color-primary: #1565C0;
+  --color-heading: #1A237E;
+  --color-accent: #00897B;
+  --color-text: #212121;
+  --color-muted: #616161;
+  --color-surface: #F5F7FA;
+  --color-border: #D8DEE6;
+  --color-bg: #FFFFFF;
+  --sp-para: 0 0 0.5em 0;
+  --sp-h1: 0 0 0.5em 0;
+  --sp-h1b: 0.22em;
+  --sp-h2: 1.1em 0 0.45em 0;
+  --sp-h2l: 0.42em;
+  --sp-cell: 0.32em 0.5em;
+  --sp-th: 0.34em 0.5em;
+  --sp-td: 0.34em 0.5em;
+  --sp-note: 0.5em 0.7em;
+  --sp-note-m: 0.4em 0 0.8em 0;
+  --sp-label: 0 0 0.3em 0;
+  --page-width: 16.6cm;
+}
+
+body { font-family: var(--ff-body); font-size: var(--fs-body); line-height: 1.6; color: var(--color-text); background: var(--color-bg); max-width: var(--page-width); margin-left: auto; margin-right: auto; }
+
+p { font-family: var(--ff-body); font-size: var(--fs-body); line-height: 1.6; color: var(--color-text); text-indent: 0; text-align: left; margin: var(--sp-para); }
+
+h1 { font-family: var(--ff-heading); font-size: var(--fs-h1); font-weight: bold; color: var(--color-primary); text-indent: 0; text-align: left; margin: var(--sp-h1); padding-bottom: var(--sp-h1b); border-bottom: 1.5px solid var(--color-primary); }
+h2 { font-family: var(--ff-heading); font-size: var(--fs-h2); font-weight: bold; color: var(--color-primary); text-indent: 0; text-align: left; margin: var(--sp-h2); padding-left: var(--sp-h2l); border-left: 4px solid var(--color-primary); }
+
+.meta-line { font-family: var(--ff-body); font-size: var(--fs-tiny); color: var(--color-muted); text-indent: 0; text-align: left; margin: var(--sp-label); }
+
+.executive-summary { background: var(--color-surface); border-left: 4px solid var(--color-accent); padding: var(--sp-note); margin: var(--sp-note-m); }
+.sum-title { font-family: var(--ff-heading); font-size: var(--fs-small); font-weight: bold; color: var(--color-accent); text-indent: 0; text-align: left; margin: var(--sp-label); }
+.executive-summary p.body { font-family: var(--ff-body); font-size: var(--fs-small); color: var(--color-text); text-indent: 0; text-align: left; margin: var(--sp-para); line-height: 1.6; }
+
+.note { font-family: var(--ff-body); font-size: var(--fs-tiny); color: var(--color-muted); text-indent: 0; text-align: left; margin: var(--sp-label); }
+
+table.data { width: 100%; border-collapse: collapse; margin: var(--sp-note-m); }
+table.data th { font-family: var(--ff-heading); font-size: var(--fs-tiny); font-weight: bold; color: var(--color-heading); background: var(--color-surface); border: 0.5px solid var(--color-border); padding: var(--sp-th); text-align: left; }
+table.data td { font-family: var(--ff-body); font-size: var(--fs-small); color: var(--color-text); border: 0.5px solid var(--color-border); padding: var(--sp-td); text-align: left; line-height: 1.55; }
+table.data td.pg { font-family: var(--ff-heading); font-weight: bold; color: var(--color-primary); text-align: center; }
+table.data td.topic { font-family: var(--ff-heading); font-weight: bold; color: var(--color-heading); }
+table.data td.num { font-family: var(--ff-heading); font-weight: bold; color: var(--color-accent); }
+strong { font-weight: bold; color: var(--color-heading); }
+</style>
+</head>
+<body>
+
+<section role="body" data-page-restart="1">
+<main>
+
+<h1 id="title">NL ⇒ Schedule 汇报提示卡</h1>
+<p class="meta-line">汇报人：黎贤栗　｜　正文约 15 分钟　｜　共 25 页　｜　括号内为该页建议时长</p>
+
+<div class="executive-summary">
+  <p class="sum-title">忘词只抓这三句</p>
+  <p class="body">开场：车间主任用一段人话下单，大模型能不能直接排出一张能用的排产表。</p>
+  <p class="body">转折：它看得懂、想得远，但落不了地。</p>
+  <p class="body">收尾：这篇论文的价值，是把"能不能排产"第一次做成了可测量的实验。</p>
+</div>
+
+<h2 id="pages">逐页提示</h2>
+
+<table class="data">
+  <thead>
+    <tr><th style="width:6%">页</th><th style="width:16%">主题</th><th>关键提示词</th><th style="width:21%">必说数字</th></tr>
+  </thead>
+  <tbody>
+    <tr><td class="pg">1</td><td class="topic">封面（30″）</td><td>问句开场 · 主线三问：提问题→找原因→解决方式 · ACL 2026，川大 SCUNLP</td><td class="num">—</td></tr>
+    <tr><td class="pg">2</td><td class="topic">主线（40″）</td><td>三块：任务是什么 / 错在哪层 / 怎么补 · 立场：看得懂、想得远、落不了地</td><td class="num">—</td></tr>
+    <tr><td class="pg">3</td><td class="topic">任务定义（70″）</td><td>输入人话 → 输出排班表（机器＋起止时间）· feasible 不是 optimal · 像 NL2SQL，但是归纳推理</td><td class="num">32.5%</td></tr>
+    <tr><td class="pg">4</td><td class="topic">矩阵（60″）</td><td>一行一任务，两两一组（机器, 时长）· M0 机械臂 / M1 锅 / M2 砧板 / M3 灶 · M0 反复复用＝瓶颈 · 数字是人填的＝gap</td><td class="num">负载 1.00</td></tr>
+    <tr><td class="pg">5</td><td class="topic">动机（60″）</td><td>三缺口：绕过语言 / 数据假 / 流水线脆 · 三贡献：任务·数据集·MANS</td><td class="num">45% 死在写代码</td></tr>
+    <tr><td class="pg">6</td><td class="topic">五步造数据（60″）</td><td>4 书 3 站 3 游戏 → 135 图 → 13 车间 → 240 实例 → 240 段话 · 顺序是反的</td><td class="num">135 / 13 / 240</td></tr>
+    <tr><td class="pg">7</td><td class="topic">数据来源（50″）</td><td>书：Pinedo·Singh·Groover·Automotive · 站：SAE·DMG MORI·丰田 · 游戏：Overcooked2·Big Pharma·Construction · 游戏流程显式、有机器工时</td><td class="num">4 + 3 + 3</td></tr>
+    <tr><td class="pg">8</td><td class="topic">形式化（60″）</td><td>节点＝步骤（机器＋时长），边＝先后 · 只收图不收文本 · 图＝矩阵＝JSON</td><td class="num">28/29/32/46</td></tr>
+    <tr><td class="pg">9</td><td class="topic">聚类（70″）</td><td>机器二值向量 · J＝交÷并，汉堡 vs 薯条 2/3 · K-Medoids 不用 K-Means（中心须真实样本）· 难度＝抢同一批资源</td><td class="num">7+4+1+1＝13</td></tr>
+    <tr><td class="pg">10</td><td class="topic">组合（60″）</td><td>13 车间只管"谁能和谁配" · 副本＝n 是份数＝难度旋钮 · OR-Tools 打时限内最优 · 三件套：描述 / 图 / 最优解</td><td class="num">4×6×10＝240</td></tr>
+    <tr><td class="pg">11</td><td class="topic">生成描述（60″）</td><td>模板填充＋GPT-4 润色，只改语言不改事实 · 20 需求＋40 流程模板 · 两段式：需求概述 / 逐任务流程</td><td class="num">拼接版 4.20</td></tr>
+    <tr><td class="pg">12</td><td class="topic">数据质量（70″）</td><td>ESA＝该说的说了没 · FINE＝说的是不是真的 · 五维对比：准确只掉 0.5、简洁掉 1.6 · ICC 评的是评分本身</td><td class="num">0.98 / 0.94 / ≥0.75</td></tr>
+    <tr><td class="pg">13</td><td class="topic">数据难度（60″）</td><td>制造竞争 / 建筑长链 / 制药高频 / 烹饪零空闲 · 跨域语言差异大</td><td class="num">80.49% / 8.67 / 4.17 / 1.00</td></tr>
+    <tr><td class="pg">14</td><td class="topic">指标（70″）</td><td>SER 步 · TCR 任务 · SFR 整张 · 全对才算交付 · RMD、WRT 越低越好</td><td class="num">0.75 / 0.50 / 0</td></tr>
+    <tr><td class="pg">15</td><td class="topic">RQ1（70″）</td><td>最好也只有三成可行 · Qwen3 两个模式归零 · 规模越大越差 · CoT 对弱模型有害</td><td class="num">0.325 / 0.175 / 31 点</td></tr>
+    <tr><td class="pg">16</td><td class="topic">失败分析（70″）</td><td>四级：方案→任务→步骤→约束 · 弱模型死在第一关，强模型输在细节</td><td class="num">78.7% / 41.5% / 58.9% / 69.8%</td></tr>
+    <tr><td class="pg">17</td><td class="topic">潜力（60″）</td><td>只看可行方案，质量很高 · 三能力：全局规划·局部优化·自我纠错 · 原话：RA heavily used / conflict must fix</td><td class="num">0.085 vs 0.32</td></tr>
+    <tr><td class="pg">18</td><td class="topic">MANS（60″）</td><td>Seeker 认任务 · Weaver 拆步骤 · Verifier 校验 · Architect 排程 · Translator → Solver</td><td class="num">四个 agent</td></tr>
+    <tr><td class="pg">19</td><td class="topic">提示词（60″）</td><td>四句都在限权：sole task / extract / verify / conflict-free · 三策略：找瓶颈·想前面·允许空转 · 来自推理轨迹</td><td class="num">—</td></tr>
+    <tr><td class="pg">20</td><td class="topic">设计（50″）</td><td>四级错误 ↔ 四 agent 一一对应 · 不是模块是补丁，删谁谁复活</td><td class="num">27.5%→7.5%</td></tr>
+    <tr><td class="pg">21</td><td class="topic">结果（70″）</td><td>六基线＝CoE / OptiMUS × 3 求解器 · 赢在 SER 与 TCR · 快在不写代码 · 输在 RMD（对方是求解器）· 只说 comparable</td><td class="num">0.682 vs 0.587 / 79.59s</td></tr>
+    <tr><td class="pg">22</td><td class="topic">稳健性（50″）</td><td>同一框架只换骨干 · 放大能力，不创造能力</td><td class="num">5.6×</td></tr>
+    <tr><td class="pg">23</td><td class="topic">输出格式（60″）</td><td>JSON 五字段 · 不给 duration，只给起止 · 判分四步：对号·判错·级联·汇总</td><td class="num">5 字段</td></tr>
+    <tr><td class="pg">24</td><td class="topic">局限（60″）</td><td>半合成 / 规模小 / 指标未标准化 · 追问：口径·时长指纹·每格 10 例·基线削弱</td><td class="num">—</td></tr>
+    <tr><td class="pg">25</td><td class="topic">致谢（20″）</td><td>价值在把问题做成可测量的实验</td><td class="num">—</td></tr>
+  </tbody>
+</table>
+
+<h2 id="qa">问答关键词</h2>
+
+<table class="data">
+  <thead>
+    <tr><th style="width:30%">问题</th><th>一句话回答</th></tr>
+  </thead>
+  <tbody>
+    <tr><td class="topic">为什么不用 BLEU</td><td>n-gram 不等于事实，改用 ESA ＋ FINE</td></tr>
+    <tr><td class="topic">ESA 与 FINE</td><td>一个管覆盖，一个管对错</td></tr>
+    <tr><td class="topic">ICC</td><td>评的是评分，不是文本</td></tr>
+    <tr><td class="topic">CoE / OptiMUS</td><td>LLM 建模写码 ＋ 外部求解器，共六个基线</td></tr>
+    <tr><td class="topic">MANS 区别</td><td>终点是解，不是代码</td></tr>
+    <tr><td class="topic">RMD 为什么输</td><td>对方最后一步是 OR-Tools</td></tr>
+    <tr><td class="topic">公平吗</td><td>全部同一个 Gemini-Flash 骨干</td></tr>
+    <tr><td class="topic">7 个还是 9 个</td><td>表里挑代表，完整见 Table 2</td></tr>
+  </tbody>
+</table>
+
+<p class="note">口径提醒：第 15 页表格只放 7 个模型，标题说九个，讲时补一句"挑代表"；第 21 页"快 35–48%"讲成"快四成左右"。</p>
+
+</main>
+</section>
+
+</body>
+</html>

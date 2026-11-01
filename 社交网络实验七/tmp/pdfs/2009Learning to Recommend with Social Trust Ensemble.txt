@@ -1,0 +1,712 @@
+         Learning to Recommend with Social Trust Ensemble
+
+                                                  Hao Ma, Irwin King and Michael R. Lyu
+                                               Department of Computer Science and Engineering
+                                                     The Chinese University of Hong Kong
+                                                           Shatin, N.T., Hong Kong
+                                                       {hma, king, lyu}@cse.cuhk.edu.hk
+
+
+ABSTRACT                                                                                   gest information items (movies, books, music, news, Web
+As an indispensable technique in the field of Information                                  pages, images, etc.) that are likely to interest the users.
+Filtering, Recommender System has been well studied and                                    Typically, recommender systems are based on Collaborative
+developed both in academia and in industry recently. How-                                  Filtering, which is a technique that automatically predicts
+ever, most of current recommender systems suffer the fol-                                  the interest of an active user by collecting rating information
+lowing problems: (1) The large-scale and sparse data of the                                from other similar users or items.
+user-item matrix seriously affect the recommendation qual-                                    Although recommender systems have been widely stud-
+ity. As a result, most of the recommender systems can-                                     ied in the academia and deployed in the industry, such as
+not easily deal with users who have made very few ratings.                                 Amazon and Ebay, most of these techniques suffer several
+(2) The traditional recommender systems assume that all                                    inherent weaknesses. The first well known challenge is the
+the users are independent and identically distributed; this                                data sparsity problem. As reported in [20], the density of
+assumption ignores the connections among users, which is                                   the available ratings in commercial recommender systems is
+not consistent with the real world recommendations. Aim-                                   often less than 1%. Many collaborative filtering algorithms
+ing at modeling recommender systems more accurately and                                    are impeded by the sparsity problem, hence cannot han-
+realistically, we propose a novel probabilistic factor analysis                            dle users who have rated few items. Secondly, traditional
+framework, which naturally fuses the users’ tastes and their                               recommender systems ignore the social connections or trust
+trusted friends’ favors together. In this framework, we coin                               relations among users. But the fact is, in the real world, we
+the term Social Trust Ensemble to represent the formulation                                always turn to friends we trust for book, music, or restau-
+of the social trust restrictions on the recommender systems.                               rant recommendations, and our favors can easily be affected
+The complexity analysis indicates that our approach can be                                 by the friends we trust. Therefore, traditional recommender
+applied to very large datasets since it scales linearly with                               systems, which purely mine the user-item rating matrix for
+the number of observations, while the experimental results                                 recommendations, do not provide realistic output. Recently,
+show that our method performs better than the state-of-the-                                trust-aware recommender systems have drawn lots of atten-
+art approaches.                                                                            tion [14, 15], but most of these methods are based on some
+                                                                                           ad hoc heuristics, and they still have the data sparsity and
+Categories and Subject Descriptors: H.3.3 [Informa-                                        scalability problems. Moreover, the relationship between the
+tion Search and Retrieval] Information Filtering; J.4 [Com-                                user-item matrix and the users’ trust network are not fully
+puter Applications] Social and Behavioral Sciences                                         understood.
+                                                                                              In this paper, aiming at solving the above problems and
+General Terms: Algorithm, Experimentation
+                                                                                           modeling the recommender systems more accurately and re-
+Keywords: Recommender Systems, Social Network, Social                                      alistically, we make three assumptions based on our obser-
+Trust Ensemble, Matrix Factorization                                                       vations on the real world recommendation processes.
+                                                                                               • Users have their own characteristics, and they have dif-
+1.     INTRODUCTION                                                                               ferent tastes on different items, such as movies, books,
+   As the exponential growth of information generated on                                          music, articles, food, etc.
+the World Wide Web, the Information Filtering techniques                                       • Users can be easily influenced by the friends they trust,
+like Recommender Systems have become more and more im-                                            and prefer their friends’ recommendations.
+portant and popular. Recommender systems form a specific                                       • One user’s final decision is the balance between his/her
+type of information filtering technique that attempts to sug-                                     own taste and his/her trusted friends’ favors.
+                                                                                              Based on the above intuitions, we endow a novel under-
+                                                                                           standing to all the ratings in the user-item matrix R. We
+Permission to make digital or hard copies of all or part of this work for                  interpret the rating Rij in the user-item matrix as the rep-
+personal or classroom use is granted without fee provided that copies are                  resentation mixed by both the user ui ’s taste and his/her
+not made or distributed for profit or commercial advantage and that copies                 trusted friends tastes on the item vj . This assumption natu-
+bear this notice and the full citation on the first page. To copy otherwise, to            rally employs both the user-item matrix and the users’ social
+republish, to post on servers or to redistribute to lists, requires prior specific         trust network for the recommendations.
+permission and/or a fee.
+SIGIR’09, July 19–23, 2009, Boston, Massachusetts, USA.                                       In terms of the users’ own tastes, we factorize the user-
+Copyright 2009 ACM 978-1-60558-483-6/09/07 ...$10.00.                                      item matrix and learn two low-dimensional matrices, which
+
+
+
+                                                                                     203
+are user-specific latent matrix and item-specific latent ma-             factors that are important, and a user’s preference vector is
+trix. For the social trust graph, based on the intuition that            determined by how each factor applies to that user.
+users always prefer the items recommended by the friends                    Recall that all the above methods for recommender sys-
+they trust, we infer and formulate the recommendation prob-              tems are based on the assumption that users are independent
+lem purely based on their trusted friends’ favors. Then, by              and identically distributed, and ignores the social trust re-
+employing a probabilistic framework, we fuse the users and               lationships between users, which is not consistent with the
+their trusted friends’ tastes together by an ensemble param-             reality that we normally ask trusted friends for recommen-
+eter. Finally, by performing a simple gradient descent on                dations. Based on this intuition, many researchers have
+the objective function, we learn the latent low-dimensional              recently started to analyze trust-based recommender sys-
+user-specific and item-specific matrices for the prediction of           tems [1, 2, 13, 14, 15].
+users’ favors on different items. The experimental results on               Andersen et al. in [1] developed a set of five natural ax-
+a large Epinions1 dataset show that our method outperforms               ioms that a trust-based recommendation system might be
+the state-of-the-art collaborative filtering and social trust-           expected to satisfy, and then proved that no system can si-
+based recommendation algorithms, especially when the users               multaneously satisfy all the axioms. Apparently, this work
+have very few ratings. Moreover, the complexity analysis                 is out of the scope of this paper since we focus on how
+indicates that our approach can be applied to very large                 to employ both social trust network and user-item matrix
+datasets, since it scales linearly with the number of obser-             to provide more accurate and realistic recommendations.
+vations.                                                                 In [14, 15], Massa and Avesani studied the trust-aware rec-
+   The remainder of this paper is organized as follows. In               ommender systems. Their work replaces the similarity find-
+Section 2, we provide an overview of several major approaches            ing process with the use of a trust metric, which is able to
+for recommender systems and other related work. Section 3                propagate trust over the trust network and to estimate a
+presents our work on recommender system with social trust                trust weight. The experiments on a large real dataset shows
+ensemble. The results of an empirical analysis are presented             that this work increases the coverage (number of ratings that
+in Section 4, followed by the conclusions and future work in             are predictable) while not reducing the accuracy (the error
+Section 5.                                                               of predictions). Bedi et al. in [2] proposed a trust-based rec-
+                                                                         ommender system for the Semantic Web; this system runs
+2.     RELATED WORK                                                      on a server with the knowledge distributed over the net-
+                                                                         work in the form of ontologies, and uses the Web of trust
+   In this section, we review several major approaches for rec-          to generate the recommendations. The trust-based meth-
+ommender systems, including (1) traditional recommender                  ods have become a popular research topic recently, however,
+systems which are mainly based on collaborative filtering                there are several problems with previous methods. Firstly,
+techniques, and (2) social trust-based recommender systems               these approaches only employ some heuristics to generate
+which have drawn lots of attention recently.                             recommendations while the relationship between the trust
+   Traditional collaborative filtering algorithms mainly fo-             network and the user-item matrix has not been studied sys-
+cus on the user-item matrix. Among all of these methods,                 tematically. Moreover, these methods are not scalable to
+the memory-based approaches are the most popular meth-                   very large datasets, since they may need to calculate the
+ods and they are widely adopted in commercial collaborative              pairwise user similarities and pairwise user trust scores.
+filtering systems [10, 17]. These methods employ different                  In recent work proposed in [13], Ma et al. developed a
+strategies to find similar users and items for making the                factor analysis method based on the probabilistic graphical
+predictions, which are known as user-based approaches [3,                model which fuses the user-item matrix with the users’ social
+6, 9, 12] and item-based approaches [5, 10, 20], respectively.           trust networks by sharing a common latent low-dimensional
+To predict a rating Rij of a given item vj for an active                 user feature matrix. The experimental analysis shows that
+user ui , user-based methods search for other users similar              this method generates better recommendations than the non-
+to the user ui and utilize their ratings to the item vj for              social collaborative filtering algorithms. However, the disad-
+prediction, while item-based methods leverage the ratings                vantage of this work is that although the users’ social trust
+of other items similar to the item vj from the user ui in-               network is integrated into the recommender systems by fac-
+stead. In order to take advantages of these two types of                 torizing the social trust graph, the real world recommenda-
+methods, Wang et al. in [23] and Ma et al. in [12] proposed              tion processes are not reflected in the model. This drawback
+two fusion models to combine user-based method with item-                not only causes lack of interpretability in the model, but
+based method. In addition to the memory-based methods,                   also affects the recommendation qualities. A more novel
+model-based approaches, which employ statistical and ma-                 and realistic approach is needed to model the trust-aware
+chine learning techniques to learn models from the data,                 recommendation problem.
+also play an important role in the collaborative filtering re-
+search. Examples of model-based approaches include aspect
+models [7, 8, 21], the latent factor model [4], the Bayesian hi-         3. RECOMMENDATION WITH SOCIAL
+erarchical model [24] and the ranking model [11]. Recently,
+several matrix factorization methods [16, 18, 19, 22] have
+                                                                            TRUST ENSEMBLE
+been proposed for collaborative filtering. These methods                    Traditional recommender system techniques, like collabo-
+focus on factorizing the user-item rating matrix using low-              rative filtering, only utilize the information of the user-item
+rank representations, and then utilize them to make further              rating matrix for recommendations while ignore the social
+predictions. The motivation behind a low-dimensional fac-                trust relations among users. As the exponential growth of
+torization model is that there is only a small number of                 online social networks, incorporating social trust informa-
+                                                                         tion into recommender systems is becoming more and more
+1
+    http://www.epinions.com                                              important. In this section, we first describe the trust-aware
+
+
+
+                                                                   204
+                                                                         logistic function g(x) = 1/(1 + exp(−x)), which makes it
+                                                                         possible to bound the range of UiT Vj within the range [0, 1].
+                                                                         The zero-mean spherical Gaussian priors are also placed on
+                                                                         user and item feature vectors:
+                                                                                      m
+                                                                                      Y                                      n
+                                                                                                                             Y
+                                                                               2                       2
+                                                                         p(U |σU )=         N (Ui |0, σU I), p(V |σV2 )=           N (Vj |0, σV2 I). (2)
+                                                                                      i=1                                    j=1
+
+
+
+  (a) Social Trust Graph      (b) User-Item Rating Matrix                Hence, through a Bayesian inference, we have
+
+Figure 1: Example for Trust based Recommendation                                      2
+                                                                          p(U, V |R, σR    2
+                                                                                        , σU , σV2 ) ∝ p(R|U, V, σR
+                                                                                                                  2        2
+                                                                                                                    )p(U |σU )p(V |σV2 )
+                                                                                   YYh 
+                                                                                    m    n
+                                                                                                                   2
+                                                                                                                     iIij
+                                                                                                                        R
+recommendation problem in Section 3.1, and then provide                        =              N Rij |g(UiT Vj ), σR
+the solution in Sections 3.2, 3.3 and 3.4.                                            i=1 j=1
+                                                                                      m                         n
+3.1 Problem Description                                                        ×
+                                                                                      Y                2
+                                                                                            N (Ui |0, σU I) ×
+                                                                                                                Y
+                                                                                                                      N (Vj |0, σV2 I).            (3)
+   In the real world, the process of recommendation scenario                          i=1                       j=1
+includes two central elements: the trust network and the
+favors of these friends, which can essentially be modeled by             The graphical model of Eq. (3) is shown in Fig. 2(a). This
+the examples of the trust graph in Fig. 1(a) and the user-               equation represents the method on how to derive the users’
+item rating matrix in Fig. 1(b), respectively. In the trust              latent feature space or users’ characteristics purely based on
+graph illustrated in Fig. 1(a), totally, 5 users (nodes, from            the user-item rating matrix without considering the favors
+u1 to u5 ) are connected with 9 relations (edges) between                of users’ trusted friends. In the next section, we will system-
+users, and each relation is associated with a weight Sij in              atically illustrate how to recommend based on the tastes of
+the range (0, 1] to specify how much user ui knows or trusts             trusted friends.
+user uj . Normally, the trust relations in the online trust
+network are explicitly stated by online users. As illustrated
+in Fig. 1(b), each user also rated some items (from v1 to v6 )
+                                                                         3.3 Recommendations by Trusted Friends
+on a 5-point integer scale to express the extent of the favor               In this section, we analyze how our social trust networks
+of each item (normally, 1, 2, 3, 4 and 5 represent “hate”,               affect our decisions or behaviors, and propose a method to
+“don’t like”, “neutral”, “like” and “love”, respectively). The           recommend only by using the tastes of trusted friends.
+problem we study in this paper is how to predict the missing                Suppose we have a directed social trust graph G = (U, E ),
+values for the users effectively and efficiently by employing            where the vertex set U = {ui }m i=1 represents all the users in
+
+the trust graph and the user-item rating matrix.                         a social trust network and the edge set E represents the trust
+                                                                         relations between users. Let S = {Sij } denote the m × m
+3.2 User Features Learning                                               matrix of G, which is also called the social trust matrix in
+   In order to learn the characteristics or features of the              this paper. For a pair of vertices, ui and uj , let Sij ∈ (0, 1]
+users, we employ matrix factorization to factorize the user-             denote the weight associated with an edge from ui to uj , and
+item matrix. The idea of user-item matrix factorization is               Sij = 0, otherwise. The physical meaning of the weight Sij
+to derive a high-quality l-dimensional feature representation            can be interpreted as how much a user ui trusts or knows
+U of users and V of items based on analyzing the user-item               user uj in a social network. Note that social trust matrix S is
+matrix R. Suppose in a user-item rating matrix, we have                  an asymmetric matrix, since in a trust-based social network,
+m users, n items, and rating values within the range [0, 1].             user ui trusting uj does not necessary indicate user uj trusts
+Actually, most recommender systems use integer rating val-               ui .
+ues from 1 to Rmax to represent the users’ judgements on                    As analyzed in Section 1, we always turn to our friends
+items. In this paper, without loss of generality, we map the             for recommendations since we trust our friends. We also
+ratings 1, ..., Rmax to the interval [0, 1] using the function           believe that most probably we will like the items (books,
+f (x) = x/Rmax . Let Rij represent the rating of user ui for             music, movies, etc.) that our trusted friends recommend.
+item vj , and U ∈ Rl×m and V ∈ Rl×n be latent user and                   Even if the recommended items are not the types we like,
+item feature matrices, with column vectors Ui and Vj repre-              we still have a high probability to be influenced by our
+senting the l-dimensional user-specific and item-specific la-            trusted friends. In the real world, suppose a user wants to
+tent feature vectors of user ui and item vj , respectively. Note         see the movie “The Dark Knight” (suppose it is the item v1 in
+that the solutions of U and V are not unique. In [19], the               Fig. 1(b)), which is now playing at the theaters, but he/she
+conditional distribution over the observed ratings is defined            knows nothing about the movie, like user u1 in Fig. 1(b).
+as:                                                                      What this user normally do is to take into account his/her
+                         n h
+                                                                         trusted friends’ recommendations. Among all of his/her
+                      m Y
+                      Y                            iIij
+                                                       R
+
+    p(R|U, V, σR 2
+                   )=                             2
+                              N Rij |g(UiT Vj ), σR       , (1)          trusted friends in Fig. 1(a), u2 and u4 rated this movie as 4
+                    i=1 j=1
+                                                                         and 5, and u1 trusts u4 (weight 1.0) more than u2 (weight
+                                                                         0.6). Based on the information, there is a very high probabil-
+                2
+where N (x|µ, σ ) is the probability density function of the             ity that u1 will draw the conclusion that “The Dark Knight”
+Gaussian distribution with mean µ and variance σ 2 , and IijR
+                                                                         is a very good movie worth of watching.
+is the indicator function that is equal to 1 if user ui rated               From the above analysis, we can generalize the above so-
+item vj and equal to 0 otherwise. The function g(x) is the               cial process as
+
+
+
+                                                                   205
+(a) Factorization of User-        (b) Recommendations by Trusted     (c) Recommendations with Social Trust Ensemble
+Item Matrix                       Friends
+                                                 Figure 2: Graphical Models
+                                 P
+                                     Rjk Sij                                                    2
+                                                                           p(U, V |R, S, σS2 , σU , σV2 )∝p(R|S, U, V, σS2 )p(U |σU2
+                                                                                                                                     )p(V |σV2 ),
+                             j∈T (i)
+                       b
+                       Rik =                 ,                 (4)                                                                IijR
+                                 |T (i)|                                            Ym Y  n                  X
+        b ik is the prediction of the rating that user ui would                 =              N  Rij |g(       Sik UkT Vj ), σS2 
+where R                                                                                 i=1 j=1                   k∈T (i)
+give item vj , Rjk is the score that user uj gave item vk , T (i)
+                                                                                        m
+                                                                                        Y                         n
+                                                                                                                  Y
+is the friends set that user ui trusts and |T (i)| is the number                                         2
+                                                                                 ×            N (Ui |0, σU I) ×         N (Vj |0, σV2 I).     (10)
+of trusted friends of user ui in the set T (i). |T (i)| can be
+                                                                                        i=1                       j=1
+merged into Sij since it is the normalization term of trust
+                                                                                         2
+scores. Hence, Eq. (4) can be simplified as                                 where p(U |σU  ) and p(V |σV2 ) are zero-mean spherical Gaus-
+                               X                                            sian priors on user and item feature vectors. This equation
+                       b ik =
+                       R            Rjk Sij .                (5)            specifies the method to recommend purely based on users’
+                               j∈T (i)                                      trusted friends’ tastes. The graphical model is shown in
+Then the prediction of the ratings that user ui gives to all                Fig. 2(b).
+the items can be inferred as
+                                                                      3.4 Social Trust Ensemble
+          Rb i1       R11 R21 ... Rm1       Si1                                In Section 3.2, given the user-item rating matrix, the ob-
+        R b                                 
+        i2  =  R12 R22 ... Rm2   Si2  .           (6)                 served rating Rij is interpreted by the user ui ’s favor on item
+        ...   ... ... ... ...   ...                                   vj , while in Section 3.3, given the user-item rating matrix
+          Rb in       R1n R2n ... Rmn       Sim                             and users’ social trust network, the observed rating Rij is
+                                                                            realized as the favors on item vj of user ui ’s trusted friends.
+We can then infer that for all the users to obtain
+                                                                            Actually, both of the above assumptions are partially right
+                              b = SR,
+                              R                                (7)          since in the real world situation, every user has his/her own
+                                                                            taste and at the same time, every user may be influenced by
+where SR can be interpreted as the recommendations purely
+                                                                            his/her friends he/she trusts. Hence, in order to define the
+based on the trusted friends’ tastes.
+                                                                            model more realistically, every observed rating in the user-
+  From the social trust network aspect, we define the con-
+                                                                            item matrix should reflect both of these two factors. Based
+ditional distribution over the observed ratings as
+                                                                            on this motivation, we model the conditional distribution
+                    2
+      p(R|S, U, V, σR )=                                                    over the observed ratings as:
+                                             Iij                                            2
+                                                                           p(U, V |R, S, σ 2 , σU , σV2 )
+                                                  R
+         Ym Y n              X
+                 N Rij |g(        T        2
+                               Sik Uk Vj ), σS  , (8)                                                                          Iij
+                                                                                                                                      R
+                                                                             Ym Y n                             X
+          i=1 j=1                 k∈T (i)
+                                                                           =        NRij |g(αUiT Vj + (1 − α)   Sik UkT Vj ), σ 2
+where Sik is normalized by |T (i)|, which is the number of                     i=1 j=1                                       k∈T (i)
+                                              R
+trusted friends of user ui in the set T (i). Iij is the indicator              m
+                                                                               Y                         n
+                                                                                                         Y
+                                                                                                2
+function that is equal to 1 if user i rated item j and equal               ×         N (Ui |0, σU I) ×         N (Vj |0, σV2 I).              (11)
+to 0 otherwise.                                                                i=1                       j=1
+  Hence, similar to Eq. (3), through a Bayesian inference,                  In Eq. (11), the users’ favors and the trusted friends’ favors
+we have                                                                     are smoothed by the parameter α, which naturally fuses
+                          2
+     p(U, V |R, S, σS2 , σU , σV2 )                                         appropriate amount of real world recommendation processes
+                                                                            into the recommender systems. The parameter α controls
+           ∝                               2
+                p(R|S, U, V, σS2 )p(U |S, σU )p(V |S, σV2 ).   (9)
+                                                                            how much do users trust themselves or their trusted friends.
+In Eq. (9), we can assume that S is independent with the                    It is also the reason we call our approach Recommendation
+low-dimensional matrices U and V , then this equation can                   with Social Trust Ensemble (RSTE). The graphical model
+be changed to                                                               of RSTE is shown in Fig. 2(c).
+
+
+
+                                                                     206
+   The log of the posterior distribution for the recommenda-                       Table 1: Statistics of User-Item Rating Matrix of Epinions
+tions is given by                                                                                   Statistics         User Item
+lnp(U, V |R, S, σ 2 , σU
+                       2
+                         , σV2 ) =                                                          Max. Num. of Ratings 1960 7082
+       m    n
+                                                                                            Avg. Num. of Ratings 12.21 7.56
+   1 XX R                                     X
+− 2            Iij (Rij − g(αUiT Vj + (1 − α)   Sik UkT Vj ))2                      Table 2: Statistics of Social Trust Network of Epinions
+  2σ i=1 j=1
+                                                   k∈T (i)                            Statistics   Trust per User Be Trusted per User
+         m               n
+     1 X T           1 X T                                                           Max. Num.           1763                2443
+−           Ui Ui −        V Vj
+      2
+    2σU i=1         2σV j=1 j
+                      2                                                              Avg. Num.           9.91                9.91
+       m   n                                                                       a user trusts. Since almost all of the online social networks
+ 1 XX R             1
+− (                        2
+          I )lnσ 2 − (mllnσU + nllnσV2 ) + C,                        (12)          fit the power-law distribution, a large long tail of users only
+ 2 i=1 j=1 ij       2
+                                                                                   have few trusted friends. This indicates that the value of k
+where C is a constant that does not depend on the parame-                          is relatively small. The computational complexities for the
+                                                                                               ∂L       ∂L
+ters. Maximizing the log-posterior over two latent features                        gradients ∂U   and ∂V   in Eq. (14) are O(ρR p l + ρR p kl) and
+with hyperparameters (i.e., the observation noise variance                         O(ρR l + ρR kl), respectively, where p is the average number
+and prior variances) kept fixed is equivalent to minimizing                        of friends who trust a user, which is also a small value. Ac-
+the following sum-of-squared-errors objective functions with                       tually, in a social trust graph, the value of k is always equal
+quadratic regularization terms:                                                    to the value of p, which is 9.91 in the dataset we employ in
+                                                                                   the Section 4. Therefore, the total computational complex-
+L(R, S, U, V )                                                                     ity in one iteration is O(ρR p l + ρR p kl), which indicates
+       m    n
+    1 XX R                                    X                                    that theoretically, the computational time of our method
+  =            Iij (Rij − g(αUiT Vj + (1 − α)   Sik UkT Vj ))2                     is linear with respect to the number of observations in the
+    2 i=1 j=1
+                                                   k∈T (i)
+                                                                                   user-item matrix R. This complexity analysis shows that
+      λU          λV                                                               our proposed approach is very efficient and can scale to very
+    +    kU k2F +    kV k2F ,                                        (13)
+       2           2                                                               large datasets.
+                 2
+where λU = σ 2 /σU , λV = σ 2 /σV2 , and k · k2F denotes the
+Frobenius norm.                                                                    4. EMPIRICAL ANALYSIS
+  A local minimum of the objective function given by Eq. (13)                        In this section, we conduct several experiments to com-
+can be found by performing gradient descent in Ui , Vj ,                           pare the recommendation qualities of our RSTE approach
+        Xn                           X                                             with other state-of-the-art collaborative filtering and trust-
+∂L           R ′
+    =α      Iij g (αUiT Vj + (1 − α)        Sik UkT Vj )Vj                         aware recommendation methods. Our experiments are in-
+∂Ui     j=1                                                                        tended to address the following questions: (1) How does
+                                   k∈T (i)
+             T
+                            X                                                      our approach compare with the published state-of-the-art
+    × (g(αUi Vj + (1 − α)        Sik UkT Vj ) − Rij )                              collaborative filtering and trust-aware recommendation al-
+                              k∈T (i)
+                                                                                   gorithms? (2) How does the model parameter α affect the
+                 X   n
+                     X                                   X
+                             R ′
+                                                                                   accuracy of prediction? (3) What is the performance com-
+     + (1 − α)              Ipj g (αUpT Vj + (1 − α)          Spk UkT Vj )         parison on users with different observed ratings? (4) Can
+               p∈B(i) j=1                               k∈T (p)                    our algorithm achieve good performance even if users have
+                           X
+     × (g(αUpT Vj + (1 − α) Spk UkT Vj ) − Rpj )Spi Vj +λU Ui ,                    few observed rating records? (5) Is our algorithm efficient
+                              k∈T (p)
+                                                                                   when training the model?
+
+∂L
+       m
+       X R ′
+                                 X                                                 4.1 Dataset Description
+   =    Iij g (αUiT Vj + (1 − α)       Sik UkT Vj )
+∂Vj i=1                                                                               We choose Epinions as the data source for our experi-
+                               k∈T (i)
+                          X                                                        ments on recommendation with social trust ensemble. Epin-
+            T
+   × (g(αUi Vj + (1 − α)       Sik UkT Vj ) − Rij )                                ions.com is a well known knowledge sharing site and review
+                              k∈T (i)                                              site, which was established in 1999. In order to add reviews,
+                            X                                                      users (contributors) need to register for free and begin sub-
+     × (αUi + (1 − α)             Sik UkT ) + λV Vj ,                (14)
+                                                                                   mitting their own personal opinions on topics such as prod-
+                        k∈T (i)
+                                                                                   ucts, companies, movies, or reviews issued by other users.
+where g ′ (x) is the derivative of logistic function g ′ (x) =                     Users can also assign products or reviews integer ratings
+exp(x)/(1 + exp(x))2 and B(i) is the set that includes all                         from 1 to 5. These ratings and reviews will influence future
+the users who trust user ui . In order to reduce the model                         customers when they are about to decide whether a prod-
+complexity, in all of the experiments we conduct in Section 4,                     uct is worth buying or a movie is worth watching. Every
+we set λU = λV .                                                                   member of Epinions maintains a “trust” list which presents
+                                                                                   a social network of trust relationships between users. Epin-
+3.5 Complexity Analysis                                                            ions is thus an ideal source for experiments on social trust
+   The main computation of gradient methods is evaluating                          recommendation.
+the object function L and its gradients against variables.                            The dataset used in our experiments is collected by crawl-
+Because of the sparsity of matrices R and S, the compu-                            ing the Epinions.com site on Jan 2009. It consists of 51,670
+tational complexity of evaluating the object function L is                         users who have rated a total of 83,509 different items. The
+O(ρR l + ρR kl), where ρR is the number of nonzero entries                         total number of ratings is 631,064. The density of the user-
+in the matrix R, and k is the average number of friends that                       item rating matrix is less than 0.015%. We can observe that
+
+
+
+                                                                             207
+                          Table 3: Performance Comparisons (A Smaller MAE or RMSE Value Means a Better Performance)
+                                                             Dimensionality = 5          Dimensionality = 10
+                                 Training Data Metrics
+                                                       Trust   PMF    SoRec RSTE   Trust   PMF     SoRec RSTE
+                                               MAE     0.9054 0.8676 0.8442 0.8377 0.9039 0.8651 0.8404 0.8367
+                                      90%
+                                               RMSE    1.1959 1.1575 1.1333 1.1109 1.1917 1.1544 1.1293 1.1094
+                                               MAE     0.9221 0.8951 0.8638 0.8594 0.9215 0.8886 0.8580 0.8537
+                                      80%
+                                               RMSE    1.2140 1.1826 1.1530 1.1346 1.2132 1.1760 1.1492 1.1256
+                                  4
+                               x 10                                                                   Dimensionality = 10                                    Dimensionality = 10
+                          2                                                             1.1                                                    1.4
+                                                                                                                            Trust                                                  Trust
+                                                                                       1.05                                 PMF               1.35                                 PMF
+Number of Test Ratings
+
+
+
+
+                         1.5                                                                                                SoRec                                                  SoRec
+                                                                                                                                               1.3
+                                                                                         1                                  RSTE                                                   RSTE
+                                                                                                                                              1.25
+                                                                                       0.95
+
+
+
+
+                                                                                                                                       RMSE
+                                                                           MAE
+                          1                                                                                                                    1.2
+                                                                                        0.9
+                                                                                                                                              1.15
+                                                                                       0.85
+                         0.5                                                                                                                   1.1
+                                                                                        0.8                                                   1.05
+
+                          0                                                            0.75                                                      1
+                                1−10   11−20 21−40 41−80 81−160 >160                     1−10   11−20 21−40 41−80 81−160        >160            1−10   11−20 21−40 41−80 81−160        >160
+                                        Number of Observed Ratings                                 Number of Observed Ratings                             Number of Observed Ratings
+(a) Distribution of Testing Data (90% as (b) MAE Comparison on Different User (c) RMSE Comparison on Different User
+Training Data)                           Rating Scales (90% as Training Data) Rating Scales (90% as Training Data)
+                                Figure 3: Performance Comparison on Different Users
+the user-item rating matrix of Epinions is very sparse, since    ommendations, and it is based on probabilistic matrix
+the densities for the two most famous collaborative filtering    factorization.
+datasets Movielens (6,040 users, 3,900 movies and 1,000,209
+ratings) and Eachmovie (74,424 users, 1,648 movies and        2. Trust: this is the method purely uses trusted friends’
+2,811,983 ratings) are 4.25% and 2.29%, respectively. More-      tastes making recommendations. It is proposed in Sec-
+over, an important factor that we choose the Epinions dataset    tion 3.3 in this paper. It is also a special case of RSTE
+is that user social trust network information is not included    when α = 0.
+in the Movielens and Eachmovie datasets. The statistics of
+                                                              3. SoRec: this is the method proposed in [13]. It is a
+the Epinions user-item rating matrix is summarized in Ta-
+                                                                 social trust-aware recommendation method that fac-
+ble 1. As to the user social trust network, the total number
+                                                                 torizes the user-item rating matrix and users’ social
+of issued trust statements is 511,799. The statistics of this
+                                                                 trust network by sharing the same user latent space.
+data source is summarized in Table 2.
+
+4.2 Metrics                                                                                                        We use different amounts of training data (90%, 80%) to
+                                                                                                                test the algorithms. Training data 90%, for example, means
+   We use two metrics, the Mean Absolute Error (MAE) and                                                        we randomly select 90% of the ratings from Epinions dataset
+the Root Mean Square Error (RMSE), to measure the pre-                                                          as the training data to predict the remaining 10% of ratings.
+diction quality of our proposed approach in comparison with                                                     The random selection was carried out 5 times independently.
+other collaborative filtering and trust-aware recommenda-                                                       The experimental results using 5 and 10 dimensions to rep-
+tion methods.                                                                                                   resent the latent features are shown in Table 3.
+   The metrics MAE is defined as:                                                                                  The parameter settings of our approach are α = 0.4 for
+                            P
+                              i,j |ri,j − r
+                                          bi,j |                                                                both 90% training data and 80% training data, λU = λV =
+                  M AE =                         ,     (15)                                                     0.001, and in all the experiments conducted in the following
+                                    N
+                                                                                                                sections, we set all of the parameters λU , λV equal to 0.001.
+where ri,j denotes the rating user i gave to item j, rbi,j de-                                                  From Table 3, we can observe that our approach RSTE out-
+notes the rating user i gave to item j as predicted by a                                                        performs the other methods. In general, two social trust
+method, and N denotes the number of tested ratings. The                                                         recommendation approaches SoRec and RSTE all perform
+metrics RMSE is defined as:                                                                                     better than the PMF method (only uses the user-item ma-
+                                                                                                                trix for recommendations). However, the Trust method per-
+                                                    sP
+                                                                               2                                forms worse than the PMF method, which indicates purely
+                                                          i,j (ri,j − r
+                                                                      bi,j )
+                                                                                                                utilizing trusted friends’ tastes to recommend is not ap-
+                                         RM SE =                                   .               (16)
+                                                                N                                               plicable. Among these three trust-aware recommendation
+                                                                                                                methods, our RSTE method generally achieves better per-
+4.3 Comparison                                                                                                  formance than the SoRec and Trust methods on both MAE
+  In this section, in order to show the performance improve-                                                    and RMSE. This demonstrates that our interpretation on
+ment of our RSTE approach, we compare our method with                                                           the formation of the ratings is realistic and reasonable.
+the following approaches.
+                                                                                                                4.4 Performance on Different Users
+                   1. PMF: this method is proposed by Salakhutdinov and                                            One challenge of the recommender systems is that it is
+                      Minh in [19]. It only uses user-item matrix for the rec-                                  difficult to recommend items to users who have very few
+
+
+
+                                                                                                          208
+                      90% as Training Data                                       90% as Training Data                                   80% as Training Data                                     80% as Training Data
+      0.94                                                      1.24                                                    0.94                                                     1.24
+
+      0.92                                                      1.22                                                                                                             1.22
+                                                                                                                        0.92
+                                                                 1.2
+       0.9                                                                                                                                                                        1.2
+                                                                1.18                                                     0.9
+
+
+
+
+                                                         RMSE
+
+
+
+
+                                                                                                                                                                          RMSE
+MAE
+
+
+
+
+                                                                                                                  MAE
+      0.88                                                                                                                                                                       1.18
+                                                                1.16                                                    0.88
+      0.86                                                                                                                                                                       1.16
+                                                                1.14
+                                                                                                                        0.86
+      0.84                                                      1.12                                                                                                             1.14
+
+      0.82                                                       1.1                                                    0.84                                                     1.12
+          0   0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9    1              0   0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9   1             0   0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9   1              0   0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9   1
+                           Values of α                                               Values of α                                             Values of α                                              Values of α
+
+                         (a)                                                        (b)                                                    (c)                                                      (d)
+                                                     Figure 4: Impact of Parameter α (Dimensionality = 10)
+                     Dimensionality = 10                                      Dimensionality = 10
+       1.3                                                  1.55                                                         or 80% training data, as α increases, the MAE and RMSE
+                                      RSTE α = 0                                               RSTE α = 0
+      1.25
+                                      RSTE α = 0.4
+                                                             1.5
+                                                                                               RSTE α = 0.4
+                                                                                                                         decrease (prediction accuracy increases) at first, but when
+       1.2                            RSTE α = 0.7          1.45                               RSTE α = 0.7              α surpasses a certain threshold, the MAE and RMSE in-
+      1.15                            RSTE α = 1             1.4                               RSTE α = 1                crease (prediction accuracy decreases) with further increase
+       1.1
+                                                            1.35
+                                                     RMSE
+
+
+
+
+                                                                                                                         of the value of α. This phenomenon confirms with the intu-
+MAE
+
+
+
+
+      1.05
+                                                             1.3
+        1                                                                                                                ition that purely using the user-item rating matrix or purely
+                                                            1.25
+      0.95                                                                                                               using the users’ social trust network for recommendations
+       0.9                                                   1.2
+                                                                                                                         cannot generate better performance than fusing these two
+      0.85                                                  1.15
+       0.8                                                   1.1
+                                                                                                                         favors together.
+          0   50   100 150 200 250 300 350 400                  0       50 100 150 200 250 300 350 400                      From Fig. 4(a) and Fig. 4(b), when using 90% ratings as
+                         Iterations                                              Iterations
+                       (a)                                                      (b)                                      training data, we observe that, our RSTE method achieves
+                                                                                                                         the best performance when α is around 0.4, while smaller
+Figure 5: Efficiency Analysis (90% as Training Data)                                                                     values like α = 0.1 or larger values like α = 0.7 can poten-
+ratings. Hence, in order to compare our approach with the                                                                tially degrade the model performance. This indicates that
+other methods thoroughly, we first group all the users based                                                             we need to trust more about the tastes of users’ trusted
+on the number of observed ratings in the training data, and                                                              friends than their own tastes, since the training data of user-
+then evaluate prediction accuracies of different user groups.                                                            item matrix is very sparse, which can hardly learn the accu-
+The experimental results are shown in Fig. 3. Users are                                                                  rate characteristics of users. In Fig. 4(c) and Fig. 4(d), when
+grouped into 6 classes: “1−10”, “11−20”, “21−40”, “41−80”,                                                               using 80% ratings as training data, the optimal value of α
+“81 − 160” and “> 160”, denoting how many ratings users                                                                  is also around 0.4. However, less ratings for users will lead
+have rated.                                                                                                              to an overall degradation of the recommendation results.
+   Fig. 3(a) summarizes the distributions of testing data ac-
+cording to groups in the training data (90% as training
+                                                                                                                         4.6 Training Efficiency Analysis
+data). For example, there are a total 3,360 user-item pairs to                                                              The complexity analysis in Section 3.5 states that the
+be predicted in the testing dataset in which the related users                                                           computational complexity of our approach is linear with re-
+in the training dataset have rating numbers from 1 to 10. In                                                             spect to the number of ratings, which shows that our ap-
+Fig. 3(b) and Fig. 3(c), we observe that our RSTE algorithm                                                              proach is scalable to very large datasets. Actually, our ap-
+consistently performs better than other methods, especially                                                              proach is very efficient even when using a very simple gra-
+when few user ratings are given. When users’ rating records                                                              dient descent method. In the experiments using 90% of the
+are ranging from 1 to 80, our RSTE method performs much                                                                  data as training data, our method only needs less than 400
+better than the Trust, PMF and SoRec approaches.                                                                         iterations for training, and each iteration only requires less
+                                                                                                                         than 20 seconds. All the experiments are conducted on a
+4.5 Impact of Parameter α                                                                                                normal personal computer containing an Intel Pentium D
+   In our method proposed in this paper, the parameter α                                                                 CPU (3.0 GHz, Dual Core) and 1G memory.
+balances the information from the users’ own characteristics                                                                Fig. 5(a) and Fig. 5(b) show the performance (MAE and
+and their friends’ favors. It controls how much our method                                                               RMSE) changes with the iterations. We observe that when
+should trust users themselves and their friends. If α = 1, we                                                            using a large value of α, such as α = 1 or α = 0.7, at the
+only mine the user-item rating matrix for matrix factoriza-                                                              end of the training, the model begins to overfit (especially
+tion, and simply employ users’ own tastes in making recom-                                                               for the RMSE), while a relatively smaller α, such as α = 0
+mendations. If α = 0, we only extract information from the                                                               or α = 0.4, does not have the overfitting problem. These
+social trust graph to predict users’ preferences purely from                                                             experiments clearly demonstrate that in this dataset, an ap-
+the friends they trust. In other cases, we fuse information                                                              proach ignoring the social trust information can cause the
+from the user-item rating matrix and the user social trust                                                               overfitting problem, and that the predictive accuracy can
+network for probabilistic matrix factorization and, further-                                                             be improved by incorporating appropriate amount of social
+more, to predict ratings for the users.                                                                                  trust information.
+   Fig. 4 shows the impacts of α on MAE and RMSE. We
+observe that the value of α impacts the recommendation re-                                                               5. CONCLUSIONS AND FUTURE WORK
+sults significantly, which demonstrates that fusing the users’                                                              This paper is motivated by the fact that a user’s trusted
+own tastes with their friends’ favors greatly improves the rec-                                                          friends on the Web will affect this user’s online behavior.
+ommendation accuracy. No matter using 90% training data                                                                  Based on the intuition that every user’s decisions on the Web
+
+
+
+                                                                                                              209
+should include both the user’s characteristics and the user’s               [2] P. Bedi, H. Kaur, and S. Marwaha. Trust based
+trusted friends’ recommendations, we propose a novel, effec-                    recommender system for semantic web. In Proc. of IJCAI
+tive and efficient probabilistic matrix factorization frame-                    ’07, pages 2677–2682, 2007.
+work for the recommender systems. Experimental analy-                       [3] J. S. Breese, D. Heckerman, and C. Kadie. Empirical
+                                                                                analysis of predictive algorithms for collaborative filtering.
+sis on the Epinions dataset shows the promising future of                       In Proc. of UAI ’98, 1998.
+our proposed method. Moreover, the method introduced in                     [4] J. Canny. Collaborative filtering with privacy via factor
+this paper by using probabilistic matrix factorization is not                   analysis. In Proc. of SIGIR ’02, pages 238–245, New York,
+only working in trust-aware recommender systems, but also                       NY, USA, 2002. ACM.
+applicable to other popular research topics, such as social                 [5] M. Deshpande and G. Karypis. Item-based top-n
+search, collaborative information retrieval, and social data                    recommendation. ACM Transactions on Information
+mining.                                                                         Systems, 22(1):143–177, 2004.
+   In this paper, although we employ the trusted friends’                   [6] J. L. Herlocker, J. A. Konstan, A. Borchers, and J. Riedl.
+                                                                                An algorithmic framework for performing collaborative
+opinions in the social trust network to make recommenda-                        filtering. In Proc. of SIGIR ’99, pages 230–237, New York,
+tions for the users, we do not consider the possible diffusions                 NY, USA, 1999. ACM.
+of trusts between various users. Under the circumstance that                [7] T. Hofmann. Collaborative filtering via gaussian
+both the user-item rating matrix and the trust relations of                     probabilistic latent semantic analysis. In Proc. of SIGIR
+a social network are very sparse, the diffusions of trust re-                   ’03, pages 259–266, New York, NY, USA, 2003. ACM.
+lations become inevitable since this consideration will help                [8] T. Hofmann. Latent semantic models for collaborative
+to alleviate the data sparsity problem and will potentially                     filtering. ACM Transactions on Information Systems,
+                                                                                22(1):89–115, 2004.
+increase the prediction accuracy. We plan to employ the
+                                                                            [9] R. Jin, J. Y. Chai, and L. Si. An automatic weighting
+diffusion processes in our future work.                                         scheme for collaborative filtering. In Proc. of SIGIR ’04,
+   In many popular applications on the Web, users not only                      pages 337–344, New York, NY, USA, 2004. ACM.
+can keep a list of trust relationships, but also have the rights           [10] G. Linden, B. Smith, and J. York. Amazon.com
+to establish a list of distrust or block relationships. If a user               recommendations: Item-to-item collaborative filtering.
+uj is in the distrust list of a user ui , most probably, it is be-              IEEE Internet Computing, pages 76–80, Jan/Feb 2003.
+cause the user ui thinks the user uj ’s taste is totally different         [11] N. N. Liu and Q. Yang. Eigenrank: a ranking-oriented
+from him/her. Actually, this information is very useful on                      approach to collaborative filtering. In Proc. of SIGIR ’08,
+                                                                                pages 83–90, New York, NY, USA, 2008. ACM.
+the recommender systems. Unfortunately, to the best of our
+                                                                           [12] H. Ma, I. King, and M. R. Lyu. Effective missing data
+knowledge, no previous work can employ this information                         prediction for collaborative filtering. In Proc. of SIGIR ’07,
+well into recommender systems. The understanding of dis-                        pages 39–46, New York, NY, USA, 2007. ACM.
+trust relations is still unclear to the researchers: We cannot             [13] H. Ma, H. Yang, M. R. Lyu, and I. King. SoRec: Social
+use diffusion methods to model it due to the reason that one                    recommendation using probabilistic matrix factorization.
+person’s enemy’s enemy is not necessarily the enemy of this                     In Proc. of CIKM ’08, pages 931–940, New York, NY,
+person. In the future, we plan to study the formation and                       USA, 2008. ACM.
+nature of the distrust relations, and explicitly model them                [14] P. Massa and P. Avesani. Trust-aware collaborative
+                                                                                filtering for recommender systems. In Proc. of
+in the recommender systems.
+                                                                                CoopIS/DOA/ODBASE, pages 492–508, 2004.
+   As the exponential growth of online social network sites                [15] P. Massa and P. Avesani. Trust-aware recommender
+continues, the research of social search is becoming more and                   systems. In Proc. of RecSys, pages 17–24, New York, NY,
+more important. We also plan to develop similar techniques                      USA, 2007. ACM.
+to allow users’ trusted friends to influence the users’ search             [16] J. D. M. Rennie and N. Srebro. Fast maximum margin
+results or query suggestions. The intuition behind this is                      matrix factorization for collaborative prediction. In Proc.
+that if a large number of our friends are searching for some-                   of ICML ’05, 2005.
+thing, it’s likely that we may be interested in that topic too.            [17] P. Resnick, N. Iacovou, M. Suchak, P. Bergstrom, and
+                                                                                J. Riedl. Grouplens: An open architecture for collaborative
+This would be an interesting search phenomenon to explore                       filtering of netnews. In Proc. of CSCW ’94, 1994.
+in social networks.                                                        [18] R. Salakhutdinov and A. Mnih. Bayesian probabilistic
+                                                                                matrix factorization using markov chain monte carlo. In
+6.   ACKNOWLEDGMENTS                                                            Proc. of ICML ’08, 2008.
+                                                                           [19] R. Salakhutdinov and A. Mnih. Probabilistic matrix
+  We thank Dr. Haixuan Yang, Mr. Shikui Tu and Mr.                              factorization. In Advances in Neural Information
+Tom Chao Zhou for many valuable discussions on this topic.                      Processing Systems, volume 20, 2008.
+The work described in this paper is supported by grants from               [20] B. Sarwar, G. Karypis, J. Konstan, and J. Reidl.
+the Research Grant Council of the Hong Kong Special Ad-                         Item-based collaborative filtering recommendation
+                                                                                algorithms. In Proc. of WWW ’01, pages 285–295, New
+ministrative Region, China (Project No.: CUHK 4128/08E                          York, NY, USA, 2001. ACM.
+and CUHK 4158/08E). This work is also affiliated with the                  [21] L. Si and R. Jin. Flexible mixture model for collaborative
+Microsoft-CUHK Joint Laboratory for Human-centric Com-                          filtering. In Proc. of ICML ’03, 2003.
+puting and Interface Technologies.                                         [22] N. Srebro and T. Jaakkola. Weighted low-rank
+                                                                                approximations. In Proc. of ICML ’03, 2003.
+                                                                           [23] J. Wang, A. P. de Vries, and M. J. T. Reinders. Unifying
+7.   REFERENCES                                                                 user-based and item-based collaborative filtering
+                                                                                approaches by similarity fusion. In Proc. of SIGIR ’06,
+ [1] R. Andersen, C. Borgs, J. Chayes, U. Feige, A. Flaxman,                    pages 501–508, New York, NY, USA, 2006. ACM.
+     A. Kalai, V. Mirrokni, and M. Tennenholtz. Trust-based
+     recommendation systems: an axiomatic approach. In Proc.               [24] Y. Zhang and J. Koren. Efficient bayesian hierarchical user
+     of WWW ’08, pages 199–208, New York, NY, USA, 2008.                        modeling for recommendation system. In Proc. of SIGIR
+                                                                                ’07, pages 47–54, New York, NY, USA, 2007. ACM.
+     ACM.
+
+
+
+
+                                                                     210
+

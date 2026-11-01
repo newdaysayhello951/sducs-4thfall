@@ -1,0 +1,902 @@
+               Sumblr: Continuous Summarization of Evolving
+                              Tweet Streams
+
+                               Lidan Shou 1;2               Zhenhua Wang 1                      Ke Chen1        Gang Chen1
+                                                  1
+                                                      College of Computer Science and Technology
+                                                              2
+                                                                State Key Lab of CAD&CG
+                                                                   Zhejiang University
+                                                                    Hangzhou, China
+                                                 {should, wzh-cs, chenk, cg}@zju.edu.cn
+
+ABSTRACT
+With the explosive growth of microblogging services, short-
+text messages (also known as tweets) are being created and
+shared at an unprecedented rate. Tweets in its raw form
+can be incredibly informative, but also overwhelming. For
+both end-users and data analysts it is a nightmare to plow
+through millions of tweets which contain enormous noises
+and redundancies. In this paper, we study continuous tweet
+summarization as a solution to address this problem. While
+traditional document summarization methods focus on static
+and small-scale data, we aim to deal with dynamic, quickly
+arriving, and large-scale tweet streams. We propose a novel
+prototype called Sumblr (SUMmarization By stream cLus-
+teRing) for tweet streams. We ﬁrst propose an online tweet
+stream clustering algorithm to cluster tweets and maintain
+distilled statistics called Tweet Cluster Vectors. Then we de-
+                                                                                             Figure 1: A timeline example for topic “Apple”
+velop a TCV-Rank summarization technique for generating
+online summaries and historical summaries of arbitrary time                             rate. Take Twitter for instance, receiving over 400 million
+durations. Finally, we describe a topic evolvement detection                            tweets per day1 , it has become an invaluable source of news,
+method, which consumes online and historical summaries to                               blogs, opinions, and more. Tweets in its raw form can be
+produce timelines automatically from tweet streams. Our                                 incredibly informative, but also overwhelming. For exam-
+experiments on large-scale real tweets demonstrate the eﬃ-                              ple, searching for a hot topic in Twitter can yield millions of
+ciency and eﬀectiveness of our approach.                                                tweets, which span for weeks. Even if ﬁltering is allowed,
+                                                                                        plowing through so many tweets for interesting contents
+                                                                                        would be a nightmare, not to mention the enormous noises
+Categories and Subject Descriptors                                                      and redundancies that one could encounter. To make things
+H.3.1 [Content Analysis and Indexing]: Abstracting                                      worse, new tweets satisfying the ﬁltering criteria may arrive
+methods; H.3.4 [Systems and Software]: Performance                                      continuously, at an unpredictable rate.
+evaluation (eﬃciency and eﬀectiveness)                                                     A possible solution to the above problem is continuous
+                                                                                        tweet summarization, which represents the massive tweets
+Keywords                                                                                in a set of short text pieces covering the main topics (or
+                                                                                        sub-topics of course). Speciﬁcally, let us look at an example,
+Tweet stream; continuous summarization; timeline
+                                                                                        which presumes availability of a topic-related tweet stream,
+                                                                                        for example tweets about “Apple”. With a tweet summariza-
+1. INTRODUCTION                                                                         tion system, we can (i) continuously monitor “Apple”-related
+  With the explosive growth of microblogging services, such                             tweets arriving from the stream and produce a continuous
+as Twitter, Weibo and Tumblr, short-text messages known                                 timeline which grows by time. (ii) Suppose a user wants to
+as tweets are being created and shared at an unprecedented                              learn the main happenings about “Apple” from the tweets
+                                                                                        between 22 Oct 2012 and 11 Nov 2012. The range timeline
+Permission to make digital or hard copies of all or part of this work for               during that period can be provided to her, so that she un-
+personal or classroom use is granted without fee provided that copies are not           derstands the big picture of topic evolution in those weeks
+made or distributed for profit or commercial advantage and that copies bear             (as shown in Figure 1). (iii) After that, she may need more
+this notice and the full citation on the first page. Copyrights for components          detailed reports for a much smaller duration (e.g. from 8 am
+of this work owned by others than ACM must be honored. Abstracting with
+                                                                                        to 11 pm on 5 Nov), which is like a drill-down summary on
+credit is permitted. To copy otherwise, or republish, to post on servers or to
+redistribute to lists, requires prior specific permission and/or a fee. Request         the duration. (iv) Alternatively, she may ask for a more con-
+permissions from permissions@acm.org.                                                   cise report during 21 Oct to 30 Oct, in a roll-up summary.
+SIGIR’13, July 28–August 1, 2013, Dublin, Ireland.                                      1
+Copyright 2013 ACM 978-1-4503-2034-4/13/07 ...$15.00.                                       https://blog.twitter.com/2013/celebrating-twitter7
+
+
+
+
+                                                                                  533
+                                                                        the current clusters maintained in memory. This algorithm
+                          7ZHHW6WUHDP&OXVWHULQJ
+                                                                        ﬁrst computes centrality scores for tweets kept in TCVs, and
+   7ZHHW         7ZHHW&OXVWHU         3\UDPLGDO7LPH                selects the top-ranked ones in terms of content coverage and
+   6WUHDP           9HFWRUV                  )UDPH
+                                                                        novelty. (2) To compute historical summaries where the
+                                                                        user speciﬁes an arbitrary time duration, we ﬁrst retrieve
+                               +LJKOHYHO                              two historical cluster snapshots from the PTF with respect
+                             6XPPDUL]DWLRQ                              to the two endpoints (the beginning and ending points) of
+                     2QOLQH                  +LVWRULFDO                the duration. Then, based on the diﬀerence between the two
+                   6XPPDULHV                 6XPPDULHV                  cluster snapshots, the TCV-Rank summarization algorithm
+                                                                        is applied to generate summaries.
+                   (YROYHPHQW                                             The summarization module also contains a topic evolve-
+                    'HWHFWLRQ                 7LPHOLQH                  ment detection algorithm, which consumes online/historical
+                                                           8VHU         summaries to produce continuous/range timelines. A time-
+            Figure 2: The framework of Sumblr                           line is a sequence of time-stamped summaries (nodes). Both
+                                                                        continuous and range timelines are generated by monitoring
+Such application would not only facilitate easy navigation
+                                                                        a quantity called summary-based variation, which is deﬁned
+in topic-relevant tweets, but also support a range of data
+                                                                        for summaries during the course of topic evolvement. A large
+analysis tasks such as instant reports or historical survey.
+                                                                        variation at a particular moment implies a sub-topic change,
+   Implementing continuous tweet stream summarization is
+                                                                        leading to the addition of a new node on the timeline.
+not an easy task, as the tweets are of noisy, redundant, and
+                                                                           The main contributions of our work include: (1) A con-
+social nature. More importantly, tweets arrive very quickly
+                                                                        tinuous tweet stream summarization framework; (2) Novel
+and are strongly correlated with their posted time. A good
+                                                                        data structures and algorithms for online summarization and
+solution to continuous tweet stream summarization has to
+                                                                        historical summarization of any arbitrary time interval; (3)
+address the following issues: (1) Eﬃciency - tweet streams
+                                                                        A topic evolvement detection scheme for continuous and
+always have very large scales, so their summarization should
+                                                                        range timelines; (4) Extensive experiments on real Twitter
+be highly eﬃcient, with only one pass over the data; (2)Flex-
+                                                                        datasets, showing promising results in terms of summary
+ibility - the ability to provide tweet summaries of arbitrary
+                                                                        quality and eﬃciency.
+time durations. (3)Topic evolvement - to automatically de-
+                                                                           The rest of the paper is organized as follows. Section 2
+tect sub-topic changes and the moments that they happen.
+                                                                        reviews the related work. Section 3 explains concepts includ-
+   Unfortunately, the importance of continuous summariza-
+                                                                        ing TCV and PTF. Section 4 describes our Sumblr frame-
+tion has long been overlooked by the research community.
+                                                                        work in detail. The experimental settings and results are
+Although there exist numerous studies on document sum-
+                                                                        presented in Section 5. In Section 6, we conclude the paper.
+marization [6, 26, 23, 13, 9, 11], these methods cannot sat-
+isfy our requirements, because: (1) They mainly focus on                2.    RELATED WORK
+static and small-sized datasets, making it intractable to im-
+                                                                          In this section, we review the related work including stream
+prove their eﬃciency. (2) To provide summary for arbi-
+                                                                        data clustering, traditional document summarization and mi-
+trary duration, these techniques will have to perform iter-
+                                                                        croblog summarization and mining.
+ative/recursive summarization for every possible time du-
+ration, which is unacceptable. (3) The summary results of               2.1   Stream Data Clustering
+these algorithms are insensitive to time. Thus it is diﬃcult               Stream data clustering has been widely studied in the lit-
+for them to detect topic evolvement.                                    erature. CluStream [1] is one of the most classic stream
+   In this paper, we introduce a novel tweet summarization              clustering methods. It consists of an online micro-clustering
+prototype called Sumblr (SUMmarization By stream cLus-                  component and an oﬄine macro-clustering component. The
+teRing). To the best of our knowledge, our work is the ﬁrst             pyramidal time frame is also proposed in [1] to recall histor-
+to study continuous tweet stream summarization. The over-               ical micro-clusters for diﬀerent time durations.
+all structure of the prototype is depicted in Figure 2. Sumblr             A variety of services on the Web such as news ﬁltering,
+consists of two main components, namely a Tweet Stream                  text crawling, and topic detecting etc. have posed require-
+Clustering module and a High-level Summarization module.                ments for text stream clustering. A few algorithms have
+In the tweet stream clustering module, we design an eﬃcient             been proposed to tackle the problem [7][10][27][29]. Most
+tweet stream clustering algorithm, an online algorithm allow-           of these techniques adopt partition-based approaches to en-
+ing for eﬀective clustering of tweets with only one pass over           able online clustering of stream data. As a consequence,
+the data. This algorithm uses two data structures to keep               these techniques fail to provide eﬀective analysis on clusters
+important tweet information in clusters. The ﬁrst one is a              formed over diﬀerent time durations.
+compressed structure called Tweet Cluster Vector (TCV).                    In [2], the authors propose to generate duration-based
+TCVs are considered as potential sub-topic delegates and                clustering results by extending CluStream for text and cat-
+maintained dynamically in memory during stream process-                 egorical data stream. However, this algorithm relies on an
+ing. The second structure is the Pyramidal Time Frame                   online phase to generate large number of “micro-clusters”,
+(PTF) [1], which is used to store and organize cluster snap-            leading to ineﬃciency and poor storage utilization.
+shots at diﬀerent moments, thus allowing historical tweet
+data to be retrieved by any arbitrary time durations.                   2.2   Traditional Document Summarization
+   The high-level summarization module supports the gen-                   Document summarization techniques can be categorized
+eration of two kinds of summaries: online summaries and                 into two types: extractive techniques and abstractive ones.
+historical ones. (1) To generate online summaries, we pro-              The former selects sentences from the documents, while the
+pose a TCV-Rank summarization algorithm by referring to                 latter may generate phrases and sentences that do not ap-
+
+
+
+
+                                                                  534
+pear in the original documents. In this paper, we focus on             fected by the author’s social inﬂuence. To estimate the user
+extractive summarization.                                              inﬂuence, we build a matrix based on social relationships
+   Extractive document summarization has received a lot of             among users, and compute the UserRank as [5].
+recent attention. Most of them assign salient scores to sen-              As a result, we deﬁne a tweet ti as a tuple: (tvi , tsi , wi ),
+tences of the documents, and select the top-ranked sentences           where tvi is the textual vector, tsi is the posted timestamp
+[3][30] [19][26] [6][22]. Some works try to extract sentences          and wi is the UserRank value of the tweet’s author.
+without such salient scores. A method using Singular Value
+Decomposition (SVD) is proposed in [8] to select highly
+                                                                       3.2    Tweet Cluster Vector
+ranked sentences. Wang et al. [23] use the Symmetric Non-                 During tweet stream clustering, it is necessary to maintain
+negative Matrix Factorization (SNMF) to cluster sentences              statistics for tweets to facilitate summary generation. In
+and choose sentences in each cluster for summarization. In             this section, we propose a new data structure called Tweet
+[11], He et al. propose to summarize documents from the                Cluster Vector, which keeps information of tweet cluster.
+perspective of data reconstruction, and select sentences that             Definition 1. For a cluster C containing tweets t1 , t2 , ..., tn ,
+can best reconstruct the original documents. Unfortunately,            its Tweet Cluster Vector (TCV) is deﬁned as a tuple:
+all above methods neglect the signiﬁcant temporal dimen-               T CV (C) = (sum v, wsum v, ts1, ts2, n, f t set), where
+                                                                                          ∑n
+sion of documents, which is critical in our problem.                       • sum v =         i=1 tvi /||tvi || is the sum of normalized
+   Yan et al. propose a technique called Evolutionary Time-                  textual vectors,
+line Summarization (ETS) [24] to compute evolution time-                                   ∑
+                                                                           • wsum v = n       i=1 wi ·tvi is the sum of weighted textual
+lines consisting of individual but correlated component sum-                 vectors,
+maries. However, the dates of component summaries are de-                           ∑
+                                                                           • ts1 = n   i=1 tsi is the sum of timestamps,
+termined by a pre-deﬁned timestamp set. In contrast, our                            ∑n
+solution discovers the changing dates and generate timelines               • ts2 = i=1 (tsi )2 is the quadratic sum of timestamps,
+dynamically during the process of continuous summariza-                    • n is the number of tweets in the cluster, and
+tion. More importantly, ETS does not focus on eﬃciency                     • f t set is a focus tweet set of size m, consisting of the
+and scalability. Its task is formulated as an optimization                   closest m tweets to the cluster centroid.
+problem via iterative substitution. Thus it does not meet              The form of sum v is used for ease of presentation. In
+our requirements.                                                      fact, we only store the identiﬁers and sums of values of the
+2.3 Microblog Summarization and Mining                                 words occurring in the cluster. The same convention is used
+  While document summarization has been studied for years,             for wsum v. To select tweets into f t set, we use cosine
+microblog summarization is still in its infancy. Shariﬁ et al.         similarity as the distance metric.
+proposed the Phrase Reinforcement algorithm to summarize                  From the deﬁnition, we can derive the vector of cluster
+multiple tweet posts on the same topic with a single tweet             centroid (denoted as cv):
+[20]. Later, Inouye et al. proposed a modiﬁed Hybrid TF-                                    ∑ n
+
+IDF algorithm and a Cluster-based algorithm to generate                             cv = (       wi · tvi )/n = wsum v/n             (1)
+                                                                                           i=1
+multiple post summaries [13]. In [9], Harabagiu et al. in-
+troduced a framework for microblog summarization which                   The deﬁnition of TCV is an extension of the cluster feature
+capitalizes on a combination of two relevance models: an               vector in [28]. Like in [28], our TCV structure can also be
+event structure model and a user behavior model. Taka-                 updated in an incremental way when new tweets arrive. We
+mura et al. proposed a microblog summarization method                  shall discuss details on updates to TCV in Section 4.1.2.
+based on the p-median problem, which takes posted time of              3.3    Pyramidal Time Frame
+microblogs into consideration [21].
+  The emergence of microblogs also motivates research on                  To support summarization over user-deﬁned time dura-
+other mining tasks, including topic modeling [12], storyline           tions, it is crucial to store the maintained TCVs at partic-
+generation [14] and event exploration [17]. Most of these              ular moments, which are called snapshots. While storing
+researches focus on static datasets instead of data streams.           snapshots at every moment is impractical due to huge stor-
+Yang et al. studied twitter stream analysis [25], but they             age overhead, insuﬃcient snapshots make it hard to recall
+aim at frequent pattern mining and compression, which is               historical information for diﬀerent durations. This dilemma
+also a diﬀerent problem from ours.                                     leads to the incorporation of the Pyramidal Time Frame [1]:
+  To sum up, almost all existing document/microblog sum-                  Definition 2. The Pyramidal Time Frame (PTF) stores
+marization works mainly deal with static and small datsets,            snapshots at diﬀering levels of granularity depending on the
+and rarely pay attention to evolvement and eﬃciency issues.            recency. Snapshots are classiﬁed into diﬀerent orders which
+                                                                       vary from 0 to log(T ), where T is the time elapsed since the
+3. PRELIMINARIES                                                       beginning of the stream. The order of a particular class of
+   In this section, we ﬁrst give a data model for tweets.              snapshots deﬁnes the level of granularity in time at which the
+Then we introduce two data structures used in our solu-                snapshots are maintained. The snapshots of diﬀerent orders
+tion, namely the Tweet Cluster Vector and the Pyramidal                are maintained as follows:
+Time Frame.                                                                • Snapshots of the i-th order occur at time intervals of
+3.1 Tweet Representation                                                     αi , where α is an integer and α ≥ 1. Speciﬁcally, each
+  Generally, a document is represented as a textual vector,                  snapshot of the i-th order is taken at a moment in time
+where the value of each dimension is the TF-IDF score of a                   when the timestamp from the beginning of the stream
+word. However, tweets are not only textual, but also hav-                    is exactly divisible by αi .
+ing temporal nature - a tweet is strongly correlated with its              • At any given moment in time, only the last αl + 1 (l ≥
+posted time. In addition, the importance of a tweet is af-                   1) snapshots of order i are stored.
+
+
+
+
+                                                                 535
+   Table 1: Example of PTF with α = 3 and l = 2                            Algorithm 1: Incremental tweet stream clustering
+   Order Timestamps of snapshots in the same order                          Input: a cluster set S
+     4                       81                                          1 while !stream.end() do
+     3                      54 27                                        2     T weet t = stream.next();
+     2                72 63 45 36 18 9                                   3     choose Cp in S whose centroid is the closest to t;
+     1          84 78 75 69 66 60 57 51 48 42                            4     if M axSim(cop , t) < M BS then
+     0          86 85 83 82 80 79 77 76 74 73                            5        create a new cluster Cnew = {t};
+                                                                         6        S = S ∪ Cnew ;
+   According to the deﬁnition, PTF has two properties: (1)
+                                                                         7     else
+The maximum order of any snapshot stored at T times-
+                                                                         8        update Cp with t;
+tamps since the beginning of the stream is log (T ); (2) The
+maximum number of snapshots maintained at T is (αl +                  9        if T Scurrent % (αi ) == 0 then
+1) · log (T ). These properties are crucial for system per-          10            store S into PTF;
+formance. Taking more snapshots (by using a larger α or
+l) oﬀers better accuracy of time duration approximation,                 very distant from Cp . In such case, a new cluster will be
+but meanwhile causes larger storage overhead. Therefore,                 created. The decision of whether to create a new cluster can
+we need to strike a balance between duration accuracy and                be made with the following heuristic.
+storage space. Note that we only maintain the current clus-                 Heuristic 1. If M axSim(co, t) is smaller than a Mini-
+ters in main memory, and store all historical snapshots in               mum Bounding Similarity (MBS), then t is upgraded to
+the PTF on disk.                                                         a new cluster. Otherwise, t is added to its closest cluster.
+   To clarify how snapshots are stored, we give an example
+here. Let α = 3 and l = 2, then there are at most 32 +1 = 10               The MBS is deﬁned as β · Sim(co, ti ), where β is a bound-
+snapshots stored in each order. Suppose the stream starts                ing factor (0 < β < 1) and Sim(co, ti ) is the average cosine
+at timestamp 1 and the current timestamp is 86. The stored               similarity between co and tweets included in Cp . According
+snapshots are illustrated in Table 1. Redundancy is removed              to Section 3.2, Sim(co, ti ) can be calculated by using the
+by storing each snapshot only in its highest possible order.             information stored in TCV:
+                                                                                           1 ∑ tvi · cv                         ∑
+                                                                                              n                                  n
+   Note that for more recent timestamps, the time interval                                                               cv           tvi
+                                                                         Sim(co, ti ) =                            =
+between successive snapshots stored in PTF is smaller (ﬁner                                n i=1 ||tvi || · ||cv||   n · ||cv|| i=1 ||tvi ||
+granularity). This feature of PTF is consistent with the                                        wsum v
+demand that recent summaries should be of higher quality                                                               wsum v · sum v
+                                                                                       =            n
+                                                                                                             · sum v =
+because people usually care more about recent events.                                       n · || wsum
+                                                                                                      n
+                                                                                                        v
+                                                                                                          ||            n · ||wsum v||
+                                                                            When adding a new cluster, it is hard to tell whether it is
+4. THE SUMBLR FRAMEWORK                                                  noise or a truly new sub-topic. Actually, the decision cannot
+   In this section, we present the details of our Sumblr frame-          be made until more tweets arrive. We discuss how noises are
+work. As shown in Figure 2, our framework includes two                   diminished in Section 4.4.
+main modules: the tweet stream clustering module and the                    After applying Heuristic 1, the corresponding TCV needs
+high-level summarization module. In what follows, we will                to be updated. For a newly created cluster, its TCV can be
+elaborate these two modules respectively.                                initialized easily. For an existing cluster, its components in
+4.1 Tweet Stream Clustering                                              TCV can also be easily updated in an incremental manner,
+                                                                         except the focus tweet set.
+  The tweet stream clustering module maintains the online                   Recall that in Deﬁnition 1, f t set is the set of the closest
+statistical data. Given a topic-based tweet stream, it is able           m tweets to the cluster centroid. However, as new tweets
+to eﬃciently cluster the tweets and maintain compact cluster             are added to the cluster during stream processing, the clus-
+statistics, with only one scan on the data.                              ter centroid would change unpredictably. Since we can not
+4.1.1 Initialization                                                     store all tweets in the cluster, it is rather diﬃcult to main-
+   At the beginning of the stream, we collect a small number             tain exact focus tweets. For this reason, we use a heuristic
+of tweets and use a k-means clustering algorithm to create               strategy to choose promising candidates instead of exact fo-
+the initial clusters. The value of k and the initial cluster             cus tweets: for the newly absorbed tweet and those already
+centroids are decided via the Canopy [18] method. Once the               in f t set, we compute their cosine distances to the new cen-
+initial clusters are established, the ﬁrst set of TCVs are ini-          troid, and select the closest m tweets. The advantage of
+tialized according to Deﬁnition 1. Next, the stream cluster-             this strategy is that it gives a higher probability for fresh
+ing process starts to incrementally update the TCVs when                 tweets to get into the focus set, which usually represent new
+a new tweet arrives.                                                     statuses of the topic.
+4.1.2 Incremental Clustering                                                The above updating process is executed upon the arrival of
+  Suppose a tweet t arrives at time ts, and there are N active           each new tweet. Meanwhile, when the current timestamp is
+clusters at that time. First, we try to absorb t into one of the         divisible by αi for any integer i, we store the snapshot of the
+current clusters. The priority is given to the cluster whose             current TCVs into disk and index it by PTF. Algorithm 1
+centroid is the closest to t. Speciﬁcally, we get the centroid           gives an overview of our incremental clustering procedure.
+(denoted as co) of a cluster based on Equation (1), compute                 During incremental clustering, assume there are N active
+the cosine similarity between co and t, and ﬁnd the cluster              clusters, the computational cost of ﬁnding the closest cluster
+Cp with M axSim(co, t).                                                  for every new tweet is O(N d), where d is the vocabulary size.
+  Note that although Cp is the closest to t, it does not mean            In addition, the complexity of computing Heuristic 1 and
+t naturally belongs to Cp . The reason is that t may still be            updating TCV is O(d) and O(md) respectively, where m is
+
+
+
+
+                                                                   536
+            I WV                                                                   tamp of the latest 10 percent tweets is more than 3 days old,
+                              S 
+                                                                                   then we regard C as an outdated cluster and remove it.
+                                                        S 
+                                                                                   4.1.4     Merging Clusters
+                                                                                      If the number of clusters keeps increasing and few of them
+                                          F       WVS WVS             WV
+                                                                                   are deleted, the system memory will be exhausted. To avoid
+ Figure 3: Probability density func. of timestamp                                  this, we specify an upper limit for the number of clusters as
+                              ^FF`                                              Nmax . When the limit is reached, a merging process starts.
+                        F                              F                            The process merges clusters in a greedy way until the ter-
+                                     F
+                    ^FFF`                                     F
+                                                                                   mination condition is satisﬁed. First, we sort all cluster pairs
+                                                                                   by their centroid similarities in a descending order. Then,
+             F              F                  F
+                                                                                   beginning with the most similar pair, we try to merge two
+                                                             F
+                                              ^FF`                              clusters in the pair. When both clusters are single clusters
+                   F              F
+                                                                                   which have not been merged with other clusters, they are
+  Figure 4: A running example of cluster merging                                   merged into a new composite cluster. When one of them be-
+the size of focus set. Then the total cost is O((N + m)d).                         longs to a composite cluster (it has been merged with others
+Because m and d are static, the computational cost depends                         before), then the other is also merged into that compos-
+on N . Similarly, the storage costs in disk (TCV snapshots)                        ite cluster. When both of them have been merged, if they
+and memory (current TCVs) also depend on N .                                       belong to the same composite cluster, this pair is skipped;
+   Given the above analysis, we need to restrict the num-                          otherwise, the two composite clusters are merged together.
+ber of active clusters. We achieve this goal via two opera-                        This process continues until there are only mc percentage
+tions: deleting outdated clusters and merging similar clus-                        of the original clusters left (mc is a merge coeﬃcient which
+ters. Since the computational complexity of deletion is O(N )                      provides a balance between available memory space and the
+and that of merging is O(N 2 ), we use the former method for                       quality of remaining clusters). We omit the pseudo-code of
+periodical examination and use the latter method only when                         the algorithm due to space limitation.
+memory limit is reached.                                                              During cluster merging, each composite cluster is given
+                                                                                   an IDList which consists of IDs of the clusters merged in
+4.1.3 Deleting Outdated Clusters                                                   it. Furthermore, its TCV is obtained by the Aggregation
+   For most events (such as news, football matches and con-                        operation to combine two TCVs.
+certs) in tweet stream, timeliness is important because they
+usually do not last for a long time. Therefore it is safe to                          Definition 3. (Aggregation Operation) Let C1 and C2
+delete the tweet clusters representing these sub-topics when                       be two clusters, and their TCV structures be T CV (C1 ) and
+they are rarely discussed. To ﬁnd out such clusters, an intu-                      T CV (C2 ). Then, when C1 and C2 are merged together, the
+itive way is to estimate the average arrival time (denoted as                      composite cluster’s T CV (C1 ∪ C2 ) is given by
+Avgp ) of the last p percent of tweets in a cluster. However,                          • sum v = sum v1 + sum v2
+storing p percent of tweets for every cluster will increase                            • wsum v = wsum v1 + wsum v2
+memory requirements, especially when some clusters grow                                • ts1 = ts11 + ts12
+big. Thus, we employ an approximate method to get Avgp .                               • ts2 = ts21 + ts22
+   Note that the temporal statistics in TCV of a cluster C al-
+                                                                                       • n = n1 + n2
+low us to compute the mean and standard√deviation of times-
+tamps of tweets in C: µc = ts1/n, σc = ts2/n − (ts1/n)2 .                              • f t set consists of the ﬁrst m tweets in f t set1 ∪f t set2 ,
+   Assuming that the tweet timestamps are normally dis-                                  sorted by distance to the newly merged centroid.
+tributed, we can obtain the arrival time of the qth percentile                        Figure 4 shows a running example of the process. For
+of the tweets. The qth percentile is the value that cuts oﬀ the                    ease of presentation, we use cluster centroids (the black solid
+ﬁrst q percent of the tweet timestamps when they are sorted                        points) to represent clusters and use Euclidean distance in-
+in ascending order. When q = 100 − p, the qth percentile is                        stead of cosine distance. First, we calculate distances for all
+the start timestamp of the last p percent of tweets (noted as                      cluster pairs and sorted them as: (c1 , c2 ), (c2 , c4 ), (c1 , c4 ),
+tsp in Figure 3). Then, we can approximate Avgp using the                          (c5 , c7 ), (c4 , c5 ), .... Suppose mc = 0.7, then we need to re-
+(100 − p/2)-th percentile (noted as tsp=2 in Figure 3).                            move 10 × (1 − 0.7) = 3 clusters. To start with, c1 and c2 are
+   Now the problem is transformed into obtaining the value                         merged into a composite cluster {c1 , c2 }. After that, when
+of tsp=2 . Let x = tsp=2 and p′ = (100 − p/2)%, we have                            processing the second pair (c2 , c4 ), we ﬁnd that c2 has been
+                                x − µc                                             merged. Hence we combine c4 into {c1 , c2 }, and the compos-
+                 F (x) = Φ(            ) = p′                                      ite cluster becomes {c1 , c2 , c4 }. For next pair, c1 and c4 both
+                                  σc
+                                                                                   have been merged, so this pair is skipped. Next we merge
+        ⇒            x = µc + σc Φ−1 (p′ )
+                                      √                                            c5 and c7 into another composite cluster {c5 , c7 }. Now that
+                         = µc + σc · 2erf −1 (2p′ − 1)                             we have reduced the number of clusters by 3, the algorithm
+where F (x) is the cumulative distribution function (CDF),                         terminates. Note that since only Nmax × (1 − mc) (denoted
+Φ(x) is the CDF of the standard normal distribution, and                           as N ′ ) clusters need to be removed, we would access at most
+                                                                                                      ′      ′
+erf −1 (z) is the inverse error function and can be calculated                          ′ + 1 = N (N − 1)/2 + 1 pairs.
+                                                                                     2
+                                                                                   CN
+using the Maclaurin series expansion [31].
+   The value of tsp=2 represents the freshness of cluster C.                       4.2     High-level Summarization
+We empirically set a freshness threshold as 3 days (as empir-                        The high-level summarization module provides two types
+ically no bursty events would last longer) and set p = 10. If                      of summaries: online and historical summaries. The online
+tsp=2 is smaller than this threshold, i.e., the average times-                     summaries are retrieved directly from the current clusters
+
+
+
+
+                                                                             537
+maintained in the memory. For historical summaries, re-                    Algorithm 2: TCV-Rank summarization
+trieval of the required clusters is more complicated. In what
+                                                                            Input: a cluster set D(c)
+follows, we shall focus on the second type.
+                                                                            Output: a summary set S
+   Suppose the length of a user-deﬁned time duration is H,
+                                                                         1 S = ∅, T = {all the tweets in f t sets of D(c)};
+and the ending timestamp of the duration is tse . From PTF,
+                                                                         2 Build a similarity graph on T ;
+we can retrieve two snapshots whose timestamps are either
+                                                                         3 Compute LexRank scores LR;
+equal to or right before tse and tse − H, respectively. We
+                                                                         4 Tc = {tweets with the highest score in each cluster};
+denote their timestamps by ts1 and ts2 , and their cluster sets
+                                                                         5 while |S| < L do
+by S(ts1 ) and S(ts2 ). Now the original duration [tse −H, tse ]
+                                                                         6     foreach tweet ti in Tc do
+is approximated by [ts2 , ts1 ].
+                                                                         7        calculate vi according to Equation (2);
+   Intuitively, we need to perform a cluster set subtraction
+between S(ts1 ) and S(ts2 ). For each cluster C in S(ts1 ), we           8     select tmax with the highest vi ;
+acquire its ID (if it is a single cluster) or IDs in its IDList          9     S = S ∪ tmax ;
+(a composite cluster). For each of these IDs, we ﬁnd the             10 while |S| < L do
+corresponding cluster in S(ts2 ), and subtract its TCV from          11   foreach tweet t′i in T − S do
+C’s TCV according to:                                                12       calculate vi′ according to Equation (2);
+   Definition 4. (Subtraction Operation) Given a clus-               13        select t′max with the highest vi′ ;
+ter C1 in S(ts1 ) and its corresponding cluster C2 in S(ts2 ),       14        S = S ∪ t′max ;
+when C2 is subtracted from C1 , their diﬀerence T CV (C1 −
+                                                                     15 return S;
+C2 ) is given by
+    • sum v = sum v1 − sum v2                                               We design a greedy algorithm to select representative tweets
+    • wsum v = wsum v1 − wsum v2                                         to form summaries (Algorithm 2). First, we gather tweets
+    • ts1 = ts11 − ts12                                                  from the f t sets in D(c) as a set T , and build a cosine simi-
+    • ts2 = ts21 − ts22                                                  larity graph. The maximum size of T is N × m, where N is
+                                                                         the number of clusters in D(c) and m is the size of f t set.
+    • n = n1 − n2
+                                                                         It is the upper bound because f t sets of some clusters (e.g.,
+    • f t set consists of tweets which exist in f t set1 but not         small clusters or clusters newly created) may not be full.
+       in f t set2 .                                                     Next, we apply the LexRank method [6] to compute cen-
+  The above process eliminates the inﬂuence of clusters cre-             trality scores for tweets. LexRank is an eﬀective static sum-
+ated before ts2 on summary results. The ﬁnal set of clusters             marization method and is eﬃcient for small-sized datasets.
+after this process is the input for historical summarization.            But when datasets become large, its eﬃciency drops quickly
+                                                                         (this will be shown in the experiment). The tweet set T
+4.2.1 TCV-Rank Summarization                                             has at most N m tweets (usually hundreds or thousands), so
+  Given an input cluster set, we denote its corresponding                LexRank is suitable for our situation.
+TCV set as D(c). A tweet set T consists of all the tweets                   However, a potential problem of LexRank is that some
+in the f t sets in D(c). Our tweet summarization aims to                 top-ranked tweets may have similar contents. Fortunately,
+extract k tweets from T , so that they can cover as many                 since the tweets are retrieved from TCVs, they have got
+tweet contents as possible.                                              inherent cluster information. Hence, we choose one tweet
+  We ﬁrst prove it is a NP-hard problem, then we present a               with the highest LexRank score from each TCV, and add
+greedy algorithm to solve it.                                            tweet t into the summary according to:
+  Lemma 1. The tweet summarization problem is NP-hard.                                      nti
+                                                                            t = argmax[λ        LR(ti ) − (1 − λ) avg Sim(ti , tj )], (2)
+   Proof. Let us ﬁrst describe this problem formally. F =                          ti     nmax                    tj ∈S
+
+{T1 , T2 , ..., Tt } is a collection of non-empty subsets of T ,         where λ (0 ≤ λ ≤ 1) is a weight parameter, nti is the size
+where a subset Ti represents a sub-topic and |Ti | means the             of the cluster containing ti , nmax is the size of the biggest
+number of its related tweets. The subsets may have some                  cluster, LR(ti ) is ti ’s LexRank score and S is the summary
+tweets in common because one tweet can be related to more                set containing already chosen tweets.
+than one sub-topic. Suppose for each Ti , there is a tweet                  The motivation of Equation (2) is analogous to that of
+which represents the content of Ti ’s sub-topic. Then, select-           Maximal Marginal Relevance (MMR) [4]. In query-oriented
+ing k tweets is equivalent to selecting k subsets.                       summarization, MMR combines query relevance and infor-
+  Now, the problem can be deﬁned as: given a number k and                mation novelty. Here, we combine coverage and novelty as
+                                          ′                 ′
+           ∪ of sets F , ﬁnd a subset F ⊆ F, such that |F | =
+a collection                                                             our criterion: the ﬁrst component on the right side of the
+k and | Ti ∈F ′ Ti | is maximized (i.e., F ′ contains as many            equation favors tweets which have high scores and belong
+tweets as possible). We notice that this is the Max-k-Cover              to big clusters (content coverage); the second component
+problem, which is NP-hard. Therefore, our summarization                  penalizes redundant tweets with similar contents to those
+problem is also NP-hard.                                                 already chosen (novelty).
+  More generally, summary length are limited in terms of                    After the ﬁrst round selection, if the summary length is
+words (250 words). Since the number of words and that of                 still not reached, then we try to select tweets globally (ti ∈
+tweets are linearly dependent, the problem is still NP-hard.             T − S) according to Equation (2).
+  From the geometric interpretation, our summarization tends                The computational complexity for LexRank is O(r|T |2 ),
+to select tweets that span the intrinsic subspace of candidate           where r is the iteration number. In tweet selection, note
+tweet space, such that it can cover most information of the              that for each tweet, the ﬁrst component in the righthand of
+whole tweet set.                                                         Equation (2) only needs to be computed once, and the sec-
+
+
+
+
+                                                                   538
+ond component can be updated incrementally. So the worst-                          Table 2: Basic information of 5 datasets
+case cost of tweet selection is O(N 2 + (|S| − N ) · |T |). Since              Topics (ﬁltering keywords)   #Tweets       Time Span
+|S| << |T |, the total cost for our algorithm is O(r|T |2 +                              Obama               95,055    2009.2 - 2009.10
+                                                                                        Chelsea             438,884    2012.11 - 2012.12
+N 2 ) = O(rm2 N 2 ). As mentioned before, N m is always
+                                                                                 Arsenal Arsene Wenger      323,555    2012.11 - 2012.12
+controlled at a relatively small number, hence the summa-                     Tablet Smartphone Cellphone   231,011    2012.11 - 2012.12
+rization procedure is very eﬃcient.                                                   Black Friday          124,684    2012.11 - 2012.12
+4.3 Topic Evolvement Detection
+   Topic evolvment detection algorithm can produce contin-                5. EXPERIMENTS
+uous and range timelines in a similar way. We shall only                  5.1 Experimental Setup
+describe the continuous case here.
+                                                                             Datasets We construct 5 datasets to evaluate Sumblr.
+   As tweets arrive from the stream, online summaries are
+                                                                          One is obtained by conducting keyword ﬁltering on a Twitter
+generated continuously by utilizing real-time cluster statis-
+                                                                          dataset (from Feb. to Oct., 2009) used by [5]. The other
+tics. This allows for a continuous timeline. Generally, when
+                                                                          four include more recent tweets acquired in one month via
+an obvious variation occurs in the main contents discussed
+                                                                          Twitter’s keyword tracking API 2 . As we do not have access
+in tweets, we can expect a change of sub-topics (i.e., a time
+                                                                          to the respective users’ social networks for these four, we set
+node on the timeline). To quantify the variation, we use
+                                                                          their weights of tweets wi to the default value of 1. Details
+Kullback-Leibler divergence to measure the distance between
+                                                                          of the datasets are listed in Table 2.
+two word distributions in two successive summaries Sp and
+                                                                             Ground truth for summaries As no previous work has
+Sc , Sp is the previous summary and Sc is the current one.
+                                                                          conducted similar study on continuous summarization, we
+                             ∑              p(w|Sc )
+            DKL (Sc ||Sp ) =     p(w|Sc )ln          ,     (3)            have to build our own ground truth (reference summaries).
+                             w∈V
+                                            p(w|S p)                      However, manual creation of these summaries is apparently
+where                                                                     impractical due to the huge size of the datasets.
+                                 tf (w, Sc )                                 Thus, we employ a two-step method to obtain fair-quality
+             p(w|Sc )   =    ∑           ′
+                                 w′ tf (w , Sc )
+                                                                          reference summaries without tremendous human labor:
+                                  tf (w, Sp ) + ϵ                            1) Given a time duration, we ﬁrst retrieve the correspond-
+             p(w|Sp )   =    ∑            ′
+                                                                          ing tweet subset, and use the following three well-recognized
+                                 w′ (tf (w , Sp ) + ϵ)                    summarization algorithms to get three candidate summaries.
+V is the vocabulary set and tf (w, S) is the term frequency                  ClusterSum [13]: ﬁrst clusters the tweets and then sum-
+for word w in S. ϵ is a small positive constant for Laplace               marizes each cluster by picking the most weighted post ac-
+Smoothing, which is applied to avoid zero values of p(w|Sp ).             cording to the hybrid TF-IDF weighting described in [13].
+Furthermore, we normalize the distance into interval [0, 1)                  LexRank [6]: ﬁrst builds a sentence similarity graph, and
+using D = 1 − e−DKL , for ease of comparison.                             then selects important sentences based on the concept of
+   According to the summary-based variation, we determine                 eigenvector centrality.
+if the current time is a sub-topic changing node by:                         DSDR [11]: models the relationship among sentences us-
+                          Dcur                                            ing linear reconstruction, and ﬁnds an optimal set of repre-
+                                > τ,                                      sentative sentences to approximate the original documents,
+                          Davg
+                                                                          by minimizing the reconstruction error.
+where Dcur is the distance between current summary and its                   2) Next, for each subset, the ﬁnal reference summary is
+previous neighboring summary, Davg is the average distance                manually extracted from three candidate summaries. Pri-
+of all the previous successive summary pairs which do not                 ority is given to those sentences appearing in at least two
+produce time nodes, and τ (τ ≥ 1) is the decision threshold.              candidate summaries. The length of each summary is lim-
+  That is, we detect topic evolvement when there is a burst               ited to 250 words.
+in distances between successive summaries. In this way, we                   Ground truth for timelines For the timeline gener-
+can automatically draw a timeline as the stream proceeds.                 ation test, the reference timelines are manually produced.
+4.4 Discussion                                                            We choose the “Arsenal” and “Chelsea” datasets for this ex-
+   Handling noises The eﬀect of clusters of noises can be                 periment, as the ground truth for sport topics are relatively
+diminished by two means in Sumblr. First, in tweet stream                 easier to build manually. Speciﬁcally, we read through all the
+clustering, noise clusters which are not updated frequently               related news during one month from news websites (Yahoo!
+will be deleted as outdated clusters. Second, in the summa-               and ESPN), and select those dates as nodes on the refer-
+rization step, tweets from noise clusters are far less likely to          ence timeline when important events happen, e.g., football
+be selected into summary, due to their small LexRank scores               matches, players’ signing of new contracts, etc. 3
+and cluster sizes.                                                           Baseline methods Most existing summarization meth-
+   Extension to multi-topic streams So far we have                        ods are not designed to handle continuous summarization.
+assumed a tweet stream of only one topic as the input to                  However, they can be adapted to streaming data by using
+Sumblr. However, we should note that Sumblr can be easily                 a sliding window scheme. As illustrated in Figure 8, each
+extended for multi-topic streams. For example, when a new                 window contains a certain number (window size) of tweets
+tweet arrives, we ﬁrst decide its related topics by keyword               which are summarized as a document. After that, the win-
+matching. Then it is delivered into diﬀerent groups of clus-              dow moves forward by a step size, so that the oldest tweets
+ters. Clusters are grouped by their corresponding topical                 are discarded and the new ones are added into the window.
+IDs. Consequently, Sumblr is applied within each cluster                  2
+                                                                           https://dev.twitter.com/docs/api/1.1/post/statuses/ﬁlter
+group. It is important to note that this mechanism allows                 3
+                                                                           Our datasets and ground truth are available at
+for distributed system implementation.                                    http://db.zju.edu.cn/s/sumblr/.
+
+
+
+
+                                                                    539
+                                                          Random                                                                 ClusterSum                                    ClusterSum
+             0.50                                         ClusterSum                                                                                                           DSDR
+                                                                                                                                 DSDR
+                                                          DSDR                         40000                                     LexRank                      10000            LexRank
+                                                          LexRank                                                                Sumblr                                        Sumblr
+             0.45                                         Sumblr                       20000
+
+
+
+
+                                                                                                                                              runtime (sec)
+                                                                       runtime (sec)
+             0.40                                                                                                                                              1000
+                                                                                        8000
+  F-score
+
+
+
+
+             0.35                                                                       6000
+
+                                                                                                                                                                100
+                                                                                        4000
+             0.30
+                                                                                        2000
+
+             0.25                                                                          0                                                                     10
+                    4000     8000    12000        16000   20000                                4000   8000    12000      16000    20000                               0   5k   10k   15k    20k   25k   30k   35k   40k
+                                    step_size                                                                step_size                                                                      data size
+
+            Figure 5: Quality on step size                              Figure 6: Eﬃciency on step size                                       Figure 7: Scalability on data size
+                                       ZLQGRZVL]H
+            WZHHWVWUHDP                                                                                             DSDR and LexRank achieve better summary quality than
+                                                                                                                      Sumblr, at the expense of much more computation. When
+                                                                                                                      step size ≥ 12000, Sumblr outperforms all the baseline meth-
+                                                                                                                      ods in terms of both summarization quality and computation
+                            N            N                   N      N
+                                                                                                                      cost. Although the eﬃciency of LexRank is comparable with
+                                 VWHS VL]H
+                                                  VOLGLQJZLQGRZ                                                      our method when step size ≥ 16000, its summary quality is
+               Figure 8: The sliding window mechanism                                                                 signiﬁcantly worse.
+                                                                                                                         The above results reveal a major problem with the base-
+In this way, we implement the sliding window version of the                                                           line methods: These methods rely on a small step size to
+above three algorithms, namely ClusterSum, LexRank, and                                                               produce quality summaries. Unfortunately, small step size
+DSDR. The windows are dimensioned by number of tweets                                                                 leads to very frequent and expensive computations for win-
+instead of time duration, because the number of tweets may                                                            dows. In contrast, Sumblr strikes a good balance between
+vary dramatically across ﬁxed-length durations, leading to                                                            summary quality and eﬃciency.
+very poor performance of the baseline algorithms.                                                                        Another issue to note here is that, as the ground truth is
+   Evaluation method We apply the popular ROUGE                                                                       generated using these baseline methods, the summary qual-
+toolkit [15] for evaluation. Among supported metrics, ROUGE-                                                          ity is to some extent biased in favor of them.
+1 has been demonstrated to be the most consistent with hu-
+man judgement [16]. Considering the short and informal                                                                Scalability
+nature of the tweet contents, we decide that ROUGE-1 is                                                               The scalability experiment evaluates the eﬃciency results of
+suitable for measuring tweet summaries.                                                                               a single window, while varying the window size. It simulates
+   To evaluate the metrics on a continuous time period [T0 , T ],                                                     the case of a large burst of tweets in a short period.
+we have to calculate the integral of the metric over the pe-                                                             Figure 7 presents the scalability results for diﬀerent meth-
+riod, which is given by                                                                                               ods. Note that the y-axis is in the log scale. We can see that
+                         ∫ T                                                                                          our method outperforms the others signiﬁcantly. When the
+                             metric(t)dt                    (4)                                                       data size is above 15000, Sumblr is faster than LexRank by
+                                             T0                                                                       nearly an order of magnitude, and outperforms the other
+The integral requires unaﬀordable number of samplings dur-                                                            two by more than that. The small ﬂuctuations in Sumblr
+ing the period. In practice, we only sample the metrics by                                                            may be caused by the cluster deletions and merges.
+each arrival of a certain number of new tweets. This number
+is called the sampling interval. Note the sampling interval                                                           5.3        Parameter Tuning
+must be no greater than the step size.                                                                                  In this section, we tune the parameters in our approach.
+   In our experiments, we ﬁnd similar trends in the compar-                                                           In each of the following experiments, we vary one parameter
+ison of precision, recall and F-score between the proposed                                                            and keep the others ﬁxed.
+approach and the baseline methods. Therefore, we shall                                                                  Eﬀect of β. In Heuristic 1 we use β to determine whether
+only report the F-score results to save space. The F-score                                                            to create a new cluster. Figure 9(a) and Figure 9(b) show its
+results presented are averaged on all ﬁve datasets.                                                                   eﬀect on summary quality and eﬃciency. When β is small,
+                                                                                                                      tweets related to diﬀerent sub-topics may be absorbed into
+5.2 Overall Performance Comparison                                                                                    the same clusters, so the input of our summarization com-
+   In this section, we compare the F-scores and runtime cost                                                          ponent is of low quality. At the same time, there are many
+between Sumblr and the three baseline algorithms (sliding                                                             focus tweets in each cluster, thus the time cost of cluster
+window version). As tweets are often produced very quickly                                                            updating and summarization is high. When β increases, too
+and reach a huge volume in a short while, it is hardly mean-                                                          many clusters are created, causing damage to both quality
+ingful to summarize a small number of tweets. Thus the                                                                and eﬃciency. A good choice is β = 0.07 as it gives more
+window size should be a relatively large one. In this ex-                                                             balanced results.
+periment, we set window size to 20000, sampling interval to                                                             Eﬀect of Nmax . Figure 9(c) and Figure 9(d) depicts
+2000. The step size varies from 4000 to 20000. The metrics                                                            the performance of Nmax . For small Nmax s, many merging
+are averaged over the whole stream.                                                                                   operations are conducted, which are time-consuming and
+   Figure 5 and Figure 6 present the results for diﬀerent step                                                        produce lots of low-quality clusters. For large values, stream
+sizes. In Figure 5, we also give a baseline Random method,                                                            clustering is slow due to large number of clusters. Note
+which selects tweets randomly from each window. Note that                                                             that the storage overhead (both in memory and disk) is also
+Sumblr is not aﬀected by the step size, as it supports con-                                                           higher for larger Nmax s. A balanced value for Nmax is 150.
+tinuous summarization inherently.                                                                                       Eﬀect of mc. Another parameter in cluster merging is
+   The results show that when the step size is small (4000),                                                          mc (0 < mc < 1). It does not have signiﬁcant impact on
+
+
+
+
+                                                                                                             540
+                                                                                                                                                                                                                                                                      2700
+             0.42                                                                                                                                                     0.42
+                                                                                          2400                                                                                                                                                                        2400
+
+             0.41                                                                         2100                                                                                                                                                                        2100
+                                                                                                                                                                      0.40
+
+
+
+
+                                                                                                                                                                                                                                                      runtime (sec)
+                                                                          runtime (sec)
+                                                                                          1800
+
+
+
+
+                                                                                                                                                            F-score
+                                                                                                                                                                                                                                                                      1800
+   F-score
+
+             0.40
+                                                                                                                                                                      0.38
+                                                                                          1500                                                                                                                                                                        1500
+             0.39
+                                                                                          1200                                                                                                                                                                        1200
+                                                                                                                                                                      0.36
+             0.38                                                                                                                                                                                                                                                     900
+                                                                                          900
+                                                                                                                                                                      0.34                                                                                            600
+             0.37                                                                         600                                                                                   30     50     70     90 110 130 150 170 190 210
+                    0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11                                      0.04 0.05 0.06 0.07 0.08 0.09 0.10 0.11                                                                                                                                      30   50      70    90 110 130 150 170 190 210
+                                             β                                                                         β                                                                                       Nmax                                                                                     Nmax
+
+             (a) eﬀect of β on quality                                              (b) eﬀect of β on eﬃciency                                              (c) eﬀect of Nmax on quality                                                             (d) eﬀect of Nmax on eﬃciency
+
+                                                                                                                           0.420
+                                 0.42                                                                                                                                                                                                  0.42
+
+                                                                                                                                                                                                                                       0.41
+                                                                                                                           0.415
+                                 0.41                                                                                                                                                                                                  0.40
+
+
+
+
+                                                                                                                                                                                                                             F-score
+                       F-score
+
+
+
+
+                                                                                                                 F-score
+                                                                                                                           0.410
+                                                                                                                                                                                                                                       0.39
+                                 0.40
+                                                                                                                                                                                                                                       0.38
+                                                                                                                           0.405
+                                                                                                                                                                                                                                       0.37
+                                 0.39
+                                     0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0                                                   10    20   30   40       50           60       70        80                                                0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+                                                        mc                                                                                              m                                                                                                                      λ
+
+                                         (e) eﬀect of mc                                                                                (f) eﬀect of m                                                                                              (g) eﬀect of λ
+                                     Figure 9: Performance of diﬀerent parameters
+eﬃciency, so we only present its quality results (Figure 9(e)).            l = 8 (592)                                Precision
+                                                                                                                      Recall                                                                                                                                                 0.8
+                                                                           l = 5 (173)                                                                                         0.44
+Small values of mc result in low-quality clusters, while large             l = 3 (63)
+                                                                                                                      F-score
+                                                                                                                                                                                                                                                                             0.7
+                                                                                                                                                                               0.42
+ones lead to many merging operations, which in turn reduce                                                                                                                                                                                                                   0.6
+
+                                                                                                                                                                                                                                                                             0.5
+the quality of clusters. An ideal value for mc is 0.7.                                                                                                                         0.40
+
+
+
+
+                                                                                                                                                                       score
+                                                                                                                                                                                                                                                                             0.4
+
+  Eﬀect of m. As shown in Figure 9(f), the summary                                                                                                                             0.38
+                                                                                                                                                                                                                                                                             0.3
+
+
+quality improves when m increases. When m ≥ 40, the                                                                                                                            0.36                                                                                          0.2
+
+                                                                                                                                                                                                                                                                             0.1
+improvement is not obvious. Meanwhile, a larger m incurs                                                                                                                       0.34
+                                                                                                                                                                                                                                                                             0.0
+                                                                   start                       end                                                                                      288        336   384    432   480   528        576    624                                  1.000        1.004   1.008   1.012   1.016   1.020
+more storage overhead. We choose m = 40.                                               ts                     τ
+
+  Eﬀect of λ. Finally we check the eﬀect of λ (0 ≤ λ ≤ 1),      Figure   10:       Quality on time Figure 11: Eﬀect of τ
+which is a trade-oﬀ factor between content coverage and         duration
+novelty. We gradually vary λ from 0 to 1 at the step of 0.1     • A larger l leads to better results but more storage cost
+to examine its eﬀect, as shown in Figure 9(g). When λ ≥ 0.7,      (the numbers in the parentheses represent the amounts
+the extreme emphasis on coverage causes performance loss.         of snapshots in PTF). This is obvious, as a larger l en-
+Therefore, we set λ = 0.4 as a balanced factor.                   ables PTF to store more snapshots, which results in more
+5.4 Flexibility                                                                                                                                                                accurate approximation and heavier storage burden.
+  One distinguishing feature of Sumblr is the ﬂexibility to                                                                                                       For diﬀerent applications, Sumblr can be customized with
+summarize tweets over arbitrary time durations. This fea-                                                                                                       diﬀerent l values. For example, for real-time summarization,
+ture is provided by incorporating the PTF. The eﬀective-                                                                                                        a small l is enough; while for historical review, a large l is
+ness of PTF depends on α and l (Section 3.3). We ﬁx α                                                                                                           needed.
+at 2 and show the results varying l. For consistency, we
+extract a subset of one-month period from each dataset as                                                                                                       5.5                    Timeline Generation
+the input stream. The interval between two successive snap-                                                                                                        In this section, we evaluate the eﬀectiveness of topic evolve-
+shots (timestamp unit) is one hour. For a timestamp ts, we                                                                                                      ment detection. We present the precision, recall, and F-score
+evaluate the results for drill-down/roll-up summaries using                                                                                                     of the timeline nodes detected by our algorithm while vary-
+durations with diﬀerent length len. Due to space limit, we                                                                                                      ing the decision threshold τ .
+only present the average F-score for len varying from 1 day                                                                                                        From Figure 11, we can see that the recall declines as τ
+to 10 days, and report score(ts) by interval of 48 hours.                                                                                                       increases. This is expected as higher threshold would ex-
+                       ∑                                                                                                                                        clude more promising candidates i.e., produce more false
+                         len F -score([ts − len, ts])
+          score(ts) =                                     (5)                                                                                                   negatives. The precision and F-score both reach the highest
+                                    10
+                                                                                                                                                                value when τ = 1.012. Although the recall drops when τ
+  Figure 10 gives the following observations:                                                                                                                   increases, precision increases further (as more false positive
+• There exists a common trend for all ls: as a time dura-                                                                                                       nodes are excluded). Surprisingly, when τ > 1.012, preci-
+  tion is closer to the current time, the summary quality                                                                                                       sion also drops. This may result from the incompleteness of
+  improves. This is because PTF has ﬁner granularity of                                                                                                         our manual timeline or noises in the datasets.
+  snapshots for more recent moments. Thus the queried                                                                                                              The output for “Arsenal” is presented in Table 3. It is
+  durations can be better approximated.                                                                                                                         interesting to ﬁnd that our summary-based timeline not only
+• For diﬀerent values of l, the summary quality is similar                                                                                                      detects important events (e.g. a match is called oﬀ due to a
+  for recent durations, but decreases in diﬀerent degrees for                                                                                                   tube strike), but also contains popular public opinions (e.g.
+  early durations. The reason is that for recent moments,                                                                                                       public calling for WENGER OUT).
+  most of their snapshots or neighborhood snapshots are
+  still kept in PTFs regardless of l; while for early moments,                                                                                                  6.                    CONCLUSION
+  their snapshots are more likely to be removed from PTFs                                                                                                         We proposed a prototype called Sumblr which supported
+  with smaller ls, due to smaller capacity of each order.                                                                                                       continuous tweet stream summarization. Sumblr employed
+
+
+
+
+                                                                                                                                                   541
+                                      Table 3: Selected part of the timeline for “Arsenal”
+ 12.12:                                                                           12.19:
+ 1. Yes Bradford! WENGER OUT.                                                     1. Good news for Arsenal fans: Wilshere, Oxlade-Chamberlain,
+ 2. Arsenal lose to Bradford: Should Arsene Wenger go?                            Ramsey, Gibbs and Jenkinson sign new contracts.
+ 3. Arsenal Chief Executive Ivan Gazidis has apologised to the club’s fans,       2. ♯afc Arsenal’s Premier League match against West Ham on
+ and described Arsenal’s defeat to Bradford.                                      Boxing Day is called oﬀ because of a possible tube strike.
+ 12.16:                                                                           3. Five Arsenal players sign new contracts, but not one of those
+ 1. Every arsenal fan knows how chelsea fans feel like right now.                 ﬁve is Theo Walcott.
+ 2. Game over, we lost.. Am I sad? No are arsenal fans happy? Yes, are            4. Wenger: ”We hope we will be capable of building a team around
+ they gonna ever play world club cup? No.                                         the young English players.” ♯Arsenal ♯AFC
+ 3. RVP: ”I’m sorry to Arsenal fans, I’ve never been happier than this.           12.20:
+ Finally I found a home and peace here. I’m happy at Man United.”                 1. Champions League draw: Manchester United v Real Madrid,
+ 12.18:                                                                           Arsenal v Bayern Munich, Celtic v Juventus.
+ 1. Arsenal vs Reading Come on arsenal ♯Arsenal                                   2. So it is @Arsenal Vs Bayern Munich....good game we’ll have :-)
+ 2. What a come back! Cazorla is a class! But I love how Wenger gave the          12.22:
+ right position for Walcott.                                                      1. Arsenal better win the game against wigan.
+ 3. I know it’s ”only” Reading but still good to see Arsenal playing so well.     2. Wilshere hails Arsenal’s ﬁghting spirit after Wigan win.
+
+a tweet stream clustering algorithm to compress tweets into                     [14] C. Lin, C. Lin, J. Li, D. Wang, Y. Chen, and T. Li.
+TCVs and maintain them in an online fashion. Then, it                                Generating event storylines from microblogs. In CIKM,
+used a TCV-Rank summarization algorithm for generating                               pages 175–184, 2012.
+online summaries and historical summaries with arbitrary                        [15] C.-Y. Lin. Rouge: A package for automatic evaluation of
+                                                                                     summaries. In Proc. ACL workshop on Text
+time durations. The topic evolvement could be detected au-                           Summarization Branches Out, pages 74–81, 2004.
+tomatically, allowing Sumblr to produce dynamic timelines                       [16] C.-Y. Lin and E. Hovy. Automatic evaluation of summaries
+for tweet streams. The experimental results demonstrated                             using n-gram co-occurrence statistics. In HLT-NAACL,
+the eﬃciency and eﬀectiveness of our method. For future                              pages 71–78, 2003.
+work, we aim to develop a multi-topic version of Sumblr in                      [17] A. Marcus, M. S. Bernstein, O. Badar, D. R. Karger,
+a distributed system, and evaluate it on more complete and                           S. Madden, and R. C. Miller. Twitinfo: aggregating and
+large-scale datasets.                                                                visualizing microblogs for event exploration. In CHI, pages
+                                                                                     227–236, 2011.
+Acknowledgments                                                                 [18] A. McCallum, K. Nigam, and L. H. Ungar. Eﬃcient
+                                                                                     clustering of high-dimensional data sets with application to
+The work is supported by the National Science Foundation                             reference matching. In KDD, pages 169–178, 2000.
+of China (GrantNo. 61170034).                                                   [19] D. R. Radev, H. Jing, M. Styś, and D. Tam.
+                                                                                     Centroid-based summarization of multiple documents. Inf.
+7. REFERENCES                                                                        Process. Manage., 40(6):919–938, 2004.
+ [1] C. C. Aggarwal, J. Han, J. Wang, and P. S. Yu. A
+                                                                                [20] B. Shariﬁ, M.-A. Hutton, and J. Kalita. Summarizing
+     framework for clustering evolving data streams. In VLDB,
+                                                                                     microblogs automatically. In HLT-NAACL, pages 685–688,
+     pages 81–92, 2003.
+                                                                                     2010.
+ [2] C. C. Aggarwal and P. S. Yu. On clustering massive text
+                                                                                [21] H. Takamura, H. Yokono, and M. Okumura. Summarizing a
+     and categorical data streams. Knowl. Inf. Syst.,
+                                                                                     document stream. In ECIR, 2011.
+     24(2):171–196, 2010.
+                                                                                [22] X. Wan and J. Yang. Multi-document summarization using
+ [3] R. Barzilay and M. Elhadad. Using lexical chains for text
+                                                                                     cluster-based link analysis. In SIGIR, pages 299–306, 2008.
+     summarization. In Proceedings of the ACL Workshop on
+     Intelligent Scalable Text Summarization, pages 10–17, 1997.                [23] D. Wang, T. Li, S. Zhu, and C. Ding. Multi-document
+                                                                                     summarization via sentence-level semantic analysis and
+ [4] J. Carbonell and J. Goldstein. The use of mmr,
+                                                                                     symmetric matrix factorization. In SIGIR, pages 307–314,
+     diversity-based reranking for reordering documents and
+                                                                                     2008.
+     producing summaries. In SIGIR, pages 335–336, 1998.
+                                                                                [24] R. Yan, X. Wan, J. Otterbacher, L. Kong, X. Li, and
+ [5] C. Chen, F. Li, B. C. Ooi, and S. Wu. Ti: an eﬃcient
+                                                                                     Y. Zhang. Evolutionary timeline summarization: a
+     indexing mechanism for real-time search on tweets. In
+                                                                                     balanced optimization framework via iterative substitution.
+     SIGMOD, pages 649–660, 2011.
+                                                                                     In SIGIR, pages 745–754, 2011.
+ [6] G. Erkan and D. R. Radev. Lexrank: graph-based lexical
+                                                                                [25] X. Yang, A. Ghoting, Y. Ruan, and S. Parthasarathy. A
+     centrality as salience in text summarization. J. Artif. Int.
+                                                                                     framework for summarizing and analyzing twitter feeds. In
+     Res., 22(1):457–479, 2004.
+                                                                                     KDD, pages 370–378, 2012.
+ [7] L. Gong, J. Zeng, and S. Zhang. Text stream clustering
+                                                                                [26] W.-t. Yih, J. Goodman, L. Vanderwende, and H. Suzuki.
+     algorithm based on adaptive feature selection. Expert Syst.
+                                                                                     Multi-document summarization by maximizing informative
+     Appl., 38(3):1393–1399, 2011.
+                                                                                     content-words. In IJCAI, pages 1776–1782, 2007.
+ [8] Y. Gong and X. Liu. Generic text summarization using
+                                                                                [27] J. Zhang, Z. Ghahramani, and Y. Yang. A probabilistic
+     relevance measure and latent semantic analysis. In SIGIR,
+                                                                                     model for online document clustering with application to
+     pages 19–25, 2001.
+                                                                                     novelty detection. In NIPS, 2005.
+ [9] S. M. Harabagiu and A. Hickl. Relevance modeling for
+                                                                                [28] T. Zhang, R. Ramakrishnan, and M. Livny. Birch: an
+     microblog summarization. In ICWSM, 2011.
+                                                                                     eﬃcient data clustering method for very large databases. In
+[10] Q. He, K. Chang, E.-P. Lim, and J. Zhang. Bursty feature                        SIGMOD, pages 103–114, 1996.
+     representation for clustering text streams. In SDM, 2007.
+                                                                                [29] S. Zhong. Eﬃcient streaming text clustering. Neural
+[11] Z. He, C. Chen, J. Bu, C. Wang, L. Zhang, D. Cai, and                           Networks, 18(5-6):790–798, 2005.
+     X. He. Document summarization based on data
+                                                                                [30] Q. Zhou, L. Sun, and J. Nie. Is sum: A multi-document
+     reconstruction. In AAAI, 2012.
+                                                                                     summarizer based on document index graphic and lexical
+[12] L. Hong, A. Ahmed, S. Gurumurthy, A. J. Smola, and                              chains. DUC2005, 2005.
+     K. Tsioutsiouliklis. Discovering geographical topics in the
+                                                                                [31] D. Zwillinger. CRC standard mathematical tables and
+     twitter stream. In WWW, pages 769–778, 2012.
+                                                                                     formulae. CRC press, 2011.
+[13] D. Inouye and J. K. Kalita. Comparing twitter
+     summarization algorithms for multiple post summaries. In
+     SocialCom, pages 298–306, 2011.
+
+
+
+
+                                                                        542
+

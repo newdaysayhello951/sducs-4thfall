@@ -1,0 +1,666 @@
+=== PAGE 1 ===
+Human-Computer Interaction
+8. Data Analysis
+1
+
+=== PAGE 2 ===
+Last week
+• Mental Model
+• Model human processor
+- Perceptual processor
+- Working memory
+- Cognitive processor
+- Motor processor
+2
+
+=== PAGE 3 ===
+“How your mind thinks that something works” 
+Recap: Mental model
+3
+
+=== PAGE 4 ===
+“The models people have of themselves, others, the environment and the things with 
+which they interact. People form mental models through experience, training and 
+instruction”
+• An explanation of someone's thought process about how something works in the 
+real world
+• Enable people to reason about a system
+• Affect the way we see and interpret reality
+• When users approach an unfamiliar system, they subconsciously refer to their 
+mental model, User’s model
+Recap: Mental model
+4
+
+=== PAGE 5 ===
+Recap: User’s vs. designer’s model
+As a designer, you want to use the system’s UI to accurately
+convey your mental model of the system to the user.
+the conceptual 
+model of the 
+system to be built the way the user 
+interprets the 
+System Image
+5
+
+=== PAGE 6 ===
+Recap: The Model Human Processor
+• Calculate how long it takes to perform a certain task
+• Consider humans as information processing systems
+• Consist of three interacting processors
+1. Perceptual processor: Responsible for transforming external environment 
+into a form that cognitive system can process
+2. Cognitive processor: Uses contents of working memory and long-term 
+memory to make decisions and schedule actions with motor system
+3. Motor processor: Translates thoughts into actions
+6
+
+=== PAGE 7 ===
+Recap: The Model Human Processor
+7
+
+=== PAGE 8 ===
+Recap: Visual Processing Properties
+Pre-attentive
+• A limited set of visual properties that are detected very rapidly and accurately 
+by the low-level visual system without our conscious action. 
+• It allows the designer to grab the attention of the user without their input or 
+effort.
+Change blindness
+• A perceptual phenomenon that occurs when a change in a visual stimulus is 
+introduced and the observer does not notice it
+Selective attention (Tunnel Vision)
+• The act of focusing on a particular object for a period of time while 
+simultaneously ignoring irrelevant information that is also occurring
+8
+
+=== PAGE 9 ===
+Recap: The Magic number 7 ± 2
+• George Miller’s theory of how much information people can remember
+• People’s immediate memory capacity is very limited
+• The number of objects an average human can hold in working memory 
+(short-term) is 7±2
+9
+
+=== PAGE 10 ===
+Recap: Chunking
+• Breaking up long strings of information into units
+• The primary purpose of chunking is the enhancement 
+of working memory
+When to use chunking:
+• Ideal when specific information must be memorized for later use
+• Effective use of chunking can improve the usability and effectiveness of an 
+information system
+When not to use chunking:
+• Should not be used when the information must be searched, scanned, or 
+analyzed
+• Should not be used as an argument for improved simplicity, legibility, or 
+uncluttered page design
+10
+
+=== PAGE 11 ===
+Recap: Fitts’s law
+• Fitts’s law predict the amount of time taken to move to and select a target
+• It is faster to hit larger targets close to you than smaller targets further from 
+you
+• T (Travel time to hit the target) increases as the distance to the target (A) 
+increases
+• T decreases as the size of the target (W) increases 
+Ways to apply Fitts’s law in UI design:
+• Bring items closer to the cursor
+• Increase the target size
+• Exploit the edges
+11
+
+=== PAGE 12 ===
+Recap: Fitts’s law in Mobile UI
+• No benefit on device edges
+• How device is held is important
+12
+
+=== PAGE 13 ===
+Today’s agenda
+• Data Analysis
+- Affinity Diagram
+- Work Models
+- Survey Report 
+13
+
+=== PAGE 14 ===
+14
+
+=== PAGE 15 ===
+Affinity diagram
+15
+
+=== PAGE 16 ===
+Affinity diagram
+“a UX designer’s tool, used to capture and synthesize 
+qualitative data”
+The affinity diagram brings together issues and insights across all users into a 
+hierarchical diagram to reveal the scope of the problem. 
+• Gathers large amounts of language data (ideas, opinions, issues) and 
+organizes them into groupings based on their natural relationships
+• A single picture of the customer population a design will address
+• Shows how the work hangs together rather than breaking it up in lists and what 
+matters
+• Used to brainstorm and generate ideas 
+16https://zhuanlan.zhihu.com/p/496643551
+
+=== PAGE 17 ===
+Affinity Diagram
+• Affinity Diagrams are generated during group session
+• Each observation/idea/note is copied to a post-it
+• Notes are hierarchically organized into themes, based on the focus of the 
+project
+• Usually done in a chaotic fashion, with design team members running back and 
+forth with post-its and yelling ideas to each other
+17
+
+=== PAGE 18 ===
+Reading responses
+• They don't categorize the stickies, they let the stickies categorize themselves. 
+This is important because then we can actually get insights instead of place 
+data into already set assumptions... I thought this was very helpful because it 
+allowed me to find more categories than I would've found if I grouped them 
+originally in the categories I thought we had. - Anchalee
+• It's important to work as a team - who is also structured - to receive different 
+perceptions and viewpoints of the users' data because after all, you could 
+never design for just one person nor could you, I think, design something as a 
+one man team without input and ideas from other designers. - Mary 
+18
+
+=== PAGE 19 ===
+Steps: Creating an Affinity Diagram
+Collect Data Extract raw data Synthesize data Understand
+19
+
+=== PAGE 20 ===
+1.Collect Data
+• Interviews
+• Surveys
+• Observations
+• Field notes
+• …
+20
+
+=== PAGE 21 ===
+2. Extract raw data
+• Record all of your interviews and re-listen to them as you transfer the 
+insights on to post-it notes
+• Start each post-it note from the perspective of the user
+• For each person that you spoke with, choose a different color post-it 
+note
+21
+
+=== PAGE 22 ===
+3. Synthesis
+Arrange them into clusters that make sense to you! In another word, sort the 
+sticky notes into groups, such as (but not limited to): 
+• Biographical information 
+• Frustrations 
+• Interactions/touch points  
+• goals/motivations
+22
+
+=== PAGE 23 ===
+3. Synthesis
+• Start by looking for two ideas that seem related in some way. Place them together 
+in a column off to one side 
+• Look for ideas that are related to those you've already set aside and add them to 
+that group
+• Look for other ideas that are related to each other and establish new groups
+23
+
+=== PAGE 24 ===
+4. Create header cards
+Header: An idea that captures the essential link among the ideas contained in a 
+group of cards
+• Finding already existing cards within the groups that will serve well as headers 
+and placing them at the top of the group of related cards
+• Alternatively, discussing and agreeing on the wording of cards created 
+specifically to be headers
+• Discovering a relationship among two or more groups and arranging them in 
+columns under a super-header. The same rules apply for super-headers as for 
+regular header cards
+• It should be concise and have a clear meaning!
+24
+
+=== PAGE 25 ===
+5. Draw finished diagram
+• Write a problem statement at the top of the diagram
+• Place header and super-header cards above the groups of ideas
+• Review and clarify the ideas and groupings
+• Document the finished Affinity Diagram
+25
+
+=== PAGE 26 ===
+5. Draw finished diagram
+Issues in implementing continuous process improvement
+26
+
+=== PAGE 27 ===
+27
+
+=== PAGE 28 ===
+28
+
+=== PAGE 29 ===
+29
+
+=== PAGE 30 ===
+30
+
+=== PAGE 31 ===
+31
+
+=== PAGE 32 ===
+Work models
+32
+
+=== PAGE 33 ===
+33
+
+=== PAGE 34 ===
+34
+
+=== PAGE 35 ===
+Work Model
+• A graphical way of representing the data
+• Representing the key aspects of work that design teams need to account for 
+in their designs
+• A concrete set of deliverables allowing the design team to agree upon a 
+shared understanding and representation
+Types of models
+• Flow model
+• Sequence model
+• Artifact model
+• Cultural model
+• Physical model
+35
+
+=== PAGE 36 ===
+Flow & Sequence
+• Sequence: Work tasks are often an ordered sequence of actions, unfolding 
+over time
+• Flow: How work is broken up across people, how they coordinate
+• Components
+o Time and Place: Where does this occur and over what time scale?
+o Individuals & Groups: bubbles with job titles/group name, annotated with 
+responsibilities (list)
+o Intents: An objective for the individual/group
+o Flow: communication between individuals, groups, artifacts
+o Breakdowns: potential disruptions on communication
+• Starting point: intents (i.e., objective)
+36
+
+=== PAGE 37 ===
+Flow Model
+• A bird’s-eye view of the organization, showing the people and their 
+responsibilities, the communication path between people independent of time, 
+and the things communicated
+• Purpose: Capture and Visualize
+- Roles of individuals
+- Communication and coordination
+- Mechanisms that help and hinder
+- Strategies
+• Focuses on the roles of different users, and how they communicate and 
+coordinate to get work done
+• Includes the places where communication happens, the artifacts used for 
+communication, and breakdowns in communication that negatively impact work
+37
+
+=== PAGE 38 ===
+Components of Flow Model
+• Individuals (Bubbles with responsibilities)
+• Groups of individuals with common actions
+• Places central to work (Large box w/ responsibilities)
+• Responsibilities 
+• Flow (Arrows between individuals)
+• Artifacts (Small boxed label on a flow)
+• Communication topic or action (Label on a flow)
+• Breakdowns in communication (Lightning bolt!)
+38
+
+=== PAGE 39 ===
+Flow Model: Engineer
+Field Engineer
+-- Evaluates equipment
+-- Records data
+-- Completes forms
+Customer
+-- Owns and operates 
+equipment
+Supervisor
+-- Assigns jobs
+-- Oversees work 
+Field Site
+-- Contains equip-
+ment to be 
+evaluated
+Form Database
+-- Contains all
+official company
+forms
+data
+questions
+responses
+completed equip-
+ment reports
+work status
+reportsquestions
+assignments
+suggestions
+work status 
+reports
+official data
+collection forms
+completed equip-
+ment reports
+39
+
+=== PAGE 40 ===
+Sequence Model
+• “Low-level, step-by-step information on how work is actually done”
+• Includes the intent behind the action, the trigger that led the user to this action, 
+and breakdowns that create problems 
+• Captured at level of detail appropriate for focus of the design team
+• Examines the actions of workers, and how/when they occur
+• By examining their structure, you can identify:
+- Their strategy
+- Their intent
+- Important dynamics of the task
+• Related to ‘procedures’
+40
+
+=== PAGE 41 ===
+Sequence Model
+• Useful for laying out sequence of:
+o Actions 
+o Processes
+• Similar to 
+o Process charts 
+o Work cards   
+• But is descriptive, not normative!
+41
+
+=== PAGE 42 ===
+Components of Sequence Model
+• Intent
+• Trigger
+• Steps
+• Order
+• Breakdowns
+42
+
+=== PAGE 43 ===
+Sequence Model: Database
+Print completed form
+Leave hardcopy of form 
+with customer
+Trigger: Assigned 
+to do equipment 
+audit
+Send electronic form to 
+supervisor
+Store electronic form on 
+form database
+Retrieve required form 
+from database
+Type data into form on 
+computer
+Record data on
+paper form
+Collect data at site
+Print form
+43
+
+=== PAGE 44 ===
+Cultural Model
+• “Work takes place in a culture, which defines expectations, desires, policies, 
+values, and the whole approach people take to work”
+• Revealed in the language used to describe work, the tone of the place, the 
+policies, and the influence of the overall organization
+• Influencers are the individuals, formal groups or abstract principles that 
+influence the work of specific people
+44
+
+=== PAGE 45 ===
+Importance of Cultural Model
+• Your end-product might work well in theory, but in practice wouldn’t be used 
+because of
+o Differing expectations 
+o Specific desires
+o Policies
+o Values 
+o Changes in approach at organizational level
+45
+
+=== PAGE 46 ===
+Components of Cultural Model
+• Influencer
+• Extent
+• Influence
+• Breakdown
+46
+
+=== PAGE 47 ===
+Customers
+Legal/GovtCompetitors
+Field 
+Engineer
+Supervisor
+Company
+Administration
+Company
+You need to be 
+accurate and 
+truthful.
+We have 
+perfect 
+records.
+No errors 
+allowed!
+I’m doing 
+my best!
+Hurry up!
+We are going to steal 
+your business.
+No, we have the 
+best service.
+Are you done yet?
+I’m working 
+overtime!
+We need an 
+audit now!
+Almost done.
+We will be there 
+tomorrow.
+Cultural Model: Developer
+47
+
+=== PAGE 48 ===
+Artifact Model
+• What people create, use, modify things during work
+o Tool or end-object
+o ‘Official’ or ‘Informal’
+• Way of working can be built right into artifact
+o Reveals strategies, required structures, information
+• “An artifact model is a drawing or photocopy of the artifact, complete with 
+any handwritten notes”
+• Documents physical artifacts used in work
+• During the CI, interviewers should inquire into the structure, content, 
+presentation and usage of the artifact, as well as any breakdowns in its current 
+use
+48
+
+=== PAGE 49 ===
+Components of Artifact Model
+• Information
+• Parts of the object
+• Structure of the parts
+• Annotations
+• Presentation of the object
+• Usage of the artifacts
+• Breakdowns
+49
+
+=== PAGE 50 ===
+Artifact Model: Personal Calendar
+50
+
+=== PAGE 51 ===
+Artifact Model: Ticket tracker
+51
+
+=== PAGE 52 ===
+Physical Model
+• Documents the physical environment where work happens
+• Includes the organization of space, the grouping of people, and their 
+movement in the space
+• Focuses on aspects relevant to the work / focus, and not on complete fidelity
+52
+
+=== PAGE 53 ===
+Components of Physical Model
+• Places where work occurs
+• Physical structures that limit and define space
+• Usage and movement
+• Infrastructure and communication lines
+• Artifacts
+• Layout
+• Breakdowns
+Note: Physical model is a caricature of workplace, not a floor plan!
+53
+
+=== PAGE 54 ===
+Physical Model: Office
+54
+
+=== PAGE 55 ===
+Physical Model: Cafeteria
+55
+
+=== PAGE 56 ===
+56
+
+=== PAGE 57 ===
+Survey Report
+57
+
+=== PAGE 58 ===
+1. Analysis of Quantitative (Survey) Data
+Do you want to report… 
+• how many people answered a, b, c, d?
+• the average number or score?
+• a change in score between two points in time?
+• how people compared?
+• how many people reached a certain level?
+58
+
+=== PAGE 59 ===
+Common descriptive statistics
+• Count (freq)
+• Percentage
+• Mean
+• Mode
+• Median
+• Range
+• Standard dev
+• Variance
+• Ranking
+a. How many people answered a, b, c, d?
+b. The average # or score?
+c. A change in score between two points in time?
+d. How people compared?
+e. How many people reached a certain level?
+59
+
+=== PAGE 60 ===
+Dig bigger!
+• Did different groups show different results?
+• Were there findings that surprised you?
+• Are there things you don’t understand very well – further study 
+needed?
+2. Interpret & Visualize data
+60
+
+=== PAGE 61 ===
+Visual representations (Graphs)
+61
+
+=== PAGE 62 ===
+Report: Interview & Survey
+Reflect
+• What did we learn?
+• What conclusions can we draw?
+• What are our recommendations?
+• What are the limitations of our analysis?
+Report
+• Be explicit about your limitations
+• Know the claims you cannot make
+• Do not claim causation without a true experimental design
+• Do not generalize to the population without random sample and quality 
+administration (e.g., <60% response rate on a survey) 
+62
+
+=== PAGE 63 ===
+63
+
+=== PAGE 64 ===
+Group project
+64
+
+=== PAGE 65 ===
+P4. Data Analysis
+In this assignment, you will analyze the collected data. 
+1. Survey data analysis
+1) Report important findings using relevant visualization formats 
+2) Report demographic data using descriptive statistics  
+3) Write a paragraph to describe what you learned: themes, categories, things that 
+are unexpected or surprised you
+2. Interview data analysis: Crate an affinity diagram (30+ sticky notes) --> Turn into a 
+digital version. 
+1) Record your diagramming process (photos): Report the final output (synthesis) as 
+well as the process (raw data)
+2) Report a digital version of a final affinity diagram
+3) Write a paragraph describing what you learned: themes, categories, things that 
+are unexpected or surprised you
+Due by midnight 10/22 (Saturday)
+#Disclaimer. Further instruction of this submission can be given verbally during class or through Piazza. 65
+
+=== PAGE 66 ===
+P4. Data Analysis
+Submission format:
+• A PDF file, 12 point scale in Times New Roman, 1.5 line spacing
+• Add a team name, a description of your project, a link to your project website on top (Your 
+website should be accessible with full contents)
+• Body should include:
+1. Survey analysis
+2. Affinity diagram with a process
+• At the end: Indicate who contributed to the original writing of each section and who helped 
+improve and/or review at the end
+#Disclaimer. Further instruction of this submission can be given verbally during class or through Piazza. 66
+
+=== PAGE 67 ===
+P4. Data Analysis
+Rubric
+• Survey (2pt)
+o If the survey analysis is presented using a proper visualization format with proper 
+statistical measures, both demographic info and other findings (1pt)
+o If the description clearly explains what you learned (1pt)
+• Affinity diagram (5pt)
+o If the final diagram contains significant themes (2pt)
+o If the final diagram has a structure/relation of top and sub themes (1pt)
+o If the submission includes the photos to show the extract-synthesis process and a final 
+digital version (1pt)
+o If the description clearly explains what you learned (1pt)
+#Disclaimer. Further instruction of this submission can be given verbally during class or through Piazza. 67
+
+=== PAGE 68 ===
+P4. Data Analysis
+Rubric
+• You will lose 10% if your website doesn’t work
+• You will lose 50% if your submission does not follow the format
+• You will lose 30% if it’s a late submission (Not accepting a late submission submission after 
+24 hours from the due)
+#Disclaimer. Further instruction of this submission can be given verbally during class or through Piazza. 68

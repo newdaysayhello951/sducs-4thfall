@@ -1,0 +1,19 @@
+[
+  {
+    "name": "flixter_rating_file",
+    "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)>"
+  },
+  {
+    "name": "flixter_trust_file",
+    "error": "HTTP Error 502: Bad Gateway"
+  },
+  {
+    "name": "zenodo_flixster",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "name": "dataverse_flixster",
+    "bytes": 125,
+    "records": []
+  }
+]

@@ -1,0 +1,12 @@
+Command: D:\anaconda\python.exe -m pytest -q tests
+Observed result: 18 passed in 10.64s
+
+Coverage: central-difference checks for all trainable models; exact printed
+TrustSVD objective; direct-neighbor forward calculation; held-out-label
+isolation; explicit-trust gradients for unrated users; empty-view metrics;
+average-model fallback; duplicate-pair fold isolation; duplicate-value PCC;
+independent gradient-descent objective decrease.
+
+Additional performance verification: re-running FilmTrust / TrustSVD / d=5 /
+fold=0 after enabling nogil kernels yielded bitwise-identical test predictions.
+No numeric tolerance was needed for that comparison.

@@ -1,0 +1,34 @@
+{
+  "by_size": {
+    "500": {
+      "ClusterSum": 0.223,
+      "LexRank": 0.125,
+      "DSDR": 1.762,
+      "Sumblr": 0.274
+    },
+    "1000": {
+      "ClusterSum": 0.366,
+      "LexRank": 0.289,
+      "DSDR": 5.214,
+      "Sumblr": 0.672
+    },
+    "2000": {
+      "ClusterSum": 0.461,
+      "LexRank": 0.73,
+      "DSDR": 15.818,
+      "Sumblr": 1.562
+    },
+    "4000": {
+      "ClusterSum": 0.741,
+      "LexRank": 2.205,
+      "DSDR": 56.406,
+      "Sumblr": 3.229
+    },
+    "8000": {
+      "ClusterSum": 1.247,
+      "LexRank": 6.754,
+      "DSDR": 187.767,
+      "Sumblr": 7.537
+    }
+  }
+}

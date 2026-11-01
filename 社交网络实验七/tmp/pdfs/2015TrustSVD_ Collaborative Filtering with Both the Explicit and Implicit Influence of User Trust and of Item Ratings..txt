@@ -1,0 +1,535 @@
+                                         Proceedings of the Twenty-Ninth AAAI Conference on Artificial Intelligence
+
+
+
+
+                    TrustSVD: Collaborative Filtering with Both the Explicit and
+                        Implicit Influence of User Trust and of Item Ratings
+
+                                             Guibing Guo, Jie Zhang, Neil Yorke-Smith∗
+                             School of Computer Engineering, Nanyang Technological University, Singapore
+                              ∗
+                                American University of Beirut, Lebanon; and University of Cambridge, UK
+                                          {gguo1,zhangj}@ntu.edu.sg, ∗ nysmith@aub.edu.lb
+
+
+                                Abstract                                              also very sparse, yet complementary to rating information.
+                                                                                      Hence, focusing too much on either one kind of information
+   Collaborative filtering suffers from the problems of data spar-                    may achieve only marginal gains in predictive accuracy. Sec-
+   sity and cold start, which dramatically degrade recommenda-
+   tion performance. To help resolve these issues, we propose
+                                                                                      ond, users are strongly correlated with their trust neighbors
+   TrustSVD, a trust-based matrix factorization technique. By                         whereas they have a weakly positive correlation with their
+   analyzing the social trust data from four real-world data sets,                    trust-alike neighbors (e.g., friends). Given that very few trust
+   we conclude that not only the explicit but also the implicit                       networks exist, it is better to have a more general trust-based
+   influence of both ratings and trust should be taken into con-                      model that can well operate on both trust and trust-alike re-
+   sideration in a recommendation model. Hence, we build on                           lationships. These observations motivate us to consider both
+   top of a state-of-the-art recommendation algorithm SVD++                           explicit and implicit influence of ratings and of trust in a
+   which inherently involves the explicit and implicit influence                      trust-based model. The influence can be explicit (real values
+   of rated items, by further incorporating both the explicit and                     of ratings and trust) or implicit (who rates what (for ratings)
+   implicit influence of trusted users on the prediction of items                     and who trusts whom (for trust)). The implicit influence of
+   for an active user. To our knowledge, the work reported is
+   the first to extend SVD++ with social trust information. Ex-
+                                                                                      ratings has been demonstrated useful in providing accurate
+   perimental results on the four data sets demonstrate that our                      recommendations (Koren 2008). We will later show that im-
+   approach TrustSVD achieves better accuracy than other ten                          plicit trust can also provide added value over explicit trust.
+   counterparts, and can better handle the concerned issues.                             Thus we propose a novel trust-based recommendation
+                                                                                      model TrustSVD. Our approach builds on top of a state-of-
+                                                                                      the-art model SVD++ (Koren 2008) where both the explicit
+                            Introduction                                              and implicit influence of user-item ratings are involved to
+Incorporating trust into recommender systems has demon-                               generate predictions. To the authors’ knowledge, our work
+strated potential to improve recommendation performance                               is the first to extend SVD++ with social trust information.
+(Yang et al. 2013; Fang, Bao, and Zhang 2014), and to help                            Specifically, on one hand the implicit influence of trust (who
+mitigate some well-known issues, such as data sparsity and                            trusts whom) can be naturally added to the SVD++ model by
+cold start (Guo, Zhang, and Thalmann 2012). Such trust-                               extending the user modeling. On the other hand, the explicit
+aware approaches are developed based on the phenomenon                                influence of trust (trust values) is used to constrain that user-
+that friends often influence each other by recommending                               specific vectors should conform to their social trust relation-
+items. However, even the best performance reported by the                             ships. This ensures that user-specific vectors can be learned
+latest work (Fang, Bao, and Zhang 2014) can be inferior to                            from their trust information even if a few or no ratings are
+that of other state-of-the-art models which are merely based                          given. In this way, the data sparsity and cold start issues
+on user-item ratings. For instance, a well-performing trust-                          can be better alleviated. Our novel model thus incorporates
+based model (Yang et al. 2013) obtains 1.0585 on data set                             both explicit and implicit influence of item ratings as well
+Epinions.com in terms of Root Mean Square Error (RMSE),                               as user trust. In addition, a weighted-λ-regularization tech-
+whereas the performance of a user-item baseline (see Koren                            nique is used to further avoid over-fitting for model learn-
+(2008), Sect. 2.1) can achieve 1.0472 in terms of RMSE.1                              ing. Experimental results on the four real-world data sets
+   To investigate this phenomenon, we conduct an empirical                            demonstrate that our approach achieves significantly better
+trust analysis based on four real-word data sets (FilmTrust,                          accuracy than other trust-based counterparts as well as other
+Epinions, Flixster and Ciao) through which two impor-                                 ratings-only well-performing models (ten approaches in to-
+tant observations are concluded. First, trust information is                          tal), and is more capable of coping with cold start situations.
+Copyright c 2015, Association for the Advancement of Artificial                                             Related Work
+Intelligence (www.aaai.org). All rights reserved.
+    1
+     Smaller RMSE values indicate better predictive accuracy. Result reported         Trust-aware recommender systems have been widely stud-
+by the recommendation toolkit MyMediaLite (mymedialite.net/examples/                  ied, given that social trust provides an alternative view of
+datasets.html).                                                                       user preferences other than item ratings (Guo, Zhang, and
+
+
+
+                                                                                123
+Yorke-Smith 2014). Specifically, Ma et al. (2008) propose                             Table 1: Statistics of the four data sets
+a social regularization method (SoRec) by considering the                  Feature      Epinions FilmTrust Flixster              Ciao
+constraint of social relationships. The idea is to share a com-            users         40,163         1,508        53,213     7,375
+mon user-feature matrix factorized by ratings and by trust.                items        139,738         2,071        18,197     99,746
+Ma, King, and Lyu (2009) then propose a social trust en-                   ratings      664,824        35,497       409,803 280,391
+semble method (RSTE) to linearly combine a basic matrix                    density       0.051%         1.14%        0.04%      0.03%
+factorization model and a trust-based neighborhood model                   trusters      33,960          609         47,029     6,792
+together. Ma et al. (2011) further propose that the active                 trustees      49,288          732         47,029     7,297
+user’s user-specific vector should be close to the average of              trusts       487,183         1,853       655,054 111,781
+her trusted neighbors, and use it as a regularization to form              density       0.029%         0.42%        0.03%      0.23%
+a new matrix factorization model (SoReg). Jamali and Ester
+(2010) build a new model (SocialMF) on top of SoRec by
+reformulating the contributions of trusted users to the for-
+mation of the active user’s user-specific vector rather than to
+the predictions of items. Yang et al. (2013) propose a hybrid
+method (TrustMF) that combines both a truster model and a
+trustee model from the perspectives of trusters and trustees,
+that is, both the users who trust the active user and those                            (a)                             (b)
+who are trusted by the user will influence the user’s ratings            Figure 1: (a) The distribution of ratio of users who have is-
+on unknown items. Tang et al. (2013) consider both global                sued trust statements w.r.t. the number of ratings that they
+and local trust as the contextual information in their model,            each have given. (b) The correlations between a user’s rat-
+where the global trust is computed by a separate algorithm.              ings and those of her trusted neighbors in all the data sets.
+Yao et al. (2014) take into consideration both the explicit and
+implicit interactions among trusters and trustees in a rec-              In this regard, a trust-aware recommender system that fo-
+ommendation model. Fang, Bao, and Zhang (2014) stress                    cuses too much on trust (rather than rating) utility is likely
+the importance of multiple aspects of social trust. They de-             to achieve only marginal gains in recommendation perfor-
+compose trust into four general factors and then integrate               mance. In fact, the existing trust-based models consider only
+them into a matrix factorization model. All these works have             the explicit influence of ratings. That is, the utility of ratings
+shown that a matrix factorization model regularized by trust             is not well exploited. In addition, the sparsity of explicit trust
+outperforms the one without trust. That is, trust is helpful             also implies the importance of involving implicit trust in col-
+in improving predictive accuracy. However, it is also noted              laborative filtering. On the other hand, trust information is
+that even the latest work (Fang, Bao, and Zhang 2014) can                complementary to the rating information. Figure 1a shows
+be inferior to other well-performing ratings-only models. To             that: (1) A portion of users have not rated any items but are
+explain this phenomenon, we next conduct a trust analysis                socially connected with other users. (2) For the cold-start
+to investigate the value of trust in recommender systems.                users who have rated few items (less than 5 in our case), trust
+                                                                         information can provide a complementary part of source of
+                      Trust Analysis                                     information with ratio greater than 10% on average. (3) The
+Four data sets are used in our analysis and also our later               warm-start users who have rated a lot of items (e.g., > 20)
+experiments: Epinions (trustlet.org/wiki/Epinions datasets),             are not necessary to specify many other users as trustwor-
+FilmTrust       (www.librec.net/datasets.html),         Flixster         thy (12% on the average). Although having differing distri-
+(www.cs.sfu.ca/∼sja25/personal/datasets/)          and     Ciao          butions across the data sets, trust can be a complementary
+(www.public.asu.edu/∼jtang20/datasetcode/truststudy.htm).                information source to item ratings for recommendations.
+All the four data sets contain both item ratings and social                 This observation motivates us to consider both the explicit
+relationships specified by active users. The ratings in                  and implicit influence of ratings and trust, making better and
+Epinions and Ciao are integers from 1 to 5, while those                  more use of ratings and trust to resolve the concerned issues.
+in the other data sets are real values, i.e., [0.5, 4.0] for             Observation 2 A user’s ratings have a weakly positive cor-
+FilmTrust, [0.5, 5.0] for Flixster both with step 0.5. Note              relation with the average of her social neighbors under the
+that trust is asymmetric in Epinions, FilmTrust and Ciao                 concept of trust-alike relationships, and a strongly positive
+whereas it is symmetric in Flixster. A subset of the Flixster            correlation under the concept of trust relationships.
+data set is used in this paper to avoid memory-consuming
+issues. The data set statistics are illustrated in Table 1. Two             Next, we consider the influence of trust in rating pre-
+important observations are concluded from these data sets.               diction, i.e., the influence of trusted neighbors on the ac-
+                                                                         tive user’s rating for a specific item, a.k.a. social influence.
+Observation 1 Trust information is very sparse, yet is com-              Specifically, we calculate the Pearson correlation coefficient
+plementary to rating information.                                        (PCC) between a user’s ratings and the average of her social
+On one hand, as shown in Table 1, the density of trust is                neighbors. The results are presented in Figure 1b, indicat-
+much smaller than that of ratings in Epinions, FilmTrust and             ing that: (1) A weakly positive correlation is observed be-
+Flixster whereas trust is only denser than ratings in Ciao.              tween a user’s ratings and the average of the social neighbors
+Both ratings and trust are very sparse across all the data sets.         in FilmTrust (mean 0.183) and Flixster (0.063). The distri-
+
+
+
+                                                                   124
+butions of the two data sets are similar. Flixster adopts the            T = [tu,v ]m×m to describe the structure of edges E, where
+symmetric friendship relationships whereas trust is directed.            tu,v indicates the extent to which users u trusts v. We de-
+Although FilmTrust adopts the concept of trust (with values              note pu and wv as the d-dimensional latent feature vector
+from 1 to 10), the publicly available data set contains only             of truster u and trustee v, respectively. We limit the trusters
+binary values (such degrading may cause much noise). We                  in the trust matrix and the active users in the rating matrix
+regard these relationships as trust alike, i.e., the social re-          to share the same user-feature space in order to bridge them
+lationships that are similar with, but weaker (or more noisy)            together. Hence, we have truster-feature matrix P d×m and
+than social trust. (2) Under the concept of trust relationships,         trustee-feature matrix W d×m . By employing the low-rank
+on the contrary, a user’s ratings are strongly and positively            matrix approximation, we can recover the trust matrix by
+correlated with the average of trusted neighbors. Specifi-               T ≈ P > W . Thus, a trust relationship can be predicted by
+                                                                         the inner product of a truster-specific vector and a trustee-
+cally, a large portion (17.63% in Epinions, 13.14% in Ciao)
+of user correlations are in the range of [0.9, 1.0], and (resp.          specific vector t̂u,v = wv> pu . The matrices P and W can be
+                                                                         learned by minimizing the following loss function:
+54.70%, 39.14%) of user correlations are greater than 0.5.
+The average correlation is 0.446 in Epinions, and 0.322 in                      1 XX >              2 λ  X           X        
+                                                                         Lt =           wv pu − tu,v +       kpu k2F +   kwv k2F ,
+Ciao. Since PCC values are in the range of [−1, 1], values                      2 u v∈T                2 u             v
+                                                                                       u
+of 0.446 and 0.322 indicate decent correlations. In the so-
+cial networks with relatively weak trust-alike relationships             where Tu is the set of users trusted by user u.
+(e.g., friendship), implicit influence (i.e., binary relation-
+ships) may be more indicative than explicit (but noisy) val-             The TrustSVD Model
+ues for recommendations. Hence, a trust-based model that                 In line with the two observations of the previous section, our
+ignores the implicit influence of ratings and trust may lead             TrustSVD model is built on top of a state-of-the-art model
+to deteriorated performance if being applied to such cases.              known as SVD++ proposed by Koren (2008). The rationale
+   The second observation suggests that incorporating both               behind SVD++ is to take into consideration user/item biases
+the explicit and implicit influence of ratings and trust may             and the influence of rated items other than user/item-specific
+promote the generality of a trust-based model to both trust              vectors on rating prediction. Formally, the rating for user u
+and trust-alike social relationships. Our approach presented             on item j is predicted by:
+next is constructed based on these two observations.                                                                  1
+                                                                                                                        X 
+                                                                                r̂u,j = bu + bj + µ + qj> pu + |Iu |− 2      yi ,
+          TrustSVD: A Trust-based Model                                                                                 i∈Iu
+
+Problem Definition                                                       where bu , bj represent the user and item biases, respectively;
+The recommendation problem in this paper is to predict the               µ is the global average rating; and yi denotes the implicit in-
+rating that a user will give to an unknown item, based on                fluence of items rated by user u in the past on the ratings of
+both a user-item rating matrix and a user-user trust matrix.             unknown items in the future. Thus, user u’s feature vector
+Suppose that a recommender system includes m users and                   can be also represented by the set of items
+n items. Let R = [ru,i ]m×n denote the user-item rating ma-                                               1 P         she rated, and
+                                                                         finally modeled as pu + |Iu |− 2 i∈Iu yi rather than sim-
+trix, where each entry ru,i represents the rating given by user
+u on item i. For clarity, we preserve symbols u, v for users,            ply as pu . Koren (2008) has shown that integrating implicit
+and i, j for items. Let Iu denote the set of items rated by              influence of ratings can well improve predictive accuracy.
+user u. Let pu and qi be a d-dimensional latent feature vec-                Previously, we have stressed the importance of trust influ-
+tor of user u and item i, respectively. The essence of matrix            ence for better recommendations, and its potential to be gen-
+factorization is to find two low-rank matrices: user-feature             eralized to trust-alike relationships. Hence, we can enhance
+matrix P ∈ Rd×m and item-feature matrix Q ∈ Rd×n that                    the trust-unaware SVD++ model by incorporating trust in-
+can adequately recover the rating matrix R, i.e., R ≈ P > Q,             fluence. Specifically, the implicit effect of trusted users on
+where P > is the transpose of matrix P . Hence, the rating               item ratings can be considered in the same manner as rated
+on item j for user u can be predicted by the inner product               items, given by:
+of user-specific vector pu and item-specific vector qj , i.e.,
+r̂u,j = qj> pu . In this regard, the main task of recommen-                 r̂u,j = bu +bj + µ                           
+                                                                                                    1 P             1
+                                                                                   +qj> pu + |Iu |− 2   yi + |Tu |− 2
+                                                                                                                      P
+dations is to predict the rating r̂u,j as close as possible to                                                          wv ,
+the ground truth ru,j . Formally, we can learn the user- and                                            i∈Iu               v∈Tu
+item-feature matrices by minimizing the following loss (ob-              where wv is the user-specific latent feature vector of users
+jective) function:                                                       (trustees) trusted by user u, and thus qj> wv can be explained
+       1XX >               2 λ X           X        
+                                                                         by the ratings predicted by the trusted users, i.e., the influ-
+Lr =           qj pu − ru,j +      kpu k2F +   kqj k2F ,
+       2 u j∈I                2 u            j
+                                                                         ence of trustees on the rating prediction. In other words, the
+                                                                         inner product qj> wv indicates how trusted users influence
+               u
+
+ where k · kF denotes the Frobenius norm, and λ is a param-              user u’s rating on item j. Similar to ratings, a user’s fea-
+eter to control model complexity and to avoid over-fitting.              ture vector can be interpreted by the set of users whom she
+   On the other hand, suppose that a social network is rep-                                   1 P
+                                                                         trusts, i.e., |Tu |− 2 v∈Tu wv . Therefore, a user u is further
+resented by a graph G = (V, E), where V includes a set                                              1 P                   1 P
+                                                                         modeled by pu + |Iu |− 2 i∈Iu yi + |Tu |− 2 v∈Tu wv
+                                                                                                                                       
+of m nodes (users) and E represents the directed trust re-
+lationships among users. We can use the adjacency matrix                 in the social rating networks, considering the influence of
+
+
+
+                                                                   125
+both rated items and trusted users. The objective function to                      scents on bu , bj , pu , qj , yi and wv for all the users and items.
+minimize is then given as follows:                                                                                        1
+                                                                                           ∂L
+                                                                                                          eu,j + λ|Iu |− 2 bu
+                                                                                                     P
+                              2    P                                                     ∂bu =
+  L = 12          r̂u,j − ru,j + λ2     b2u + b2j
+         P P                                 P
+                                                                                                   j∈Iu
+                                                                                                                            1
+                                                                                            ∂L
+                                                                                                           eu,j + λ|Uj |− 2 bj
+                                                                                                     P
+          u j∈Iu                      u        j                                          ∂bj =
+                                                                                                   u∈Uj
+       + kpu k2F + kqj k2F + kyi k2F + kwv k2F .
+         P              P          P            P
+                                                                                           ∂L
+                                                                                                     P                   P
+           u               j                 i            v                                ∂pu =          eu,j qj + λt        eu,v wv
+                                                                                                   j∈Iu                 v∈Tu
+                                                                                                                    1             1
+To reduce the model complexity, we use the same regular-                                                               −2            −
+ization parameter λ for all the variables. Finer control and
+                                                                                                          + λ|I   u | + λt |T  1
+                                                                                                                                  u | 2 )pu
+                                                                                             ∂L
+                                                                                                      P
+                                                                                                          eu,j pu + |Iu |− 2
+                                                                                                                                   P               (2)
+tuning can be achieved by assigning separate regularization                                  ∂qj =                                     yi
+                                                                                                     u∈Uj                         i∈Iu
+parameters to different variables, but it may result in great                                                         1
+                                                                                                                                           1
+                                                                                                          +|Tu |− 2           wv + λ|Uj |− 2 qj
+                                                                                                                          P
+complexity when comparing with different models.
+                                                                                                                        v∈Tu
+   In addition, as explained earlier, we constrain that the                                                          − 12              1
+                                                                                             ∂L
+                                                                                                                          qj + λ|Ui |− 2 yi
+                                                                                                      P
+user-specific vectors decomposed from the rating matrix and                        ∀i ∈ Iu , ∂y i
+                                                                                                   =      e u,j |Iu |
+                                                                                                     j∈Iu
+those decomposed from the trust matrix share the same fea-                                                           1                        1
+                                                                                             ∂L
+                                                                                                       eu,j|Tu |− 2qj +λt eu,v pu+λ|Tv+ |− 2 wv
+                                                                                                     P
+                                                                                   ∀v ∈ Tu , ∂w    =
+ture space in order to bridge both matrices together. In this                                    v
+                                                                                                  j∈Iu
+way, these two types of information can be exploited in a
+unified recommendation model. Specifically, we can regu-                           where eu,j = r̂u,j − ru,j indicates the rating prediction error
+larize the user-specific vectors pu by recovering the social                       for user u on item j, and eu,v = t̂u,v − tu,v is the trust
+relationships with other users. The new objective function                         prediction error for user u towards user v.
+(without the other regularization terms) is given by:                                 In the cold-start situations where users may have only
+      1XX                    2 λt X X                     2                      rated a few items, the decomposition of trust matrix can
+ L=              r̂u,j − ru,j +                t̂u,v − tu,v ,                      help to learn more reliable user-specific latent feature vec-
+      2 u                         2 u                                              tors than ratings-only matrix factorization. In the extreme
+               j∈Iu                              v∈Tu
+                                                                                   case where there are no ratings at all for some users, Equa-
+where t̂u,v = wv> pu is the predicted trust between users u                        tion 2 ensures that the user-specific vector can be trained
+and v, and λt controls the degree of trust regularization.                         and learned from the trust matrix. In this regard, incorpo-
+   Further, as suggested by Yang et al. (2013), a technique                        rating trust in a matrix factorization model can alleviate the
+called weighted-λ-regularization can be used to help avoid                         cold start problem. By considering both explicit and implicit
+over-fitting when learning parameters. In particular, they                         influence of trust rather than either one alone, our model can
+consider more penalties for the users who rated more items                         better utilize trust to further mitigate the concerned issues.
+and for the items which received more ratings. However,
+we argue that such consideration may force the model to                            Complexity Analysis
+be more biased towards popular users and items. Instead, in
+this paper we adopt a distinct strategy that the popular users                     The computational time of learning the TrustSVD model
+and items should be less penalized (due to smaller chance                          is mainly taken by evaluating the objective function L and
+to be over-fitted), and cold-start users and niche items (those                    its gradients against feature vectors (variables). The time to
+receiving few ratings) should be more regularized (due to                          compute the objective function L is O(d|R| + d|T |), where
+greater chance to be over-fitted). Therefore, the new loss                         d is the dimensionality of the feature space, and |R|, |T | re-
+function to minimize is obtained as follows:                                       fer to the number of observed entries. Due to the sparsity of
+                                 2                                 2             rating and trust matrices, the values will be much smaller
+ L = 12           r̂u,j − ru,j + λ2t
+         PP                                P P
+                                                       t̂u,v − tu,v                than the matrix cardinality. The computational complexi-
+          u j∈Iu                            u v∈Tu                                                      ∂L   ∂L     ∂L     ∂L    ∂L     ∂L
+                       1                      1
+                                                                                   ties for gradients ∂b u
+                                                                                                           , ∂b j
+                                                                                                                  , ∂p u
+                                                                                                                         , ∂qj
+                                                                                                                               , ∂y i
+                                                                                                                                      , ∂w v
+                                                                                                                                             in Equa-
+      + λ2     |Iu |− 2 b2u + λ2       |Uj |− 2 b2j
+            P                     P
+                                                                                   tion 2 are O(d|R|), O(d|R|), O(d|R| + d|T |), O(d|R| +
+          Pu λ         − 21   λt
+                                   j
+                                       −1                                          d|T |), O(d|R|k) and O(d|R|p + d|T |p), where k, p are the
+      +         |I   |      +    |T u | 2 )kpu kF
+                                                    2                  (1)
+               2 u            2                                                    average number of ratings and trust statements received by
+           uP
+      + λ2
+                        1
+               |Uj |− 2 kqj k2F + λ2
+                                        P            1
+                                            |Ui |− 2 kyi k2F                       an item and a user, respectively. Hence, the overall computa-
+               j                         i                                         tional complexity in one iteration is O(d|R|c+d|T |c), where
+                      1
+      + λ2 |Tv+ |− 2 kwv k2F ,                                                     c = max(p, k). Due to c  |R| or |T |, the overall computa-
+                                                                                   tional time is linear with respect to the number of observa-
+where Uj , Ui are the set of users who rate items j and i, re-                     tions in the rating and trust matrices. To sum up, our model
+spectively; and Tv+ is the set of users who trust user v. Since                    has potential to scale up to large-scale data sets.
+the active user has rated a number of items and specified
+other users as trustworthy, the penalization on user-specific                                      Experiments and Results
+vector pu takes into account both cases.
+                                                                                   Data Sets. The four data sets presented in Table 1 are used.
+Model Learning                                                                     Cross-validation. We use 5-fold cross-validation for learn-
+To obtain a local minimization of the objective function                           ing and testing. Specifically, we randomly split each data set
+given by Equation 1, we perform the following gradient de-                         into five folds and in each iteration four folds are used as the
+
+
+
+                                                                             126
+Table 2: Performance comparison in two testing views, where * indicates the best performance among all the other methods,
+and column ‘Improve’ indicates the relative improvements that our approach TrustSVD achieves relative to the * results.
+   All       Metrics UserAvg ItemAvg PMF RSTE SoRec SoReg SocialMF TrustMF SVD++ TrustSVD Improve
+   FilmTrust MAE      0.636    0.725 0.714 0.628 0.628 0.674  0.638 0.631  0.613*  0.609   0.65%
+   d=5       RMSE     0.823    0.927 0.949 0.810 0.810 0.878  0.837 0.810  0.804*  0.789   1.87%
+             MAE      0.636    0.725 0.735 0.640 0.638 0.668  0.642 0.631  0.611*  0.607   0.65%
+   d = 10    RMSE     0.823    0.927 0.968 0.835 0.831 0.875  0.844 0.819  0.802*  0.787   1.87%
+   Epinions MAE       0.930    0.928 0.979 0.950 0.882 0.994  0.825 0.818  0.818*  0.804   1.71%
+   d=5       RMSE     1.203    1.094 1.290 1.196 1.114 1.315  1.070 1.069  1.057*  1.043   1.32%
+             MAE      0.930    0.928 0.909 0.958 0.884 0.932  0.826 0.819  0.818*  0.805   1.59%
+   d = 10    RMSE     1.203    1.094 1.197 1.278 1.142 1.232  1.082 1.095  1.057*  1.044   1.23%
+   Flixster  MAE      0.729*   0.858 0.814 0.751 0.750 0.820  0.770 0.890   0.794  0.726   0.41%
+   d=5       RMSE     0.979*   1.088 1.076 0.975 0.974 1.087  0.994 1.146   1.062  0.948   3.17%
+             MAE      0.729*   0.858 0.769 0.784 0.785 0.785  0.784 1.116   0.821  0.727   0.27%
+   d = 10    RMSE     0.979*   1.088 1.009 1.015 1.018 1.034  1.009 1.441   1.091  0.950   2.97%
+   Ciao      MAE      0.781    0.760 0.920 0.767 0.765 0.899  0.749 0.742*  0.752  0.723   2.56%
+   d=5       RMSE     1.031    1.026 1.206 1.020 1.013 1.183 0.981* 0.983   1.013  0.955   2.65%
+             MAE      0.781    0.760 0.822 0.763 0.761 0.815 0.749* 0.753   0.748  0.723   3.47%
+   d = 10    RMSE     1.031    1.026 1.078 1.013 1.010 1.076 0.976* 1.014   1.001  0.956   2.05%
+
+   Cold Start Metrics UserAvg ItemAvg PMF RSTE SoRec SoReg SocialMF TrustMF SVD++ TrustSVD Improve
+   FilmTrust MAE        0.709   0.722 0.814 0.680 0.670* 0.881  0.697 0.674   0.677 0.661    1.34%
+   d=5        RMSE      0.979   0.911 1.079 0.884 0.857* 1.104  0.916 0.867   0.897 0.853    0.47%
+              MAE       0.709   0.722 0.767 0.674 0.668* 0.771  0.680 0.687   0.680 0.663    0.75%
+   d = 10     RMSE      0.979   0.911 1.009 0.900 0.897* 1.034  0.907 0.900   0.905 0.853    4.91%
+   Epinions MAE         1.047  0.852* 1.451 1.051 0.892 1.398   0.884 0.891   0.889 0.868   -1.88%
+   d=5        RMSE      1.430   1.127 1.770 1.266 1.138 1.735   1.133 1.125*  1.162 1.105    1.78%
+              MAE       1.047   0.852 1.153 0.981 0.846* 1.139  0.857 0.853   0.891 0.868   -2.60%
+   d = 10     RMSE      1.430  1.127* 1.432 1.313 1.180 1.437   1.152 1.176   1.166 1.108    1.69%
+   Flixster   MAE       0.869   0.906 1.097 0.872 0.872 1.058   0.881 0.901  0.868* 0.855    1.50%
+   d=5        RMSE      1.155   1.114 1.390 1.097 1.096* 1.358  1.103 1.138   1.122 1.066    2.74%
+              MAE      0.869*   0.906 0.949 0.889 0.892 0.951   0.884 0.976  0.869* 0.858    1.27%
+   d = 10     RMSE      1.155   1.114 1.206 1.137 1.144 1.218  1.112* 1.328  1.112* 1.070    3.78%
+   Ciao       MAE       0.829  0.735* 1.033 0.957 0.789 1.173   0.774 0.752   0.759 0.729    0.82%
+   d=5        RMSE      1.138   1.005 1.334 1.113 0.998 1.430   1.001 0.954*  1.039 0.953    0.10%
+              MAE       0.829   0.735 0.926 0.803 0.730* 0.949  0.741 0.770   0.749 0.721    1.23%
+   d = 10     RMSE      1.138   1.005 1.191 1.014 1.031 1.214  0.978* 1.096   1.020 0.962    1.64%
+
+training set and the remaining fold as the test set. Five iter-                 and ItemAvg make predictions by the average of ratings
+ations will be conducted to ensure that all folds are tested.                   that are given by the active user and received by the target
+The average test performance is given as the final result.                      item, respectively; (2) Trust-based models: SoRec (Ma et al.
+Evaluation Metrics. We adopt two well-known metrics to                          2008), RSTE (Ma, King, and Lyu 2009), SoReg (Ma et al.
+evaluate predictive accuracy, namely mean absolute error                        2011), SocialMF (Jamali and Ester 2010), TrustMF (Yang
+(MAE) and root mean square error (RMSE), defined by:                            et al. 2013) and Fang’s (Fang, Bao, and Zhang 2014); (3)
+         P                               sP                                     Ratings-only state-of-the-art models: PMF (Salakhutdinov
+                |r̂    −      |                                2                and Mnih 2008) and SVD++ (Koren 2008).
+            u,j    u,j   ru,j               u,j (r̂u,j − ru,j )
+MAE =                           , RMSE =
+                    N                               N
+                                                                                Parameter Settings. The optimal experimental settings for
+where N is the number of test ratings. Smaller values of                        each method are determined either by our experiments or
+MAE and RMSE indicate better predictive accuracy.                               suggested by previous works. Specifically, the common set-
+Testing Views. Two data set views are created for testing.                      tings are λ = 0.001, and the number of latent features
+First, the All view indicates that all ratings are used as the                  d = 5/10, the same as all the previous trust-based models.
+test set. Second, the Cold Start view means that only the                       The other settings are: (1) RSTE: α = 0.4 for Epinions,
+users who rate less than five items will be involved in the test                and 1.0 for the others; (2) SoRec: λc = 0.1, 1.0, 0.001, 0.01
+set. Similar testing views are also defined and used in (Guo,                   corresponding to FilmTrust, Epinions, Flixster and Ciao, re-
+Zhang, and Thalmann 2012; Yang et al. 2013).                                    spectively; (3) SoReg: β = 1.0 for Flixster and 0.1 for the
+Comparison Methods. Three kinds of approaches are com-                          others; (4) SocialMF, TrustMF: λt = 1; (5) SVD++: λ =
+pared with our method TrustSVD2 : (1) Baselines: UserAvg                        0.1, 0.35, 0.03, 0.1 (resp.); (6) TrustSVD: λ = 1.2, λt = 0.9
+                                                                                for FilmTrust, λ = 0.9, λt = 0.5 for Epinions, λ =
+   2
+       Source code is included in the LibRec library at www.librec.net.         0.8, λt = 0.5 for Flixster, and λ = 0.5, λt = 1 for Ciao.
+
+
+
+                                                                          127
+         (a) FilmTrust                    (b) Epinions                      (c) Flixster                      (d) Ciao
+            Figure 2: Performance comparison on users with different trust degrees (d = 10) [best viewed in color]
+  Table 3: Comparing with (Fang, Bao, and Zhang 2014)                  respect to the feature dimensionality. We ascribe this feature
+ Fang’s vs.     Epinions          Ciao          FilmTrust              to the consideration of both the explicit and implicit influ-
+ TrustSVD d = 5 d = 10       d = 5 d = 10    d = 5 d = 10              ence of ratings and trust in a unified recommendation model.
+            0.806 0.814      0.737 0.745     0.616 0.625
+ MAE
+            0.804 0.805      0.723 0.723     0.609 0.607                  In conclusion, the experimental results indicate that our
+            1.047 1.059      0.972 0.985     0.793 0.810               approach TrustSVD outperforms the other methods in pre-
+ RMSE                                                                  dicting more accurate ratings, and that its performance is
+            1.043 1.044      0.955 0.956     0.789 0.787
+                                                                       reliable with different number of latent features.
+Comparison with other models. The experimental results
+                                                                       Comparison in trust degrees. Another series of experi-
+are presented in Table 2. For all the comparison meth-
+                                                                       ments are conducted to investigate the performance on users
+ods in the testing view of All, SVD++ outperforms the
+                                                                       with different trust degrees. The trust degrees refer to the
+other comparison methods in FilmTrust and Epinions, and
+                                                                       number of trusted neighbors specified by a user. We split
+UserAvg performs the best in Flixster. This implies that
+                                                                       the trust degrees into seven categories: 1-5, 6-10, 11-20, 21-
+these trust-based approaches cannot always beat other well-
+                                                                       40, 41-100, 101-500, >500. The results of trust-based mod-
+performing ratings-only approaches, and even simple base-
+                                                                       els are illustrated in Figure 2, where we only present the
+lines in trust-alike networks (i.e., FilmTrust and Flixster).
+                                                                       performance in RMSE when d = 10 due to space limita-
+Only in Ciao, trust-based approach (SocialMF) gives the
+                                                                       tion; similar trends in other cases. In general, our approach
+best performance. On the contrary, our approach TrustSVD
+                                                                       TrustSVD consistently achieves the best performance in the
+is consistently superior to the best approach among the oth-
+                                                                       cases of different trust degrees. Paired t-tests (confidence
+ers across all the data sets. Although the percentage of rela-
+                                                                       0.95) shows that such improvements are statistically signifi-
+tive improvements are small, Koren (2010) has pointed out
+                                                                       cant (p<10−5 ) in three data sets but not in FilmTrust (details
+that even small improvements in MAE and RMSE may lead
+                                                                       are omitted to save space). Two possible explanations can be
+to significant differences of recommendations in practice.
+                                                                       made: (1) FilmTrust has a smaller data size than the others;
+   For all the comparison methods in the testing view of               (2) due to the noise arising from converting real-valued trust
+Cold Start, SoRec and SVD++ perform respectively the best              to binary trust, the trust may be less useful in FilmTrust than
+in FilmTrust and Flixster (trust-alike), while no single ap-           in the others as indicated in (Fang, Bao, and Zhang 2014).
+proach works the best in Epinions and Ciao (trust). Gen-
+erally, our approach performs better than the others both in
+trust and trust-alike relationships. Although some exceptions
+                                                                                  Conclusion and Future Work
+are observed in Epinions in terms of MAE, TrustSVD is                  This paper proposed a novel trust-based matrix factoriza-
+more powerful in terms of RMSE. Since all the trust-based              tion model which incorporated both rating and trust infor-
+models aim to optimize the square errors between predic-               mation. Our analysis of trust in four real-world data sets
+tions and real values, RMSE is more indicative than MAE,               indicated that trust and ratings are complementary to each
+and thus TrustSVD still has best performance overall.                  other, and both pivotal for more accurate recommendations.
+   Besides the above-compared approaches, some new trust-              Our novel approach, TrustSVD, takes into account both the
+based models have been proposed recently. The most rele-               explicit and implicit influence of ratings and trust informa-
+vant model is presented in (Fang, Bao, and Zhang 2014);                tion when predicting ratings of unknown items. A weighted-
+for clarity, we denote it by Fang’s. It is reported to perform         λ-regularization technique was adapted and used to further
+better than other trust-based models and than SVD++ (ex-               regularize the user- and item-specific latent feature vec-
+cept in Ciao). Table 3 shows the comparison between Fang’s             tors. Comprehensive experimental results showed that our
+and our approach TrustSVD. The results of Fang’s approach              approach TrustSVD outperformed both trust- and ratings-
+are reported in (Fang, Bao, and Zhang 2014), and directly              based methods in predictive accuracy across different testing
+re-used in our paper. Note that we sampled more data for               views and across users with different trust degrees. For fu-
+Flixster than Fang’s, and thus their experimental results are          ture work, we intend to further improve the proposed model
+not comparable. Table 3 clearly shows that our approach per-           by considering both the influence of trusters and trustees.
+forms better than Fang’s in terms of both MAE and RMSE.
+   One more observation from Tables 2 and 3 is that the per-                               Acknowledgements
+formance of TrustSVD when d = 5 is very close to that                  Guibing Guo thanks the Institute for Media Innovation for a
+when d = 10, indicating the reliability of our approach with           PhD grant at Nanyang Technological University, Singapore.
+
+
+
+                                                                 128
+The work is also partially supported by the MoE AcRF Tier               ence on Research & Development in Information Retrieval
+2 Grant M4020110.020.                                                   (SIGIR), 975–978.
+
+                        References
+Fang, H.; Bao, Y.; and Zhang, J. 2014. Leveraging decom-
+posed trust in probabilistic matrix factorization for effective
+recommendation. In Proceedings of the 28th AAAI Confer-
+ence on Artificial Intelligence (AAAI), 30–36.
+Guo, G.; Zhang, J.; and Thalmann, D. 2012. A simple but
+effective method to incorporate trusted neighbors in recom-
+mender systems. In Proceedings of the 20th International
+Conference on User Modeling, Adaptation and Personaliza-
+tion (UMAP), 114–125.
+Guo, G.; Zhang, J.; and Yorke-Smith, N. 2014. Leverag-
+ing multiviews of trust and similarity to enhance clustering-
+based recommender systems. Knowledge-Based Systems
+(KBS) in press.
+Jamali, M., and Ester, M. 2010. A matrix factorization tech-
+nique with trust propagation for recommendation in social
+networks. In Proceedings of the 4th ACM Conference on
+Recommender Systems (RecSys), 135–142.
+Koren, Y. 2008. Factorization meets the neighborhood: a
+multifaceted collaborative filtering model. In Proceedings of
+the 14th ACM SIGKDD International Conference on Knowl-
+edge Discovery and Data Mining (KDD), 426–434.
+Koren, Y. 2010. Factor in the neighbors: Scalable and ac-
+curate collaborative filtering. ACM Transactions on Knowl-
+edge Discovery from Data (TKDD) 4(1):1:1–1:24.
+Ma, H.; Yang, H.; Lyu, M.; and King, I. 2008. SoRec: social
+recommendation using probabilistic matrix factorization. In
+Proceedings of the 31st International ACM SIGIR Confer-
+ence on Research and Development in Information Retrieval
+(SIGIR), 931–940.
+Ma, H.; Zhou, D.; Liu, C.; Lyu, M. R.; and King, I. 2011.
+Recommender systems with social regularization. In Pro-
+ceedings of the 4th ACM International Conference on Web
+Search and Data Mining (WSDM), 287–296.
+Ma, H.; King, I.; and Lyu, M. 2009. Learning to recommend
+with social trust ensemble. In Proceedings of the 32nd In-
+ternational ACM SIGIR Conference on Research and Devel-
+opment in Information Retrieval (SIGIR), 203–210.
+Salakhutdinov, R., and Mnih, A. 2008. Probabilistic matrix
+factorization. In Advances in Neural Information Processing
+Systems (NIPS), volume 20, 1257–1264.
+Tang, J.; Hu, X.; Gao, H.; and Liu, H. 2013. Exploiting local
+and global social context for recommendation. In Proceed-
+ings of the 23rd International Joint Conference on Artificial
+Intelligence (IJCAI), 2712–2718.
+Yang, B.; Lei, Y.; Liu, D.; and Liu, J. 2013. Social collab-
+orative filtering by trust. In Proceedings of the 23rd Inter-
+national Joint Conference on Artificial Intelligence (IJCAI),
+2747–2753.
+Yao, W.; He, J.; Huang, G.; and Zhang, Y. 2014. Modeling
+dual role preferences for trust-aware recommendation. In
+Proceedings of the 37th International ACM SIGIR Confer-
+
+
+
+                                                                  129
+

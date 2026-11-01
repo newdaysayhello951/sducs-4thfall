@@ -1,0 +1,101 @@
+{
+  "data": "C:\\Users\\86134\\Desktop\\大四上\\社交网络实验二\\实验二实验代码\\data\\cnn_stories_tokenized",
+  "output": "C:\\Users\\86134\\Desktop\\大四上\\社交网络实验二\\实验二实验代码\\results_study",
+  "limit": 100,
+  "sentences": 3,
+  "damping": 0.85,
+  "seed": 42,
+  "study": true,
+  "python": "3.12.7",
+  "numpy": "1.26.4",
+  "files_found": 5000,
+  "evaluated": 100,
+  "skipped_ids": [
+    "00465603227f7f56fcd37e10f4cd44e57d7647d8",
+    "07bca124a8b784800aa38e6237524eb756792c7c",
+    "09ac649da7f5ae27d3a7ef47eeb9b8ea4cbd799c",
+    "0de44dd3a66327f990e4f21b2c672424a07dbfb7"
+  ],
+  "reference": "all highlights joined into one reference",
+  "metrics": "lowercase word tokens; no stemming or stopword removal; macro ROUGE P/R/F1; whole-summary LCS; corpus BLEU-4 unsmoothed; scale 0..1",
+  "configs": [
+    [
+      "lead-3",
+      "lead",
+      3,
+      0.85
+    ],
+    [
+      "textrank-overlap",
+      "overlap",
+      3,
+      0.85
+    ],
+    [
+      "textrank-tfidf",
+      "tfidf",
+      3,
+      0.85
+    ],
+    [
+      "overlap-k1",
+      "overlap",
+      1,
+      0.85
+    ],
+    [
+      "lead-1",
+      "lead",
+      1,
+      0.85
+    ],
+    [
+      "overlap-k2",
+      "overlap",
+      2,
+      0.85
+    ],
+    [
+      "lead-2",
+      "lead",
+      2,
+      0.85
+    ],
+    [
+      "overlap-k4",
+      "overlap",
+      4,
+      0.85
+    ],
+    [
+      "lead-4",
+      "lead",
+      4,
+      0.85
+    ],
+    [
+      "overlap-k5",
+      "overlap",
+      5,
+      0.85
+    ],
+    [
+      "lead-5",
+      "lead",
+      5,
+      0.85
+    ],
+    [
+      "overlap-d0.7",
+      "overlap",
+      3,
+      0.7
+    ],
+    [
+      "overlap-d0.95",
+      "overlap",
+      3,
+      0.95
+    ]
+  ]
+}

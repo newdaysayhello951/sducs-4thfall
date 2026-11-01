@@ -1,0 +1,238 @@
+{
+  "dataset": "filmtrust",
+  "model": "TrustMF",
+  "dim": 10,
+  "fold": 0,
+  "seed": 20261036,
+  "hyperparameters": {
+    "reg": 0.001,
+    "social": 1.0,
+    "alpha": 1.0
+  },
+  "n_train": 28397,
+  "n_test": 7100,
+  "status": "completed",
+  "data": {
+    "counts": [
+      1508,
+      2071,
+      35497,
+      1853
+    ],
+    "expected": [
+      1508,
+      2071,
+      35497,
+      1853
+    ],
+    "duplicate_pairs": 3,
+    "matches_paper": true,
+    "user_union": 1642,
+    "ratings_sha256": "241167424e24d588e8871d68641e94ead98d5b3a4f0db01ef3181a74ad35e7a1",
+    "trust_sha256": "64573a033add72b988a0fb140fdbc0ad3464cb9821f940007aff6fda44b09603"
+  },
+  "optimizer": "L-BFGS-B",
+  "validation_fraction": 0.1,
+  "maxiter": 200,
+  "all": {
+    "n": 7100,
+    "mae": 0.6988975601728987,
+    "rmse": 0.9119224315435522
+  },
+  "cold_train_lt5": {
+    "n": 250,
+    "mae": 1.0227859649145805,
+    "rmse": 1.2120579277549623
+  },
+  "cold_total_lt5": {
+    "n": 134,
+    "mae": 1.1829787961194158,
+    "rmse": 1.3546092892580384
+  },
+  "all_unclipped": {
+    "n": 7100,
+    "mae": 0.6991910861242132,
+    "rmse": 0.9121083098401997
+  },
+  "training": [
+    {
+      "iterations": 40,
+      "selected_iterations": 15,
+      "best_validation_rmse": 0.9506069949390978,
+      "objective": 0.010338615907379783,
+      "gradient_norm": 0.0002054802425854462,
+      "message": "inner validation patience reached",
+      "seconds": 0.5503936999998587,
+      "trace": [
+        {
+          "iteration": 5,
+          "objective": 0.058040892087250974,
+          "gradient_norm": 0.0029254617320354083,
+          "validation_rmse": 1.2359790205831744
+        },
+        {
+          "iteration": 10,
+          "objective": 0.020547604365116014,
+          "gradient_norm": 0.0013782186269119963,
+          "validation_rmse": 1.017362650925719
+        },
+        {
+          "iteration": 15,
+          "objective": 0.014690508199731812,
+          "gradient_norm": 0.0004172437839480838,
+          "validation_rmse": 0.9506069949390978
+        },
+        {
+          "iteration": 20,
+          "objective": 0.012697193436128887,
+          "gradient_norm": 0.0003326814405744401,
+          "validation_rmse": 0.9667440633072374
+        },
+        {
+          "iteration": 25,
+          "objective": 0.011697830639629947,
+          "gradient_norm": 0.0001927947489217149,
+          "validation_rmse": 0.9644761616688867
+        },
+        {
+          "iteration": 30,
+          "objective": 0.011055030022231665,
+          "gradient_norm": 0.00040954206040663124,
+          "validation_rmse": 0.9722255215091874
+        },
+        {
+          "iteration": 35,
+          "objective": 0.010636363245038395,
+          "gradient_norm": 0.0001675657939130302,
+          "validation_rmse": 0.9697069573523615
+        },
+        {
+          "iteration": 40,
+          "objective": 0.010338615907379783,
+          "gradient_norm": 0.0002054802425854462,
+          "validation_rmse": 0.9660081211720981
+        }
+      ],
+      "stage": "selection",
+      "role": "truster"
+    },
+    {
+      "iterations": 15,
+      "selected_iterations": 15,
+      "best_validation_rmse": null,
+      "objective": 0.01539810839301576,
+      "gradient_norm": 0.0004304743955564419,
+      "message": "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT",
+      "seconds": 0.30438909999975294,
+      "trace": [
+        {
+          "iteration": 5,
+          "objective": 0.03730195973811658,
+          "gradient_norm": 0.0010745667265683356
+        },
+        {
+          "iteration": 10,
+          "objective": 0.0195826089842861,
+          "gradient_norm": 0.0008049228435630233
+        },
+        {
+          "iteration": 15,
+          "objective": 0.01539810839301576,
+          "gradient_norm": 0.0004304743955564419
+        }
+      ],
+      "stage": "refit",
+      "role": "truster"
+    },
+    {
+      "iterations": 40,
+      "selected_iterations": 15,
+      "best_validation_rmse": 0.9560800620907528,
+      "objective": 0.010474406543390605,
+      "gradient_norm": 0.00015058060967651916,
+      "message": "inner validation patience reached",
+      "seconds": 0.5845430999997916,
+      "trace": [
+        {
+          "iteration": 5,
+          "objective": 0.057469165340363663,
+          "gradient_norm": 0.0029088006226703845,
+          "validation_rmse": 1.2305361786206401
+        },
+        {
+          "iteration": 10,
+          "objective": 0.02308413942419105,
+          "gradient_norm": 0.0007758559437092993,
+          "validation_rmse": 0.97996256837723
+        },
+        {
+          "iteration": 15,
+          "objective": 0.015471180233911737,
+          "gradient_norm": 0.000717010102823409,
+          "validation_rmse": 0.9560800620907528
+        },
+        {
+          "iteration": 20,
+          "objective": 0.013149097031289992,
+          "gradient_norm": 0.0004265509357199861,
+          "validation_rmse": 0.9709555516312971
+        },
+        {
+          "iteration": 25,
+          "objective": 0.011914148341414167,
+          "gradient_norm": 0.0002416893354588993,
+          "validation_rmse": 0.9699863635255772
+        },
+        {
+          "iteration": 30,
+          "objective": 0.011209678199164108,
+          "gradient_norm": 0.00021890618888783324,
+          "validation_rmse": 0.9763530996873312
+        },
+        {
+          "iteration": 35,
+          "objective": 0.010798371183677656,
+          "gradient_norm": 0.0004230399269935088,
+          "validation_rmse": 0.9720149177789024
+        },
+        {
+          "iteration": 40,
+          "objective": 0.010474406543390605,
+          "gradient_norm": 0.00015058060967651916,
+          "validation_rmse": 0.9735337110091968
+        }
+      ],
+      "stage": "selection",
+      "role": "trustee"
+    },
+    {
+      "iterations": 15,
+      "selected_iterations": 15,
+      "best_validation_rmse": null,
+      "objective": 0.015578692553383186,
+      "gradient_norm": 0.00046541036507741673,
+      "message": "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT",
+      "seconds": 0.25676160000011805,
+      "trace": [
+        {
+          "iteration": 5,
+          "objective": 0.047164444951054464,
+          "gradient_norm": 0.0018420619425669508
+        },
+        {
+          "iteration": 10,
+          "objective": 0.020088422116208156,
+          "gradient_norm": 0.0010296372590615386
+        },
+        {
+          "iteration": 15,
+          "objective": 0.015578692553383186,
+          "gradient_norm": 0.00046541036507741673
+        }
+      ],
+      "stage": "refit",
+      "role": "trustee"
+    }
+  ],
+  "seconds": 1.8872356000001673
+}

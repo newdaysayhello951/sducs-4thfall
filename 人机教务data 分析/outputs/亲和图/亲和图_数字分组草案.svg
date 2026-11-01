@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="1860" height="1797" preserveAspectRatio="xMinYMin meet" viewBox="0 0 1860 1797" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="1860" height="1797"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-1797)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="0" y="0" width="1860" height="1797" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<text x="20" y="1765" style="font-family: SimHei; font-size: 24px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3530) scale(1,-1)">SmartCampus+ 访谈亲和图</text>
+			<text x="20" y="1739" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3478) scale(1,-1)">初步分组草案  |  44张数据卡片  |  6个上层主题  |  18个子主题  |  待小组实际讨论与照片确认</text>
+			<text x="20" y="1716" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3432) scale(1,-1)">问题：学生如何利用信息安排上课、就餐、自习和出行，遇到什么困难，并在什么条件下接受助手支持？</text>
+			<rect x="20" y="1685" width="14" height="14" style="stroke: rgb(81%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="40" y="1687" style="font-family: SimSun; font-size: 11px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3374) scale(1,-1)">I01 访谈来源</text>
+			<rect x="190" y="1685" width="14" height="14" style="stroke: rgb(81%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,92%,98%); fill-rule: evenodd;"/>
+			<text x="210" y="1687" style="font-family: SimSun; font-size: 11px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3374) scale(1,-1)">I02 访谈来源</text>
+			<rect x="360" y="1685" width="14" height="14" style="stroke: rgb(81%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,93%,85%); fill-rule: evenodd;"/>
+			<text x="380" y="1687" style="font-family: SimSun; font-size: 11px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3374) scale(1,-1)">I03 访谈来源</text>
+			<rect x="530" y="1685" width="14" height="14" style="stroke: rgb(81%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(93%,87%,95%); fill-rule: evenodd;"/>
+			<text x="550" y="1687" style="font-family: SimSun; font-size: 11px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3374) scale(1,-1)">I04 访谈来源</text>
+			<rect x="20" y="744" width="590" height="908" style="stroke: rgb(81%,84%,89%); stroke-linecap: butt; stroke-width: 1; fill: rgb(97%,98%,98%); fill-rule: evenodd;"/>
+			<rect x="20" y="1610" width="590" height="42" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(12%,20%,29%); fill-rule: evenodd;"/>
+			<text x="34" y="1625" style="font-family: SimHei; font-size: 17px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,3250) scale(1,-1)">A 找到真正适合的学习空间</text>
+			<text x="34" y="1581" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3162) scale(1,-1)">A1 课程空闲仍需核对实际活动</text>
+			<rect x="34" y="1474" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,92%,98%); fill-rule: evenodd;"/>
+			<text x="43" y="1545" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3090) scale(1,-1)">N20  I02-04</text>
+			<text x="43" y="1525" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3050) scale(1,-1)">现有APP能查教室课程占用，我到场时课表占用</text>
+			<text x="43" y="1507" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3014) scale(1,-1)">信息与实际一致。</text>
+			<text x="43" y="1483" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2966) scale(1,-1)">现有工具经验</text>
+			<rect x="318" y="1474" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,92%,98%); fill-rule: evenodd;"/>
+			<text x="327" y="1545" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3090) scale(1,-1)">N21  I02-04</text>
+			<text x="327" y="1525" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3050) scale(1,-1)">我能知道教室是否在上课，但很难查询其他活动</text>
+			<text x="327" y="1507" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3014) scale(1,-1)">的预约信息。</text>
+			<text x="327" y="1483" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2966) scale(1,-1)">信息困难</text>
+			<rect x="34" y="1374" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,92%,98%); fill-rule: evenodd;"/>
+			<text x="43" y="1445" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2890) scale(1,-1)">N22  I02-06</text>
+			<text x="43" y="1425" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2850) scale(1,-1)">我偶尔遇到教室被其他活动使用，遇到后会换一</text>
+			<text x="43" y="1407" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2814) scale(1,-1)">间教室。</text>
+			<text x="43" y="1383" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2766) scale(1,-1)">自报经历</text>
+			<text x="34" y="1347" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2694) scale(1,-1)">A2 设施与环境决定是否适合</text>
+			<rect x="34" y="1240" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="43" y="1311" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2622) scale(1,-1)">N04  I01-07</text>
+			<text x="43" y="1291" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2582) scale(1,-1)">我可以和其他人一起自习，只要人数不多、环境</text>
+			<text x="43" y="1273" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2546) scale(1,-1)">不吵。</text>
+			<text x="43" y="1249" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2498) scale(1,-1)">空间偏好</text>
+			<rect x="318" y="1240" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="327" y="1311" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2622) scale(1,-1)">N06  I01-07</text>
+			<text x="327" y="1291" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2582) scale(1,-1)">我选择自习室时，会考虑空调、插座和电源。</text>
+			<text x="327" y="1249" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2498) scale(1,-1)">空间偏好</text>
+			<rect x="34" y="1140" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="43" y="1211" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2422) scale(1,-1)">N07  I01-07</text>
+			<text x="43" y="1191" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2382) scale(1,-1)">选择自习教室时，没有课程是我的首要条件。</text>
+			<text x="43" y="1149" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2298) scale(1,-1)">空间偏好</text>
+			<text x="34" y="1113" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2226) scale(1,-1)">A3 拥挤与距离促使更换地点</text>
+			<rect x="34" y="1006" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="43" y="1077" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2154) scale(1,-1)">N05  I01-07</text>
+			<text x="43" y="1057" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2114) scale(1,-1)">期末周图书馆座位紧张时，我会改找教学楼自习</text>
+			<text x="43" y="1039" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2078) scale(1,-1)">室。</text>
+			<text x="43" y="1015" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2030) scale(1,-1)">自报习惯</text>
+			<rect x="318" y="1006" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="327" y="1077" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2154) scale(1,-1)">N08  I01-07</text>
+			<text x="327" y="1057" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2114) scale(1,-1)">教学楼离宿舍区较近，去那里自习对我更方便。</text>
+			<text x="327" y="1015" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2030) scale(1,-1)">地点偏好</text>
+			<rect x="34" y="906" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,93%,85%); fill-rule: evenodd;"/>
+			<text x="43" y="977" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1954) scale(1,-1)">N33  I03-04</text>
+			<text x="43" y="957" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1914) scale(1,-1)">常去自习室人太多或喜欢的位置被占时，我会换</text>
+			<text x="43" y="939" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1878) scale(1,-1)">自习地点。</text>
+			<text x="43" y="915" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,1830) scale(1,-1)">自报习惯</text>
+			<text x="34" y="879" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1758) scale(1,-1)">A4 寻找负担与固定工位需求不同</text>
+			<rect x="34" y="772" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="43" y="843" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1686) scale(1,-1)">N03  I01-04</text>
+			<text x="43" y="823" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1646) scale(1,-1)">找空教室有时要花约10分钟；找不到时，我会继</text>
+			<text x="43" y="805" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1610) scale(1,-1)">续找。</text>
+			<text x="43" y="781" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,1562) scale(1,-1)">自报习惯</text>
+			<rect x="318" y="772" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(93%,87%,95%); fill-rule: evenodd;"/>
+			<text x="327" y="843" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1686) scale(1,-1)">N39  I04-03</text>
+			<text x="327" y="823" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1646) scale(1,-1)">我有固定实验室工位，不需要另外寻找自习空间。</text>
+			<text x="327" y="781" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,1562) scale(1,-1)">需求差异</text>
+			<rect x="635" y="978" width="590" height="674" style="stroke: rgb(81%,84%,89%); stroke-linecap: butt; stroke-width: 1; fill: rgb(97%,98%,98%); fill-rule: evenodd;"/>
+			<rect x="635" y="1610" width="590" height="42" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(12%,20%,29%); fill-rule: evenodd;"/>
+			<text x="649" y="1625" style="font-family: SimHei; font-size: 17px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,3250) scale(1,-1)">B 就餐选择需要及时且具体的信息</text>
+			<text x="649" y="1581" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3162) scale(1,-1)">B1 到场比较菜品存在信息成本</text>
+			<rect x="649" y="1474" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,92%,98%); fill-rule: evenodd;"/>
+			<text x="658" y="1545" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3090) scale(1,-1)">N17  I02-03</text>
+			<text x="658" y="1525" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3050) scale(1,-1)">菜谱不固定，我会到食堂窗口看当天有什么菜，</text>
+			<text x="658" y="1507" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3014) scale(1,-1)">再按口味和心情选择。</text>
+			<text x="658" y="1483" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2966) scale(1,-1)">就餐行为</text>
+			<rect x="933" y="1474" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,92%,98%); fill-rule: evenodd;"/>
+			<text x="942" y="1545" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3090) scale(1,-1)">N18  I02-03</text>
+			<text x="942" y="1525" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3050) scale(1,-1)">窗口文字菜单不能让我充分判断具体菜品是什么</text>
+			<text x="942" y="1507" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3014) scale(1,-1)">样。</text>
+			<text x="942" y="1483" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2966) scale(1,-1)">信息困难</text>
+			<rect x="649" y="1374" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,93%,85%); fill-rule: evenodd;"/>
+			<text x="658" y="1445" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2890) scale(1,-1)">N31  I03-05</text>
+			<text x="658" y="1425" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2850) scale(1,-1)">去食堂之前，我无法提前知道当天窗口的人数和</text>
+			<text x="658" y="1407" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2814) scale(1,-1)">排队情况。</text>
+			<text x="658" y="1383" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2766) scale(1,-1)">信息缺口</text>
+			<text x="649" y="1347" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2694) scale(1,-1)">B2 排队会改变选择及用餐感受</text>
+			<rect x="649" y="1240" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,92%,98%); fill-rule: evenodd;"/>
+			<text x="658" y="1311" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2622) scale(1,-1)">N19  I02-03</text>
+			<text x="658" y="1291" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2582) scale(1,-1)">如果提前知道某个菜的队伍很长，我可能就不选</text>
+			<text x="658" y="1273" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2546) scale(1,-1)">它。</text>
+			<text x="658" y="1249" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2498) scale(1,-1)">条件性偏好</text>
+			<rect x="933" y="1240" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,93%,85%); fill-rule: evenodd;"/>
+			<text x="942" y="1311" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2622) scale(1,-1)">N32  I03-05</text>
+			<text x="942" y="1291" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2582) scale(1,-1)">想吃的窗口队伍太长，我换了别的饭菜；没吃到</text>
+			<text x="942" y="1273" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2546) scale(1,-1)">想吃的让我郁闷。</text>
+			<text x="942" y="1249" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2498) scale(1,-1)">自报事件</text>
+			<rect x="649" y="1140" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(93%,87%,95%); fill-rule: evenodd;"/>
+			<text x="658" y="1211" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2422) scale(1,-1)">N40  I04-04</text>
+			<text x="658" y="1191" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2382) scale(1,-1)">喜欢的食堂窗口排队太长时，我会换一家，也会</text>
+			<text x="658" y="1173" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2346) scale(1,-1)">有点不高兴。</text>
+			<text x="658" y="1149" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2298) scale(1,-1)">自报习惯</text>
+			<text x="649" y="1113" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2226) scale(1,-1)">B3 食堂信息是个人优先项</text>
+			<rect x="649" y="1006" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(93%,87%,95%); fill-rule: evenodd;"/>
+			<text x="658" y="1077" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2154) scale(1,-1)">N44  I04-05</text>
+			<text x="658" y="1057" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2114) scale(1,-1)">我最希望先获得食堂排队与菜单信息。</text>
+			<text x="658" y="1015" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2030) scale(1,-1)">个人优先项</text>
+			<rect x="1250" y="978" width="590" height="674" style="stroke: rgb(81%,84%,89%); stroke-linecap: butt; stroke-width: 1; fill: rgb(97%,98%,98%); fill-rule: evenodd;"/>
+			<rect x="1250" y="1610" width="590" height="42" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(12%,20%,29%); fill-rule: evenodd;"/>
+			<text x="1264" y="1625" style="font-family: SimHei; font-size: 17px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,3250) scale(1,-1)">C 日常安排受准备与往返条件影响</text>
+			<text x="1264" y="1581" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3162) scale(1,-1)">C1 路程预估未必包含出门准备</text>
+			<rect x="1264" y="1474" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="1273" y="1545" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3090) scale(1,-1)">N01  I01-02</text>
+			<text x="1273" y="1525" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3050) scale(1,-1)">我预留10分钟去实验楼，结果比计划晚到5分钟。</text>
+			<text x="1273" y="1483" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2966) scale(1,-1)">自报事件</text>
+			<rect x="1548" y="1474" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="1557" y="1545" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3090) scale(1,-1)">N02  I01-04</text>
+			<text x="1557" y="1525" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3050) scale(1,-1)">我预估的10分钟，没有包括打水、小程序卡顿和</text>
+			<text x="1557" y="1507" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,3014) scale(1,-1)">等电梯。</text>
+			<text x="1557" y="1483" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2966) scale(1,-1)">自报习惯</text>
+			<rect x="1264" y="1374" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="1273" y="1445" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2890) scale(1,-1)">N14  I01-06</text>
+			<text x="1273" y="1425" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2850) scale(1,-1)">打水小程序卡住时，我会先等，等久了再重新扫</text>
+			<text x="1273" y="1407" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2814) scale(1,-1)">码。</text>
+			<text x="1273" y="1383" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2766) scale(1,-1)">应对方式</text>
+			<text x="1264" y="1347" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2694) scale(1,-1)">C2 交通方式与休息需求影响往返</text>
+			<rect x="1264" y="1240" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,92%,98%); fill-rule: evenodd;"/>
+			<text x="1273" y="1311" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2622) scale(1,-1)">N15  I02-01</text>
+			<text x="1273" y="1291" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2582) scale(1,-1)">我根据课表决定出发时间：步行提前约20分钟，</text>
+			<text x="1273" y="1273" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2546) scale(1,-1)">骑车约10分钟。</text>
+			<text x="1273" y="1249" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2498) scale(1,-1)">自报习惯</text>
+			<rect x="1548" y="1240" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,93%,85%); fill-rule: evenodd;"/>
+			<text x="1557" y="1311" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2622) scale(1,-1)">N26  I03-02</text>
+			<text x="1557" y="1291" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2582) scale(1,-1)">中午回出租屋、下午返校，两段路各约15分钟，</text>
+			<text x="1557" y="1273" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2546) scale(1,-1)">反复骑车让我觉得麻烦。</text>
+			<text x="1557" y="1249" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2498) scale(1,-1)">通勤负担</text>
+			<rect x="1264" y="1140" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,93%,85%); fill-rule: evenodd;"/>
+			<text x="1273" y="1211" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2422) scale(1,-1)">N27  I03-02</text>
+			<text x="1273" y="1191" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2382) scale(1,-1)">我中午回出租屋，是为了在自己的床上午休，并</text>
+			<text x="1273" y="1173" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2346) scale(1,-1)">给手机、电脑充电。</text>
+			<text x="1273" y="1149" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2298) scale(1,-1)">行为动机</text>
+			<rect x="1548" y="1140" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(93%,87%,95%); fill-rule: evenodd;"/>
+			<text x="1557" y="1211" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2422) scale(1,-1)">N37  I04-02</text>
+			<text x="1557" y="1191" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2382) scale(1,-1)">北区到教学楼或科研地点约10至15分钟，冬天骑</text>
+			<text x="1557" y="1173" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2346) scale(1,-1)">车往返不方便。</text>
+			<text x="1557" y="1149" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2298) scale(1,-1)">通勤负担</text>
+			<text x="1264" y="1113" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2226) scale(1,-1)">C3 现有课表与提前通知也能奏效</text>
+			<rect x="1264" y="1006" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,92%,98%); fill-rule: evenodd;"/>
+			<text x="1273" y="1077" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2154) scale(1,-1)">N16  I02-02</text>
+			<text x="1273" y="1057" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2114) scale(1,-1)">我通过课表APP确认教室，认为信息准确，没有</text>
+			<text x="1273" y="1039" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2078) scale(1,-1)">报告这次上课延误。</text>
+			<text x="1273" y="1015" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2030) scale(1,-1)">顺利经验</text>
+			<rect x="1548" y="1006" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,93%,85%); fill-rule: evenodd;"/>
+			<text x="1557" y="1077" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2154) scale(1,-1)">N28  I03-04</text>
+			<text x="1557" y="1057" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2114) scale(1,-1)">老师一般提前半天通知调课，我通常在出发前就</text>
+			<text x="1557" y="1039" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,2078) scale(1,-1)">知道安排变化。</text>
+			<text x="1557" y="1015" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,2030) scale(1,-1)">顺利经验</text>
+			<rect x="20" y="379" width="590" height="340" style="stroke: rgb(81%,84%,89%); stroke-linecap: butt; stroke-width: 1; fill: rgb(97%,98%,98%); fill-rule: evenodd;"/>
+			<rect x="20" y="677" width="590" height="42" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(12%,20%,29%); fill-rule: evenodd;"/>
+			<text x="34" y="692" style="font-family: SimHei; font-size: 17px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,1384) scale(1,-1)">D 交通选择同时考虑可靠性与自由</text>
+			<text x="34" y="648" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1296) scale(1,-1)">D1 排班与实际到达存在差距</text>
+			<rect x="34" y="541" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,93%,85%); fill-rule: evenodd;"/>
+			<text x="43" y="612" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1224) scale(1,-1)">N34  I03-07</text>
+			<text x="43" y="592" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1184) scale(1,-1)">我依据学校排班表等巴士，但实际到达比排班晚</text>
+			<text x="43" y="574" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1148) scale(1,-1)">了十几分钟。</text>
+			<text x="43" y="550" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,1100) scale(1,-1)">自报事件</text>
+			<text x="34" y="514" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1028) scale(1,-1)">D2 天气与时间自由影响交通取舍</text>
+			<rect x="34" y="407" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,93%,85%); fill-rule: evenodd;"/>
+			<text x="43" y="478" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,956) scale(1,-1)">N35  I03-07</text>
+			<text x="43" y="458" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,916) scale(1,-1)">雨夜天气恶劣，我仍选择等巴士，等候约十几至</text>
+			<text x="43" y="440" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,880) scale(1,-1)">二十分钟。</text>
+			<text x="43" y="416" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,832) scale(1,-1)">情境与选择</text>
+			<rect x="318" y="407" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(93%,87%,95%); fill-rule: evenodd;"/>
+			<text x="327" y="478" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,956) scale(1,-1)">N38  I04-03</text>
+			<text x="327" y="458" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,916) scale(1,-1)">我从未坐过校园巴士，更看重自己骑电动车来去</text>
+			<text x="327" y="440" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,880) scale(1,-1)">的时间自由。</text>
+			<text x="327" y="416" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,832) scale(1,-1)">交通选择</text>
+			<rect x="635" y="45" width="590" height="674" style="stroke: rgb(81%,84%,89%); stroke-linecap: butt; stroke-width: 1; fill: rgb(97%,98%,98%); fill-rule: evenodd;"/>
+			<rect x="635" y="677" width="590" height="42" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(12%,20%,29%); fill-rule: evenodd;"/>
+			<text x="649" y="692" style="font-family: SimHei; font-size: 17px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,1384) scale(1,-1)">E 通知价值取决于相关性与个人情境</text>
+			<text x="649" y="648" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1296) scale(1,-1)">E1 现有渠道承载课程信息</text>
+			<rect x="649" y="541" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="658" y="612" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1224) scale(1,-1)">N09  I01-05</text>
+			<text x="658" y="592" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1184) scale(1,-1)">我主要通过本科学院网站和小程序获取课表与课</text>
+			<text x="658" y="574" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1148) scale(1,-1)">程通知。</text>
+			<text x="658" y="550" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,1100) scale(1,-1)">信息渠道</text>
+			<text x="649" y="514" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1028) scale(1,-1)">E2 消息负担与集中需求因人而异</text>
+			<rect x="649" y="407" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="658" y="478" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,956) scale(1,-1)">N11  I01-06</text>
+			<text x="658" y="458" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,916) scale(1,-1)">百度地图有时会向我推送与我无关的信息。</text>
+			<text x="658" y="416" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,832) scale(1,-1)">自报体验</text>
+			<rect x="933" y="407" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,92%,98%); fill-rule: evenodd;"/>
+			<text x="942" y="478" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,956) scale(1,-1)">N23  I02-06</text>
+			<text x="942" y="458" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,916) scale(1,-1)">通知集中未必更好，我会关注重要消息，选择性</text>
+			<text x="942" y="440" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,880) scale(1,-1)">忽略其他消息。</text>
+			<text x="942" y="416" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,832) scale(1,-1)">通知偏好</text>
+			<rect x="649" y="307" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,93%,85%); fill-rule: evenodd;"/>
+			<text x="658" y="378" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,756) scale(1,-1)">N29  I03-04</text>
+			<text x="658" y="358" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,716) scale(1,-1)">群里很多与我无关的信息，会让我觉得被打扰。</text>
+			<text x="658" y="316" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,632) scale(1,-1)">通知困扰</text>
+			<rect x="933" y="307" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(93%,87%,95%); fill-rule: evenodd;"/>
+			<text x="942" y="378" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,756) scale(1,-1)">N41  I04-04</text>
+			<text x="942" y="358" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,716) scale(1,-1)">研究生圈子较小，我基本没有漏看通知或被无关</text>
+			<text x="942" y="340" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,680) scale(1,-1)">消息打扰的经历。</text>
+			<text x="942" y="316" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,632) scale(1,-1)">顺利经验</text>
+			<text x="649" y="280" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,560) scale(1,-1)">E3 提醒需支持具体时间与行动</text>
+			<rect x="649" y="173" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="658" y="244" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,488) scale(1,-1)">N10  I01-07</text>
+			<text x="658" y="224" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,448) scale(1,-1)">我希望在上课前约半小时收到主动提醒。</text>
+			<text x="658" y="182" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,364) scale(1,-1)">提醒偏好</text>
+			<rect x="933" y="173" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,93%,85%); fill-rule: evenodd;"/>
+			<text x="942" y="244" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,488) scale(1,-1)">N30  I03-05</text>
+			<text x="942" y="224" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,448) scale(1,-1)">我愿意接收紧急调课和上课前需要完成任务的提</text>
+			<text x="942" y="206" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,412) scale(1,-1)">醒。</text>
+			<text x="942" y="182" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,364) scale(1,-1)">提醒偏好</text>
+			<rect x="649" y="73" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(93%,87%,95%); fill-rule: evenodd;"/>
+			<text x="658" y="144" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,288) scale(1,-1)">N42  I04-05</text>
+			<text x="658" y="124" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,248) scale(1,-1)">课程或组会改时间后，我会用空出来的时间做自</text>
+			<text x="658" y="106" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,212) scale(1,-1)">己的事，或改变去向。</text>
+			<text x="658" y="82" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,164) scale(1,-1)">一般情境举例</text>
+			<rect x="1250" y="145" width="590" height="574" style="stroke: rgb(81%,84%,89%); stroke-linecap: butt; stroke-width: 1; fill: rgb(97%,98%,98%); fill-rule: evenodd;"/>
+			<rect x="1250" y="677" width="590" height="42" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(12%,20%,29%); fill-rule: evenodd;"/>
+			<text x="1264" y="692" style="font-family: SimHei; font-size: 17px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,1384) scale(1,-1)">F 信息使用依赖信任与自主控制</text>
+			<text x="1264" y="648" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1296) scale(1,-1)">F1 官方信任与时效判断条件不同</text>
+			<rect x="1264" y="541" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="1273" y="612" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1224) scale(1,-1)">N12  I01-08</text>
+			<text x="1273" y="592" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1184) scale(1,-1)">平时课表稳定，让我信任学校官方的课程信息。</text>
+			<text x="1273" y="550" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,1100) scale(1,-1)">信任依据</text>
+			<rect x="1548" y="541" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(100%,94%,68%); fill-rule: evenodd;"/>
+			<text x="1557" y="612" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1224) scale(1,-1)">N13  I01-08</text>
+			<text x="1557" y="592" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1184) scale(1,-1)">面对两小时前更新的空教室信息，我会去现场看，</text>
+			<text x="1557" y="574" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1148) scale(1,-1)">因为没有其他判断依据。</text>
+			<text x="1557" y="550" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,1100) scale(1,-1)">假设情境回答</text>
+			<text x="1264" y="514" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,1028) scale(1,-1)">F2 共享及署名需要选择权</text>
+			<rect x="1264" y="407" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,92%,98%); fill-rule: evenodd;"/>
+			<text x="1273" y="478" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,956) scale(1,-1)">N25  I02-06</text>
+			<text x="1273" y="458" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,916) scale(1,-1)">上传教室状态时，我希望可以选择匿名或实名。</text>
+			<text x="1273" y="416" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,832) scale(1,-1)">署名偏好</text>
+			<rect x="1548" y="407" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,93%,85%); fill-rule: evenodd;"/>
+			<text x="1557" y="478" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,956) scale(1,-1)">N36  I03-06</text>
+			<text x="1557" y="458" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,916) scale(1,-1)">我愿意开放课表、课程通知和位置，但希望自己</text>
+			<text x="1557" y="440" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,880) scale(1,-1)">决定开关与限制。</text>
+			<text x="1557" y="416" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,832) scale(1,-1)">条件性授权</text>
+			<rect x="1264" y="307" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(93%,87%,95%); fill-rule: evenodd;"/>
+			<text x="1273" y="378" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,756) scale(1,-1)">N43  I04-05</text>
+			<text x="1273" y="358" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,716) scale(1,-1)">在能控制开放权限的前提下，我愿意提供广泛信</text>
+			<text x="1273" y="340" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,680) scale(1,-1)">息来换取便利。</text>
+			<text x="1273" y="316" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,632) scale(1,-1)">条件性授权</text>
+			<text x="1264" y="280" style="font-family: SimHei; font-size: 13px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,560) scale(1,-1)">F3 用户愿意贡献空间状态信息</text>
+			<rect x="1264" y="173" width="274" height="88" rx="3" ry="3" style="stroke: rgb(80%,83%,87%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(86%,92%,98%); fill-rule: evenodd;"/>
+			<text x="1273" y="244" style="font-family: SimHei; font-size: 10px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,488) scale(1,-1)">N24  I02-05</text>
+			<text x="1273" y="224" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,448) scale(1,-1)">我愿意提供课表，也愿意上报教室自习或活动占</text>
+			<text x="1273" y="206" style="font-family: SimSun; font-size: 12px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,412) scale(1,-1)">用情况。</text>
+			<text x="1273" y="182" style="font-family: SimSun; font-size: 9px;fill: rgb(39%,45%,54%); stroke:none;" transform="translate(0,364) scale(1,-1)">贡献意愿</text>
+			<text x="20" y="16" style="font-family: SimSun; font-size: 11px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,32) scale(1,-1)">短句为访谈概括，逐字摘录见配套清单。颜色表示受访者来源；主题关系与卡片位置为分析草案。</text>
+		</g>
+	</g>
+</svg>

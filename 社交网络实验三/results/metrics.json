@@ -1,0 +1,28 @@
+{
+  "records": 29846,
+  "clustered_records": 29833,
+  "zero_vector_records": 13,
+  "vocabulary_size": 5000,
+  "k": 220,
+  "nonempty_clusters": 220,
+  "iterations": 24,
+  "converged": true,
+  "inertia": 20445.508069294192,
+  "parameters": {
+    "data": "C:\\Users\\86134\\Desktop\\大四上\\社交网络实验三\\Twitter_data",
+    "output": "C:\\Users\\86134\\Desktop\\大四上\\社交网络实验三\\results",
+    "k": 220,
+    "max_iter": 50,
+    "tol": 0.0001,
+    "seed": 42,
+    "min_df": 2,
+    "max_features": 5000,
+    "batch_size": 1024,
+    "limit": null,
+    "no_normalize": false
+  },
+  "evaluated_records": 29833,
+  "adjusted_rand_index": 0.3179408470744301,
+  "purity": 0.7348573727080749,
+  "elapsed_seconds_before_export": 9.426636400000007
+}

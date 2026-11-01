@@ -1,0 +1,433 @@
+{
+  "schemaVersion": 1,
+  "backend": "native",
+  "rasterEngine": "pdfium",
+  "source": "saved",
+  "inputPath": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\_r2.pdf",
+  "sourceSha256": "2f1ed2920d062df11283c6939c7bd6fe1028cde6c9a5cc6b6152dba6e8172c24",
+  "dpi": 130,
+  "pageCount": 30,
+  "images": [
+    {
+      "index": 1,
+      "page": 1,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0001.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 88486
+    },
+    {
+      "index": 2,
+      "page": 2,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0002.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 111895
+    },
+    {
+      "index": 3,
+      "page": 3,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0003.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 311050
+    },
+    {
+      "index": 4,
+      "page": 4,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0004.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 201661
+    },
+    {
+      "index": 5,
+      "page": 5,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0005.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 128548
+    },
+    {
+      "index": 6,
+      "page": 6,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0006.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 434275
+    },
+    {
+      "index": 7,
+      "page": 7,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0007.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 145080
+    },
+    {
+      "index": 8,
+      "page": 8,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0008.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 162354
+    },
+    {
+      "index": 9,
+      "page": 9,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0009.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 173873
+    },
+    {
+      "index": 10,
+      "page": 10,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0010.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 184700
+    },
+    {
+      "index": 11,
+      "page": 11,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0011.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 160023
+    },
+    {
+      "index": 12,
+      "page": 12,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0012.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 179639
+    },
+    {
+      "index": 13,
+      "page": 13,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0013.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 149549
+    },
+    {
+      "index": 14,
+      "page": 14,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0014.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 125938
+    },
+    {
+      "index": 15,
+      "page": 15,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0015.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 148999
+    },
+    {
+      "index": 16,
+      "page": 16,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0016.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 168173
+    },
+    {
+      "index": 17,
+      "page": 17,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0017.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 434159
+    },
+    {
+      "index": 18,
+      "page": 18,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0018.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 224525
+    },
+    {
+      "index": 19,
+      "page": 19,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0019.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 413489
+    },
+    {
+      "index": 20,
+      "page": 20,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0020.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 520387
+    },
+    {
+      "index": 21,
+      "page": 21,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0021.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 151888
+    },
+    {
+      "index": 22,
+      "page": 22,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0022.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 150514
+    },
+    {
+      "index": 23,
+      "page": 23,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0023.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 151760
+    },
+    {
+      "index": 24,
+      "page": 24,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0024.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 127695
+    },
+    {
+      "index": 25,
+      "page": 25,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0025.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 141362
+    },
+    {
+      "index": 26,
+      "page": 26,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0026.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 137563
+    },
+    {
+      "index": 27,
+      "page": 27,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0027.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 130295
+    },
+    {
+      "index": 28,
+      "page": 28,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0028.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 177013
+    },
+    {
+      "index": 29,
+      "page": 29,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0029.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 122985
+    },
+    {
+      "index": 30,
+      "page": 30,
+      "path": "C:\\Users\\86134\\Desktop\\大四上\\社交网络汇报\\preview\\page-0030.png",
+      "width": 1734,
+      "height": 975,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "byteLength": 151422
+    }
+  ],
+  "missingFonts": []
+}

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="475" height="164" preserveAspectRatio="xMinYMin meet" viewBox="0 0 475 164" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="475" height="164"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-164)" style="clip-path: url(#clip)">
+		<g transform="">
+			<text x="0" y="151" style="font-family: SimHei; font-size: 11px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,302) scale(1,-1)">图1 学习阶段</text>
+			<path d="M 110,22 L 110,137 Z" style="stroke: rgb(90%,92%,95%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="108.0" y="8" style="font-family: SimSun; font-size: 8px;fill: rgb(41%,47%,54%); stroke:none;" transform="translate(0,16) scale(1,-1)">0</text>
+			<path d="M 243.181818,22 L 243.181818,137 Z" style="stroke: rgb(90%,92%,95%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="241.1818181818182" y="8" style="font-family: SimSun; font-size: 8px;fill: rgb(41%,47%,54%); stroke:none;" transform="translate(0,16) scale(1,-1)">5</text>
+			<path d="M 403,22 L 403,137 Z" style="stroke: rgb(90%,92%,95%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="399.0" y="8" style="font-family: SimSun; font-size: 8px;fill: rgb(41%,47%,54%); stroke:none;" transform="translate(0,16) scale(1,-1)">11</text>
+			<text x="56.99999999999999" y="125" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,250) scale(1,-1)">本科一年级</text>
+			<rect x="110" y="123" width="26.636363636363626" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="141.63636363636363" y="125" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,250) scale(1,-1)">1（9.1%）</text>
+			<text x="56.99999999999999" y="103" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,206) scale(1,-1)">本科二年级</text>
+			<rect x="110" y="101" width="26.636363636363626" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="141.63636363636363" y="103" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,206) scale(1,-1)">1（9.1%）</text>
+			<text x="56.99999999999999" y="81" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,162) scale(1,-1)">本科三年级</text>
+			<rect x="110" y="79" width="106.54545454545456" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="221.54545454545456" y="81" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,162) scale(1,-1)">4（36.4%）</text>
+			<text x="29.999999999999986" y="59" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,118) scale(1,-1)">本科四年级及以上</text>
+			<rect x="110" y="57" width="106.54545454545456" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="221.54545454545456" y="59" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,118) scale(1,-1)">4（36.4%）</text>
+			<text x="75.0" y="37" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,74) scale(1,-1)">研究生</text>
+			<rect x="110" y="35" width="26.636363636363626" height="12" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="141.63636363636363" y="37" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,74) scale(1,-1)">1（9.1%）</text>
+		</g>
+	</g>
+</svg>

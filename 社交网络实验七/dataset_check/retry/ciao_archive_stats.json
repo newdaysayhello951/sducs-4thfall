@@ -1,0 +1,20 @@
+{
+  "ciao/rating.mat": {
+    "rows": 284086,
+    "users": 7375,
+    "items": 105114,
+    "rating_values": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "unique_pairs": 282650
+  },
+  "ciao/trustnetwork.mat": {
+    "rows": 111781,
+    "columns": 2
+  }
+}

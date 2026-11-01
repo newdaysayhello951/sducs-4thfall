@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NL ⇒ Schedule 论文汇报 — 黎贤栗3</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; overflow:hidden; font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#fff; color:#1a1a2e; }
+  .slide { display:none; width:100%; height:100%; padding:40px 60px; position:relative; }
+  .slide.active { display:flex; flex-direction:column; }
+  .slide-num { position:absolute; bottom:16px; right:28px; font-size:11px; color:#bbb; }
+
+  .cover { justify-content:center; padding-left:80px; }
+  .cover .conf { font-size:13px; color:#2E4878; letter-spacing:2px; margin-bottom:20px; }
+  .cover h1 { font-size:36px; font-weight:700; line-height:1.3; margin-bottom:14px; }
+  .cover .sub { font-size:16px; color:#666; margin-bottom:40px; }
+  .cover .meta { font-size:14px; color:#888; line-height:1.8; }
+  .cover .bar { width:56px; height:3px; background:#2E4878; margin-bottom:28px; }
+
+  h2.page-title { font-size:26px; font-weight:700; margin-bottom:6px; }
+  .accent-bar { width:36px; height:3px; background:#2E4878; margin:10px 0 18px; }
+  .lead { font-size:15px; color:#555; line-height:1.7; margin-bottom:20px; max-width:900px; }
+
+  .chart-box { width:100%; flex:1; min-height:0; }
+  .chart-row { display:flex; gap:24px; flex:1; min-height:0; }
+  .chart-row > div { flex:1; }
+
+  .formula-box { background:#f7f9fc; border-left:3px solid #2E4878; padding:14px 20px; margin:12px 0; font-size:15px; line-height:1.8; }
+  .formula-box .label { font-size:12px; color:#888; margin-bottom:4px; }
+
+  .flow-row { display:flex; align-items:center; justify-content:center; gap:10px; margin:16px 0; }
+  .flow-node { padding:10px 16px; border:1.5px solid #2E4878; border-radius:6px; font-size:13px; font-weight:600; color:#2E4878; text-align:center; }
+  .flow-node.fill { background:#2E4878; color:#fff; }
+  .flow-node.green { border-color:#519D78; color:#519D78; }
+  .flow-node.green.fill { background:#519D78; color:#fff; }
+  .flow-arrow { font-size:18px; color:#aaa; }
+
+  table.tbl { width:100%; border-collapse:collapse; font-size:13px; margin:12px 0; }
+  table.tbl th { background:#2E4878; color:#fff; padding:8px; text-align:center; }
+  table.tbl td { padding:7px 8px; text-align:center; border-bottom:1px solid #eee; }
+  table.tbl tr:nth-child(even) td { background:#f9fafc; }
+  table.tbl td.hl { color:#2E4878; font-weight:700; }
+
+  .key-point { font-size:15px; line-height:1.8; color:#333; padding:10px 0; border-bottom:1px solid #f0f0f0; }
+  .key-point:last-child { border-bottom:none; }
+  .key-point strong { color:#2E4878; }
+
+  .ending { justify-content:center; align-items:center; text-align:center; }
+  .ending h1 { font-size:44px; color:#2E4878; margin-bottom:16px; }
+  .ending p { font-size:17px; color:#666; }
+
+  .nav-hint { position:fixed; bottom:6px; left:50%; transform:translateX(-50%); font-size:10px; color:#ddd; }
+</style>
+</head>
+<body>
+
+<!-- P1 封面 -->
+<div class="slide cover active">
+  <div class="conf">ACL 2026 · Long Paper</div>
+  <div class="bar"></div>
+  <h1>NL ⇒ Schedule:<br>Evaluate Multitask Scheduling<br>Capability of LLMs</h1>
+  <div class="sub">从自然语言到调度：大模型多任务调度能力评测与 MANS 多智能体框架</div>
+  <div class="meta">原文：Liao et al., Sichuan University<br>汇报人：黎贤栗</div>
+  <div class="slide-num">01</div>
+</div>
+
+<!-- P2 问题定义 -->
+<div class="slide">
+  <h2 class="page-title">问题：NL ⇒ Schedule</h2>
+  <div class="accent-bar"></div>
+  <p class="lead">给定自然语言描述的多任务调度问题，模型需输出可行调度——这不是抽取/翻译，而是<b>归纳推理</b>。</p>
+  <div class="flow-row">
+    <div class="flow-node">自然语言描述</div>
+    <div class="flow-arrow">⇒</div>
+    <div class="flow-node fill">LLM 端到端</div>
+    <div class="flow-arrow">⇒</div>
+    <div class="flow-node">可行调度甘特图</div>
+  </div>
+  <div class="formula-box">
+    <div class="label">目标</div>
+    min C_max（最后一道工序完成时间），受工序先后约束 + 每台机器同一时间只干一个活。
+  </div>
+  <div class="slide-num">02</div>
+</div>
+
+<!-- P3 两条路线 -->
+<div class="slide">
+  <h2 class="page-title">为什么需要新范式？</h2>
+  <div class="accent-bar"></div>
+  <p class="lead">现有两条路都有硬伤。</p>
+  <div class="chart-row">
+    <div>
+      <div class="key-point"><strong>经典 Matrix2Schedule</strong><br>输入矩阵，跳过语言理解——不真实。</div>
+      <div class="key-point"><strong>LLM + Solver 流水线</strong><br>LLM 写代码 → 外部 solver 求解——代码一错全崩，脆弱。</div>
+    </div>
+    <div>
+      <div class="formula-box">
+        <div class="label">本文主张</div>
+        LLM 自己当 solver，端到端从文本直接输出调度，不写代码、不依赖外部求解器。
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">03</div>
+</div>
+
+<!-- P4 三个RQ -->
+<div class="slide">
+  <h2 class="page-title">三个研究问题</h2>
+  <div class="accent-bar"></div>
+  <div style="display:flex; gap:20px; flex:1; margin-top:16px;">
+    <div style="flex:1; border-top:4px solid #2E4878; padding:20px; background:#f9fafc;">
+      <div style="font-size:28px; font-weight:700; color:#2E4878;">RQ1</div>
+      <p style="font-size:15px; margin-top:10px; line-height:1.6;">LLM 能端到端做吗？</p>
+    </div>
+    <div style="flex:1; border-top:4px solid #519D78; padding:20px; background:#f5faf7;">
+      <div style="font-size:28px; font-weight:700; color:#519D78;">RQ2</div>
+      <p style="font-size:15px; margin-top:10px; line-height:1.6;">差在哪？潜力在哪？</p>
+    </div>
+    <div style="flex:1; border-top:4px solid #c97b3c; padding:20px; background:#fdf8f3;">
+      <div style="font-size:28px; font-weight:700; color:#c97b3c;">RQ3</div>
+      <p style="font-size:15px; margin-top:10px; line-height:1.6;">怎么增强？</p>
+    </div>
+  </div>
+  <div class="slide-num">04</div>
+</div>
+
+<!-- P5 数据集 -->
+<div class="slide">
+  <h2 class="page-title">数据集：240 实例 · 4 场景</h2>
+  <div class="accent-bar"></div>
+  <div class="flow-row" style="margin:12px 0;">
+    <div class="flow-node">① 爬取 135 真实任务 DAG</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">② Jaccard 聚成 13 车间，抽 5-10 任务</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">③ data2text 生成自然语言描述</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node fill">OR-Tools 标注最优解</div>
+  </div>
+  <table class="tbl">
+    <tr><th>场景</th><th>工序数</th><th>瓶颈利用率</th><th>机器重叠度</th><th>难度特点</th></tr>
+    <tr><td>建筑</td><td class="hl">8.67</td><td>0.77</td><td>55%</td><td>长链依赖</td></tr>
+    <tr><td>烹饪</td><td>7.19</td><td class="hl">1.00</td><td>48%</td><td>零空闲瓶颈</td></tr>
+    <tr><td>制造</td><td>5.05</td><td>0.96</td><td class="hl">80%</td><td>资源竞争最烈</td></tr>
+    <tr><td>制药</td><td>4.17</td><td>0.93</td><td>64%</td><td>高频短周期</td></tr>
+  </table>
+  <div class="slide-num">05</div>
+</div>
+
+<!-- P6 指标 -->
+<div class="slide">
+  <h2 class="page-title">三个评测指标</h2>
+  <div class="accent-bar"></div>
+  <div class="formula-box">
+    <div class="label">SER — 步骤执行率</div>
+    SER = (1/|S|) Σ_s (1/|T_s|) Σ_t |O_j^c| / |O_j|
+  </div>
+  <div class="formula-box">
+    <div class="label">TCR — 任务完成率</div>
+    TCR = (1/|S|) Σ_s |T_s^c| / |T_s|
+  </div>
+  <div class="formula-box">
+    <div class="label">SFR — 调度可行率（核心瓶颈指标）</div>
+    SFR = |S_f| / |S|
+  </div>
+  <div class="slide-num">06</div>
+</div>
+
+<!-- P7 RQ1 结果 -->
+<div class="slide">
+  <h2 class="page-title">RQ1：SFR 普遍 &lt; 30%</h2>
+  <div class="accent-bar"></div>
+  <div id="chart-rq1" class="chart-box"></div>
+  <div class="slide-num">07</div>
+</div>
+
+<!-- P8 RQ1 发现 -->
+<div class="slide">
+  <h2 class="page-title">RQ1：四个关键发现</h2>
+  <div class="accent-bar"></div>
+  <div class="key-point"><strong>SFR 极低</strong>：最强 Gemini-2.5-Pro 在 10 任务时仅 17.5%</div>
+  <div class="key-point"><strong>规模越大越崩</strong>：组合复杂度是硬伤</div>
+  <div class="key-point"><strong>CoT 对弱模型有害</strong>：Qwen3-thinking 反而更差</div>
+  <div class="key-point"><strong>梯队</strong>：Gemini-2.5-Pro ≈ o4-mini &gt; DeepSeek-R1 &gt; GPT-4.1 &gt; 开源小模型</div>
+  <div class="slide-num">08</div>
+</div>
+
+<!-- P9 RQ2 失败 -->
+<div class="slide">
+  <h2 class="page-title">RQ2：四层失败诊断</h2>
+  <div class="accent-bar"></div>
+  <div class="chart-row">
+    <div id="chart-fail" style="height:100%;"></div>
+    <div style="display:flex; flex-direction:column; justify-content:center;">
+      <div class="key-point"><strong>弱模型</strong>：78.7% 漏任务，高层就崩</div>
+      <div class="key-point"><strong>强模型</strong>：任务找全了，但机器配错、资源冲突</div>
+      <div class="key-point"><strong>最终瓶颈</strong>：约束遵守（机器冲突、顺序颠倒）</div>
+    </div>
+  </div>
+  <div class="slide-num">09</div>
+</div>
+
+<!-- P10 RQ2 潜力 -->
+<div class="slide">
+  <h2 class="page-title">RQ2：但 LLM 有专家级潜力</h2>
+  <div class="accent-bar"></div>
+  <p class="lead">可行调度的 RMD ≈ 8.5%，效率堪比 PDR 基线。思维链分析发现三种专家能力：</p>
+  <div style="display:flex; gap:20px; margin-top:12px;">
+    <div style="flex:1; padding:16px; border-left:3px solid #2E4878; background:#f9fafc;">
+      <strong style="color:#2E4878;">全局规划</strong>
+      <p style="font-size:13px; margin-top:6px; color:#555;">识别瓶颈、CPM 关键路径</p>
+    </div>
+    <div style="flex:1; padding:16px; border-left:3px solid #519D78; background:#f5faf7;">
+      <strong style="color:#519D78;">局部优化</strong>
+      <p style="font-size:13px; margin-top:6px; color:#555;">最早开始时间贪心</p>
+    </div>
+    <div style="flex:1; padding:16px; border-left:3px solid #c97b3c; background:#fdf8f3;">
+      <strong style="color:#c97b3c;">自我纠错</strong>
+      <p style="font-size:13px; margin-top:6px; color:#555;">发现冲突→回溯重排</p>
+    </div>
+  </div>
+  <div class="slide-num">10</div>
+</div>
+
+<!-- P11 MANS -->
+<div class="slide">
+  <h2 class="page-title">RQ3：MANS 四 Agent 框架</h2>
+  <div class="accent-bar"></div>
+  <div class="flow-row" style="margin:20px 0;">
+    <div class="flow-node green fill">Seeker<br><span style="font-size:11px;">找全任务</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node green fill">Weaver<br><span style="font-size:11px;">解析步骤</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node green fill">Verifier<br><span style="font-size:11px;">校验保真</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node fill">Architect<br><span style="font-size:11px;">调度求解</span></div>
+  </div>
+  <p class="lead" style="text-align:center;">从 "LLM-as-Translator" 转向 "LLM-as-Solver"，每个 Agent 只干一件事。</p>
+  <div class="slide-num">11</div>
+</div>
+
+<!-- P12 MANS 对比 -->
+<div class="slide">
+  <h2 class="page-title">MANS vs LLM+Solver</h2>
+  <div class="accent-bar"></div>
+  <div id="chart-cmp" class="chart-box"></div>
+  <div style="display:flex; gap:24px; margin-top:8px; font-size:13px; color:#666;">
+    <span>WRT 79.6s（快 40-50%）</span>
+    <span>RMD 0.085</span>
+    <span>无代码级联错误</span>
+  </div>
+  <div class="slide-num">12</div>
+</div>
+
+<!-- P13 消融 -->
+<div class="slide">
+  <h2 class="page-title">消融：Seeker 最关键</h2>
+  <div class="accent-bar"></div>
+  <div id="chart-abl" class="chart-box"></div>
+  <p class="lead" style="margin-top:8px; text-align:center;">去掉 Seeker，10 任务 SFR 从 27.5% 暴跌至 7.5%——圈对问题范围是第一步。</p>
+  <div class="slide-num">13</div>
+</div>
+
+<!-- P14 结论 -->
+<div class="slide">
+  <h2 class="page-title">结论</h2>
+  <div class="accent-bar"></div>
+  <div class="key-point"><strong>提出任务</strong>：NL ⇒ Schedule，首个大规模 benchmark</div>
+  <div class="key-point"><strong>诊断</strong>：LLM 有专家级全局规划能力，但过程落地（约束遵守）是短板</div>
+  <div class="key-point"><strong>方法</strong>：MANS 多智能体框架，性能比肩 LLM+solver，更快更稳</div>
+  <div class="key-point"><strong>局限</strong>：半合成数据、规模小（5-10 任务）、无动态约束</div>
+  <div class="slide-num">14</div>
+</div>
+
+<!-- P15 Q&A -->
+<div class="slide ending">
+  <h1>谢谢</h1>
+  <p>欢迎提问</p>
+</div>
+
+<div class="nav-hint">← → 翻页</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let cur = 0;
+function show(i) {
+  slides[cur].classList.remove('active');
+  cur = Math.max(0, Math.min(slides.length-1, i));
+  slides[cur].classList.add('active');
+  if (cur===6 && !window._rq1) { initRQ1(); window._rq1=true; }
+  if (cur===8 && !window._fail) { initFail(); window._fail=true; }
+  if (cur===11 && !window._cmp) { initCmp(); window._cmp=true; }
+  if (cur===12 && !window._abl) { initAbl(); window._abl=true; }
+}
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key===' ') show(cur+1);
+  if (e.key==='ArrowLeft') show(cur-1);
+});
+
+function initRQ1() {
+  echarts.init(document.getElementById('chart-rq1')).setOption({
+    tooltip:{trigger:'axis'}, legend:{bottom:0},
+    grid:{left:50,right:20,top:20,bottom:40},
+    xAxis:{type:'category',data:['5','6','7','8','9','10任务']},
+    yAxis:{type:'value',max:0.35,axisLabel:{formatter:v=>(v*100)+'%'}},
+    series:[
+      {name:'Gemini-2.5-Pro',type:'line',data:[0.325,0.275,0.250,0.200,0.200,0.175],itemStyle:{color:'#2E4878'},lineStyle:{width:3}},
+      {name:'o4-mini',type:'line',data:[0.325,0.250,0.225,0.250,0.200,0.125],itemStyle:{color:'#519D78'}},
+      {name:'DeepSeek-R1',type:'line',data:[0.250,0.175,0.125,0.125,0.100,0.050],itemStyle:{color:'#c97b3c'}},
+    ]
+  });
+}
+function initFail() {
+  echarts.init(document.getElementById('chart-fail')).setOption({
+    tooltip:{}, grid:{left:90,right:30,top:10,bottom:20},
+    xAxis:{type:'value',max:100,axisLabel:{formatter:'{value}%'}},
+    yAxis:{type:'category',data:['约束违反','机器配错','步骤遗漏','任务遗漏']},
+    series:[{type:'bar',data:[
+      {value:65,itemStyle:{color:'#c97b3c'}},
+      {value:55,itemStyle:{color:'#c97b3c'}},
+      {value:30,itemStyle:{color:'#2E4878'}},
+      {value:10,itemStyle:{color:'#519D78'}}
+    ],label:{show:true,position:'right',formatter:'{c}%'}}]
+  });
+}
+function initCmp() {
+  echarts.init(document.getElementById('chart-cmp')).setOption({
+    tooltip:{trigger:'axis'}, legend:{bottom:0},
+    grid:{left:50,right:20,top:20,bottom:40},
+    xAxis:{type:'category',data:['5','6','7','8','9','10任务']},
+    yAxis:{type:'value',max:0.75,axisLabel:{formatter:v=>(v*100)+'%'}},
+    series:[
+      {name:'MANS (ours)',type:'bar',data:[0.702,0.690,0.608,0.697,0.582,0.682],itemStyle:{color:'#519D78'}},
+      {name:'CoE+MOPNR',type:'bar',data:[0.691,0.665,0.626,0.701,0.674,0.587],itemStyle:{color:'#2E4878'}},
+    ]
+  });
+}
+function initAbl() {
+  echarts.init(document.getElementById('chart-abl')).setOption({
+    tooltip:{trigger:'axis'}, legend:{bottom:0},
+    grid:{left:50,right:20,top:20,bottom:40},
+    xAxis:{type:'category',data:['完整','w/o Seeker','w/o Weaver','w/o Verifier']},
+    yAxis:{type:'value',max:0.75,axisLabel:{formatter:v=>(v*100)+'%'}},
+    series:[
+      {name:'5任务 SER',type:'bar',data:[0.702,0.612,0.665,0.648],itemStyle:{color:'#2E4878'}},
+      {name:'10任务 SER',type:'bar',data:[0.682,0.482,0.637,0.594],itemStyle:{color:'#519D78'}},
+    ]
+  });
+}
+</script>
+</body>
+</html>

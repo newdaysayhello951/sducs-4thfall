@@ -1,0 +1,942 @@
+UvA-DARE (Digital Academic Repository)
+
+
+
+
+Time-aware multi-viewpoint summarization of multilingual social text streams
+
+
+Ren, Z.; Inel, O.; Aroyo, L.; de Rijke, M.
+
+Published in:
+CIKM'16
+
+
+DOI:
+10.1145/2983323.2983710
+
+
+Link to publication
+
+
+
+
+Citation for published version (APA):
+Ren, Z., Inel, O., Aroyo, L., & de Rijke, M. (2016). Time-aware multi-viewpoint summarization of multilingual
+social text streams. In CIKM'16: proceedings of the 2016 ACM Conference on Information and Knowledge
+Management : October 24-28, 2016, Indianapolis, IN, USA (pp. 387-396). New York, NY: Association for
+Computing Machinery. https://doi.org/10.1145/2983323.2983710
+
+
+
+
+General rights
+It is not permitted to download or to forward/distribute the text or part of it without the consent of the author(s) and/or copyright holder(s),
+other than for strictly personal, individual use, unless the work is under an open content license (like Creative Commons).
+
+
+
+
+Disclaimer/Complaints regulations
+If you believe that digital publication of certain material infringes any of your rights or (privacy) interests, please let the Library know, stating
+your reasons. In case of a legitimate complaint, the Library will make the material inaccessible and/or remove it from the website. Please Ask
+the Library: https://uba.uva.nl/en/contact, or a letter to: Library of the University of Amsterdam, Secretariat, Singel 425, 1012 WP Amsterdam,
+The Netherlands. You will be contacted as soon as possible.
+
+
+
+
+UvA-DARE is a service provided by the library of the University of Amsterdam (http://dare.uva.nl)
+
+
+
+Download date: 26 2019
+                        Time-aware Multi-Viewpoint Summarization
+                           of Multilingual Social Text Streams
+
+                                                   Zhaochun Ren                                                   Oana Inel
+                                           University of Amsterdam                                 VU University Amsterdam
+                                         Amsterdam, The Netherlands                               Amsterdam, The Netherlands
+                                                     z.ren@uva.nl                                      oana.inel@vu.nl
+
+                                                       Lora Aroyo                                     Maarten de Rijke
+                                          VU University Amsterdam                                   University of Amsterdam
+                                         Amsterdam, The Netherlands                               Amsterdam, The Netherlands
+                                                 lora.aroyo@vu.nl                                        derijke@uva.nl
+
+ABSTRACT                                                                                              Tweets
+                                                                                                         Tweets
+                                                                                                                  Tweets
+                                                                                                                               Tweets
+                                                                                                                                  Tweets
+                                                                                                                                             Tweets
+                                                                                                                                                               Tweets
+                                                                                                                                                                  Tweets
+                                                                                                                                                                             Tweets
+                                                                                                                                                                                                                      Tweets
+                                                                                                                                                                                                                         Tweets
+                                                                                                                                                                                                                                  Tweets
+
+
+A viewpoint is a triple consisting of an entity, a topic related to                                               +                          +                              +                    ... ...   ... ...                +             Timeline
+                                                                                                                               Weibo                                                                                  Weibo       Weibos
+                                                                                                      Weibo       Weibos                     Weibos            Weibo        Weibos
+this entity and sentiment towards this topic. In time-aware multi-                                        Weibo                    Weibo                           Weibo                                                  Weibo
+
+
+
+
+viewpoint summarization one monitors viewpoints for a running
+                                                                                                                                             Time-aware Multi-Viewpoint Summarizer
+topic and selects a small set of informative documents. In this                                                                                                                   viewpoint v1
+paper, we focus on time-aware multi-viewpoint summarization of                                                                viewpoint v4
+                                                                                                                                                      viewpoint v2
+                                                                                                                                                                                                     viewpoint v3
+                                                                                                                                                                                                                                      ... ...
+multilingual social text streams. Viewpoint drift, ambiguous en-
+tities and multilingual text make this a challenging task. Our ap-                                    Summary at t1             Summary at t2
+                                                                                                                                 :*5 >)
+                                                                                                                                                                Summary at t3                                          Summary at tT
+
+                                                                                                      Brazil police,                                                 Is the author of this                              Netherlands beats
+                                                                                                                                 9=4 
+proach includes three core ingredients: dynamic viewpoint model-                                      protesters clash as         .<K
+                                                                                                                                 -0%!8
+                                                                                                                                                                     article serious?
+                                                                                                                                                                     Knows nothing
+                                                                                                                                                                                                                        Mexico in World
+                                                                                                                                                                                                                        Cup
+                                                                                                      World Cup begins
+ing, cross-language viewpoint alignment, and, finally, multi-view-                                                                                                   about the               ... ...
+                                                                                                                                                                     #WorldCup -
+                                                                                                                                                                     Watching the World
+                                                                                                                                                                                                            ... ...
+                                                                                                                                  Long live Germany                                                                     71 6'
+point summarization. Specifically, we propose a dynamic latent                                        Who better to explain
+                                                                                                      the emotion of a
+                                                                                                                                  ☺"@K_Adelmund:
+                                                                                                                                                                     Cup is un-American
+                                                                                                                                                                                                                        + =,#71
+                                                                                                                                                                                                                        /=3;1000
+                                                                                                      #WorldCup Opening           Germany - Portugal
+factor model to explicitly characterize a set of viewpoints through                                   Match than a scorer
+                                                                                                      at France 1998?
+                                                                                                                                  what u think?"                     We sat down with
+                                                                                                                                                                     Arturo Vidal ahead
+which entities, topics and sentiment labels during a time interval                                                                ,&(2"
+                                                                                                                                                                     of @ANFPChile’s
+                                                                                                                                                                     #WorldCup clash
+                                                                                                                                  71$<
+                                                                                                                                                                     with Spain
+are derived jointly; we connect viewpoints in different languages by
+using an entity-based semantic similarity measure; and we employ                                  Figure 1: An example of time-aware multi-viewpoint summa-
+an update viewpoint summarization strategy to generate a time-                                    rization of multilingual social text streams about #FIFA World-
+aware summary to reflect viewpoints. Experiments conducted on                                     cup 2014. The timeline at the top is divided into multiple time
+a real-world dataset demonstrate the effectiveness of our proposed                                periods. The social text stream is composed of English language
+method for time-aware multi-viewpoint summarization of multilin-                                  tweets and Chinese language weibos, which are shown at the
+gual social text streams.                                                                         top as yellow and blue rectangles, respectively. The time-aware
+                                                                                                  multi-viewpoint summarizer detects temporal viewpoints by
+Keywords                                                                                          analyzing social text and generating an update summary at
+                                                                                                  each period to reflect salient viewpoints. The summarization
+Multi-viewpoint summarization; Dynamic viewpoint modeling;                                        results are shown as colored round rectangles.
+Topic modeling; Multilingual social text streams
+                                                                                                  The task we address is time-aware multi-viewpoint summarization
+1.     INTRODUCTION                                                                               of multilingual social text streams: we extract a set of informative
+   Focused on an entity [35], a viewpoint refers to a topic with a spe-                           social text documents to highlight the generation, propagation and
+cific sentiment label. As an example, consider the entity “Japan”                                 drift process of viewpoints in a given social text stream. Fig. 1
+within the topic “#Whale hunting,” with a negative sentiment. With                                shows an example of our task’s output for the topic “#FIFA World-
+the development of social media, we have witnessed a growth in the                                Cup 2014.”
+number of social media posts that express dynamically changing                                       The growth in the volume of social text streams motivates the
+viewpoints in different languages around the same topic [38]. Un-                                 development of methods that facilitate the understanding of those
+like viewpoints in stationary documents, time-aware viewpoints of                                 viewpoints. Their multi-lingual character is currently motivating
+social text streams are dynamic, volatile and cross-linguistic [15].                              an increasing volume of information retrieval research on multi-
+                                                                                                  lingual social text streams, in areas as diverse as reputation polar-
+Permission to make digital or hard copies of part or all of this work for personal or             ity estimation [38] and entity-driven content exploration [43]. Re-
+classroom use is granted without fee provided that copies are not made or distributed             cent work confirms that viewpoint summarization is an effective
+for profit or commercial advantage and that copies bear this notice and the full citation
+on the first page. Copyrights for third-party components of this work must be honored.            way of assisting users to understand viewpoints in stationary doc-
+For all other uses, contact the owner/author(s).                                                  uments [17, 19, 26, 29, 30, 34, 46]—but viewpoint summarization
+CIKM’16 , October 24 - 28, 2016, Indianapolis, IN, USA                                            for multilingual social text streams has not been addressed yet.
+c 2016 Copyright held by the owner/author(s).                                                        The most closely related work to time-aware viewpoint summa-
+ACM ISBN 978-1-4503-4073-1/16/10. . . $15.00                                                      rization is the viewpoint summarization of stationary documents
+DOI: http://dx.doi.org/10.1145/2983323.2983710                                                    [37], in which a sentence ranking algorithm is used to summarize
+
+
+
+
+                                                                                            387
+contrastive viewpoints based on a topic-aspect model [36]. Com-                  Compared with previous work, our task is different: (1) our
+pared with viewpoint summarization in stationary documents, the               work is to extract and summarize dynamic viewpoints from multi-
+task of time-aware multi-viewpoint summarization of social text               lingual social text streams; (2) our strategy is based on a latent
+streams faces four challenges: (1) the ambiguity of entities in so-           factor model that focuses on dynamic viewpoints on the timeline;
+cial text streams; (2) viewpoint drift, so that a viewpoint’s statis-         (3) our task pays attention to methods on cross-language processing
+tical properties change over time; (3) multi-linguality, and (4) the          and update summarization.
+shortness of social text streams. Therefore, existing approaches to
+viewpoint summarization cannot be directly applied to time-aware              2.2    Update summarization
+viewpoint summarization of social text streams.                                  Traditional document summarization is retrospective in nature.
+   We propose a method to tackle the above challenges: (1) We                 Update summarization extracts and synthesizes novel information
+employ a state-of-the-art entity linking method to identify candi-            in a collection of documents [11, 33]. Given a base collection
+date entities from social text; (2) We represent a viewpoint as a             that users have already read and another update collection of re-
+tuple of an entity, a topic and a sentiment label, and propose a dy-          cent documents, the goal of update summarization is to generate an
+namic latent factor model, called the viewpoint tweet topic model             update summary by analyzing the novelty, contrast and prevalence.
+(VTTM), to discover life cycles of a viewpoint. Unlike most ex-               An intuitive solution to update summarization is to remove redun-
+isting topic models, VTTM jointly tracks dynamic viewpoints and               dancy from the output generated by a multi-document summarizer
+any viewpoint drift arising with the passing of time. VTTM em-                [10, 16]. Wan [44] propose a co-ranking algorithm to optimize
+ploys Markov chains to capture the sentiment dependency between               a trade-off strategy between novelty and relevance metrics. Mc-
+two adjacent words. At each time period, VTTM detects view-                   Creadie et al. [33] propose a pair-wise learning to rank algorithm
+points by jointly generating entities, topics and sentiment labels in         to produce an update summary. They also train a regression model
+social text streams. Gibbs sampling is applied to approximate the             to predict the novelty of the given documents in each time period.
+posterior probability distribution. (3) Focusing on multi-linguality,            As far as we know, no previous work has addressed time-aware
+we employ an entity-based viewpoint alignment method to match                 multi-viewpoint summarization.
+viewpoints in multiple languages by calculating semantic similar-
+ities between viewpoints. (4) Lastly, we present a random walk                2.3    Topic modeling for social text streams
+strategy to extract update summaries to reflect viewpoints.                      Early research on topic modeling addressed the topic detection
+   To evaluate our proposed strategy to summarizing dynamic view-             and tracking (TDT) task, where one needs to find and follow topics
+points in multilingual social text streams, we collect multilingual           and events in a stream of broadcast news stories [3, 4]. With the de-
+microblog posts for 6 well-known topics from 2014. Based on both              velopment of social media, topic modeling for social text streams
+online and offline human annotations, the evaluation of our pro-              has received increased attention [2, 9, 32, 41]. Yang et al. [48] pro-
+posed method for time-aware viewpoint summarization is shown                  pose a large-scale topic modeling system that infers topics of tweets
+to be effective.                                                              over an ontology of hundreds of topics in real-time. Focusing on
+   Our main contributions are: (1) We propose the task of time-               sparsity and drift, Albakour et al. [2] propose a query expansion
+aware multi-viewpoint summarization of multilingual social text               method to tackle real-time filtering in microblogs. To help users
+streams; (2) We propose a viewpoint tweet topic model (VTTM) to               understand events and topics in social text streams, tweets summa-
+track dynamic viewpoints from text streams; (3) We align multilin-            rization has also received attention [9, 41, 42].
+gual viewpoints by calculating semantic similarities via an entity-              Topic models have been successfully applied to topic modeling
+based viewpoint alignment method; (4) We present a Markov ran-                of social text streams [12, 39, 41]. In topic models [7, 21], each
+dom walk strategy to summarize viewpoints from multilingual so-               document is represented as a finite mixture of topics, whereas each
+cial text streams, which is shown to be effective in experiments              topic is represented as a mixture of words. Beyond the insuffi-
+using a real-world dataset.                                                   cient “bag of words” representation, dynamic topic models are pro-
+                                                                              posed to analyze topic evolution in streaming documents, such as
+2.    RELATED WORK                                                            the Dynamic Topic Model [6], Dynamic Mixture Models [47] and
+                                                                              the Topic Tracking Model [25]. To describe the whole life cycle
+  We divide related work into three parts: opinion summarization;
+                                                                              of a topic, Ahmed and Xing [1] propose an infinite dynamic topic
+update summarization, and topic modeling for social text streams.
+                                                                              model on temporal documents. Instead of assuming that a vocabu-
+2.1    Opinion summarization                                                  lary is known a priori, Zhai and Boyd-Graber [49] propose an ex-
+                                                                              tension of the Dirichlet process to add and delete terms over time.
+   In recent years, significant progress has been made on the opin-
+                                                                              Topic models have also been applied to explore personalized topics
+ion summarization task [22]. Opinion summarization generates
+                                                                              and time-aware events in social text streams [12, 41].
+structured [22, 28, 31, 34] or semi-structured [18, 23] summaries
+                                                                                 To the best of our knowledge, there is little previous work on
+for a set of opinionated documents. Given opinionated documents,
+                                                                              summarizing multiple dynamic viewpoints. By jointly modeling
+a structured opinion summary shows positive/negative opinion po-
+                                                                              temporal topics, sentiment labels and entities in multilingual social
+larities. Semi-structured opinion summarization extracts sentences
+                                                                              text streams, we propose a cross-language strategy to tackle the
+to describe opinion polarities. Hu and Liu [23] apply a sentence
+                                                                              viewpoint summarization task for multilingual social text streams.
+ranking approach based on the dominant sentiment according to
+polarity. Kim et al. [27] propose a method to extract explanatory
+sentences as opinion summary. Ganesan et al. [18] propose an un-              3.    PROBLEM FORMULATION
+supervised method to generate a concise summary to reflect opin-                 In this section, we introduce key concepts about time-aware mul-
+ions. Recently, several methods have been proposed for integrat-              ti-viewpoint summarization. First of all, Table 1 lists the notation
+ing sentence ranking and extraction. For instance, Paul et al. [37]           we use in this paper.
+propose a topic model to distinguish topics into contrastive cate-               Given a social text stream D including T time periods, we define
+gories. Because of the ambiguity of entities, viewpoint drift and             Dt ⊂ D to be the set of documents published during the t-th pe-
+multi-linguality, their approach is a poor fit for our task.                  riod. We suppose there are two different languages used in D; we
+
+
+
+
+                                                                        388
+                                                                                 of viewpoints πt at time t is derived from a Dirichlet distribution
+                        Table 1: Glossary.                                       over πt−1 . Assuming that the distribution of topics and sentiments
+      Symbol      Description                                                    also drifts over time, we set φt to be a probability distribution of
+      D           all documents                                                  words in topics and sentiment labels at time t, which is derived
+      W           vocabulary of documents D                                      from a Dirichlet distribution over φt−1 at the previous time t − 1.
+      E           entities set in D                                                 Finally, we define the task of time-aware multi-viewpoint sum-
+      L           sentiments in D                                                marization of multilingual social streams. Let multilingual social
+      Z           topics in D                                                    text streams D posted in T time periods be given. Then,
+      V           viewpoints in D                                                    • at time period t = 1, the target of time-aware multi-view-
+      K           the number of topics, i.e., |Z|                                       point summarization of multilingual social text streams is to
+      E           number of entities                                                    select a set of relevant documents as S1 as a summary of
+      Dt          documents posted at t                                                 viewpoints V1 ;
+         (A)                                                                         • at a time period t, 1 < t ≤ T , the target is to select a set
+      Dt          documents posted in language A at t
+                                                                                        of both relevant and novel documents, to summarize both the
+      Nd          words in document d
+                                                                                        content of viewpoints Vt at time period t and the difference
+      Dt          number of documents posted at t, i.e., |Dt |
+                                                                                        between Vt and viewpoints Vt−1 .
+      Nd          number of words in document d, i.e., |Nd |
+      dt          a document in Dt posted at t
+      vd          a viewpoint in document d, v ∈ V                               4.    METHOD
+      ed          a entity present in document d, e ∈ E
+      wi          the i-th word present in document, w ∈ W                       4.1    Overview
+      zi          a topic present in word wi , z ∈ Z                                 Before providing the details of our proposed method for time-
+      li          a sentiment label present in word wi                           aware viewpoint summarization, we first give an overview in Fig. 2.
+      πt          distribution of viewpoint at t                                 We divide our method in 3 phases: (A) dynamic viewpoint model-
+      θt          distribution of entity over viewpoint at t                     ing; (B) cross-language viewpoint alignment; and (C) multi-view-
+      µt          distribution of topics over viewpoint at t                     point summarization. Given a multilingual social text stream Dt =
+      φv,z,l,t    distribution of words over v, z and l at t                     {d1 , d2 , . . . , dDt } published at time t, in phase A we propose a
+      St          time-aware multi-viewpoint summary at t                        dynamic viewpoint model to draw viewpoints for each document.
+                                                                                 Using a set of viewpoints Vt extracted from phase A, in phase B we
+                                            (A)      (B)            (A)
+                                                                                 use cross-language viewpoint alignment to link similar viewpoints
+divide Dt = {d1 , d2 , . . . , dDt } into Dt ∪ Dt , where Dt                     in different languages by computing the similarity between two en-
+        (B)
+and Dt indicates the set of documents written in language A and                  tities. Phase C then summarizes documents according to viewpoint
+B respectively.                                                                  distributions using a co-ranking based strategy. In the end we get a
+    We begin by defining the notions of topic, entity and sentiment              time-aware multi-viewpoint summary St at time t.
+in our work. Following the definition of topic models [7, 8], we de-
+fine a topic, denoted as z, as a probabilistic distribution over words.          4.2    (A) Dynamic viewpoint modeling
+Assuming K topics exist in the social text streams on which we fo-                  At time period t, given documents Dt in two different languages,
+cus, we set z ∈ {1, 2, . . . , K}. We define an entity, denoted as               our task during phase A is to detect dynamic viewpoints from the
+e, as a rigid designator of a concept around a topic, e.g., “China”              documents in Dt . Using an extension of dynamic topic models [6],
+with “disputed islands between China and Japan”. Using a state-                  we propose a dynamic latent factor model, the viewpoint tweets
+of-the-art entity linking method [35], for each document we find                 topic model (VTTM), that jointly models viewpoints, topics, enti-
+an associated entity ed ∈ E. Sentiment is defined as a probability               ties and sentiment labels in Dt at each time interval t.
+distribution over sentiment labels positive, negative, and neutral.                 Using a state-of-the-art entity linking method for social media
+A sentiment label li ∈ L is attached with each word wi . Fol-                    [35], for each document d at t, we discover entities by calculat-
+lowing [28], we assume that the sentiment label li for a word wi                 ing the COMMONNESS value of the document. We assume that
+depends on the sentiment label for its previous word wi−1 and the                there are, in total, V viewpoints and K topics in social text steams.
+topic zi simultaneously. Specifically, we set li = −1 when word                  For each document d, there are an entity ed and Nd words; for each
+wi is “negative”, whereas li = 1 when wi is “positive.”                          word wi ∈ d, there is a topic zi and a sentiment label li . We assume
+    Given a topic z, sentiment label l and entity e, we define a view-           that the viewpoint vd in d is derived via a multinomial distribution
+point to be a finite mixture over the sentiment, entity and topic, i.e.,         over a random variable πt that indicates a probability distribution
+a tuple v = hz, l, ei. Unlike previous work that considers view-                 over viewpoints at t; each topic z, each sentiment label l and each
+points to be stationary [18, 37, 46], we assume that each viewpoint              entity e in document d is derived from the viewpoint vd . The prob-
+is also changing over time, which effects topics, sentiments and en-             ability distribution πt is derived from a Dirichlet mixture over the
+tities at each time interval. Thus for each viewpoint at time t, we              viewpoint distribution πt−1 at the previous period.
+represent it as a tuple v = hz, l, e, ti. Given documents Dt , be-                  In VTTM we consider the sentiment dependency between two
+cause documents in social text streams are short, we assume that in              adjacent words. That is, a Markov chain is formed to represent the
+each document d ∈ Dt only one viewpoint vd exists. We further                    dependency relation between the sentiment labels of two adjacent
+assume that there exist a probability distribution of viewpoints at              words. Given a word wi , the sentiment label li is selected depend-
+each time period.                                                                ing on its previous one. The transition probability distribution is
+    At time t, we set πt to be a probability distribution of view-               derived from the sentiment label of li−1 and a transition variable
+points at t, µt a probability distribution of topics over viewpoints             xi . The transition variable x ∈ X determines where the corre-
+at t, and θt a probability distribution of entities over viewpoints              sponding sentiment label comes from. If x = 1, then the sentiment
+t. In social text streams, the statistical properties of viewpoints              label li of wi is identical to the sentiment label li−1 of word wi−1 ;
+change over time. Thus we assume that the probability distribution               whereas if xi = −1, the sentiment label li is opposite to li−1 ,
+
+
+
+
+                                                                           389
+              Social text streams at time t-1                  1. Viewpoint distribution ⇡t 1
+                                                               2. Viewpoint-senti-topic distribution                                                                                                   Update summary at t       1
+       t-1     doc d1      ...    doc dDt 1
+                                                                                                       t 1
+
+
+
+
+                                                (A) Dynamic viewpoint modeling at time t               (B) Cross-language viewpoint alignment                                                (C) Multi-viewpoint summarization
+
+                                                 ---- Viewpoint modeling using VTTM                          ---- Cross-language entities alignment                                           ---- Co-ranking based summarization
+                                                          ---- Viewpoints detection v 2 Vt                          ---- Divide entities E into EA and EB by language
+                                                                                                                                                                                                   ---- Novelty nov(di ) for di
+                                                          ---- Entities e 2 E in doc d 2 Dt                         ---- Translate entities using a state-of-the-art SMT approach
+               Social text streams at time t                                                                        ---- Calculate similarity between two entities                                 ---- Coverage cov(di ) for di
+                                                          ---- Topics z 2 Zt
+        t      doc d1      ...     doc dDt                ---- Sentiment lw in word w
+                                                                                                             ---- Cross-language viewpoints linking
+                                                                                                                                                                                                   ---- Viewpoint-sensitive saliency sco
+                                                                                                                    ---- Divide viewpoints into VA and VB by language
+                                                                                                                   ---- Group viewpoints into entity pairs (vi , vj ) 2 VA · VB
+                                                                                                                   ---- Rank viewpoint pairs using random walk strategy
+       ...              ... ...
+                                                               1. Viewpoint distribution ⇡t                                                                                                                          Update summary at t
+              Social text streams at time t+1                  2. Viewpoint-topic distribution µt                                                               1. Common Viewpoints VC
+       t+1     doc d1      ...     doc dDt+1                   3. Entity-viewpoint distribution ✓t                                                              2. Different viewpoints VL
+                                                               4. Viewpoint-topic-sentiment distribution     t
+
+                        ... ...
+Figure 2: Overview of our approach to dynamic viewpoint summarization in social text streams. (A) dynamic viewpoint modeling;
+(B) cross-language viewpoint alignment; (C) multi-viewpoint summarization and generation of the update summary.
+
+
+    • For each topic z ∈ Z and sentiment l at time t:                                                                   P (vd = v | V−d , E, W, Z), we have:
+        – Draw φz,l,t ∼ Dir(φz,l,t−1 · βt );
+                                                                                                                                                                                              n−d
+                                                                                                                                                                                               v,t +α·πt−1
+                                                                                                                                                                                                                          Q n−d
+                                                                                                                                                                                                                             v,e,t +δ
+    • For each viewpoint v ∈ V:                                                                                               P (vd = v | V−d , E, W, Z) ∝                                                            ·                         · (1)
+                                                                                                                                                                                                   n−d
+                                                                                                                                                                                                    t +1                             n−d
+                                                                                                                                                                                                                                      v,t +Eδ
+        – Draw πv,t ∼ Dir(α · πv,t−1 );                                                                                                                                                                                   e∈E
+                                                                                                                                                                                                                              z,l,v
+        – Draw µv,t ∼ Dir(χ); θv,t ∼ Dir(δ)                                                                                           Q          n−d
+                                                                                                                                                  v,z,t +χz,t
+                                                                                                                                                                  Q Q      nwz,l,v,t +βt ·φt−1,w
+        – For each topic z, draw ρv,z ∼ Beta(η);                                                                                                               ·                              z,l,v ,
+                                                                                                                                              n−d                        n−i
+                                                                                                                                                       P                             P
+                                                                                                                                               z,t +      χz,t                   +        β ·φ
+                                                                                                                                    z∈Z              z∈Z
+                                                                                                                                                                 l∈L w∈Nd z,l,v,t w∈N t t−1,w
+    • For each document d ∈ Dt :
+        – Draw a viewpoint vd ∼ M ulti(πt );                                                                            where n−dv,t indicates the number of times that documents have been
+        – Draw an entity ed ∼ M ulti(θvd ,t );                                                                          assigned to viewpoint v at t, except for document d; n−d v,e,t indicates
+        – Draw σ ∼ Dir(τ );                                                                                             the number of times that entity e has been assigned to viewpoint v
+        – For each word wi ∈ Nd , 0 < i < Nd :                                                                          at t, excluding d; n−d v,z,t indicates the number of times that topic
+             ∗ Draw a topic zi ∼ M ulti(µvd ,t );                                                                       z, at time t, has been assigned to viewpoint v, except for topic z
+             ∗ Draw xi ∼ M ulti(σ);                                                                                     in d; nwz,l,v,t indicates the number of times that word w has been
+             ∗ If xi = 1, draw li ∼ li−1
+                                                                                                                        assigned to z, l and v jointly at t; φz,l,v
+                                                                                                                                                               t−1,w is the probability of word
+             ∗ If xi = −1, draw li ∼ (−1) · li−1 ;
+                                                                                                                        w given v, z and l at t − 1.
+             ∗ If xi = 0, draw li ∼ Bern(ρvd ,zi );
+                                                                                                                           As the second step in our sampling procedure, given the view-
+             ∗ Draw word wi ∼ M ulti(φzi ,li ,t ):
+                                                                                                                        point vd sampled from document d, when xi 6= 0 and xi+1 6= 0
+                                                                                                                        we sample the ith word wi ’s topic zi and sentiment label li using
+   Figure 3: Generative process in VTTM at time period t.                                                               the probability in Eq. 2:
+
+which shows that the sentiment label changes form one polarity to                                                            P (zi = k, li = l, xi = x|X−i , L−i , Z−i , W, vd ) ∝
+the other. Thus, we set the transition variable xi = 1 when wi and                                                                       n−i                nw  i ,−i               d                                k,l,v
+                                                                                                                                          vd ,k,t + χk,t      k,l,vd ,t + βt · φt−1,wi
+wi−1 are connected by a correlative conjunction, such as “and” and                                                                       −i       P      · −i            P         k,l,vd
+                                                                                                                                                                                          ·
+“both”; and we set xi = −1 when wi and wi−1 are connected by                                                                            nvd ,t +     χz,t nk,l,v ,t +        βt · φt−1,w
+                                                                                                                                                          z∈Z        w∈N
+                                                                                                                                                                                         d                                                       (2)
+an adversative conjunction, such as “but” and “whereas”; we set                                                                                          wi+1
+                                                                                                                                          wi           n             + I(xi+1 = xi ) + τx
+xi = 0 for other kinds of conjunctions. The generative process of                                                                        n−i,x + τx      −(i+1),xi+1
+                                                                                                                                         wi          ·         wi+1
+VTTM is shown in Fig. 3.
+                                                                                                                                               P                             P
+                                                                                                                                        n−i +     τx          n−(i+1) + 1 +     τx
+   Similar to other topic models [6, 7, 25, 45], it is intractable to                                                                         x∈X                           x∈X
+derive the explicit posterior distribution of viewpoint vd,t at time
+                                                                                                                        where n−i        indicates the number of times that a word with view-
+period t. We apply a Gibbs sampling method [12] for sampling                                                                     vd ,k,t
+
+from the posterior distribution over viewpoints, entities, topics and                                                   point vd has been assigned to a topic k at time period t, except for
+sentiment labels. The sampling algorithm provides a method for                                                          the ith word; nd−i,t indicates the number of words in document d,
+exploring the implicit topic for each word and the particular view-                                                     except for the ith word; n−i,k,l indicates the number of times that
+point for each document.                                                                                                a word has been assigned to topic z and sentiment l synchronously,
+   At time period t, given document d, the target of our sampling is                                                    excluding the ith word; φk,l,wt−1
+                                                                                                                                                          i
+                                                                                                                                                            is the probability of word wi given
+                                                                                                                        z and l at t − 1; nw     i
+                                                                                                                                                    indicates  the number of times that wi has
+to approximate the posterior distribution p(vd , ~zd , ~ld , ~
+                                                             xd | W, Z,                                                                        −i,x
+                                                                                                                        been assigned to x, excluding the current one; and I(xi+1 = xi )
+V, E, t), where ~zd , ~ld and ~
+                              xd indicate document d’s topic vector,                                                    gets the value 1 if xi+1 = xi , and 0 otherwise. When xi = 0, wi ’s
+sentiment labels, and transition vector, respectively. Conceptually,                                                    sentiment label li is derived from a Bernoulli distribution ρvd ,zi ,
+we divide our sampling procedure into two parts. First, we sample                                                       thus the last part in Eq. 2 is replaced
+the conditional probability of viewpoint vd in each document d ∈                                                                                                   Pby a posterior distribution
+                                                                                                                        over η, i.e., (n−i                −i
+                                                                                                                                         z,l,v,t + ηl )/(nv,z,t +    l∈L ηl ).
+Dt given the values of inferred topics and sentiment labels, i.e.,                                                         After sampling the probability for each viewpoint v, topic z and
+P (vd = v | V−d , E, W, Z). Second, given the current state of                                                          sentiment label l, at time period t we approximate the random
+viewpoints, we sample the conditional probability of topic zi with                                                      variable φt that indicates the probability distribution over view-
+sentiment label li for word wi , i.e., P (zi = k, li = l, xi = x |                                                      points, topics and sentiments labels, a viewpoint distribution πt ,
+X−i , L−i , Z−i , W, vd ).                                                                                              a topic distribution µt over viewpoints, and entity distribution θt
+   As the first step in our sampling procedure, for each document                                                       over viewpoints, similar to Iwata et al. [25].
+d ∈ Dt , to calculate the probability of viewpoint vd by sampling
+
+
+
+
+                                                                                                                 390
+4.3     (B) Cross-language viewpoint alignment                                      viewpoints shared by both VA and VB , and VL = (VA ∪VB , v)\VC
+   Using VTTM, we extract viewpoints from multi-lingual social                                             / VC .
+                                                                                    to denote viewpoints v ∈
+text streams. Multi-linguality may make the viewpoint set V redun-
+dant and ambiguous. To address this, we present a cross-language
+viewpoint alignment strategy to connect the same viewpoint across                   4.4    (C) Multi-viewpoint summarization
+languages. Shortness and sparseness hinder statistical machine trans-                  The last step of our method, after cross-language viewpoint align-
+lation in social text streams. We consider entities, i.e., concepts                 ment is time-aware multi-viewpoint summarization of social text
+that can be linked to a specific Wikipedia document, as a means                     streams. Following [11, 16, 33], we propose a time-aware multi-
+to connect viewpoints by comparing the similarity between two                       viewpoint summarization method to summarize time series view-
+linked Wikipedia documents. We divide viewpoints V extracted                        points by extracting a set of documents at each time period.
+from VTTM into VA and VB according to their languages LA and                           Suppose a set of viewpoint summaries {Ss }t−1    s=1 has been gen-
+LB . Similarly, we divide entities E into EA and EB according to                    erated and read during the previous t − 1 time periods. Based on
+their languages.                                                                    viewpoint pairs Vs and viewpoint distributions inferred via VTTM,
+   Given viewpoint vA ∈ VA , at time period t we extract the most                   our target is to generate an update summary St to reflect the dis-
+relevant entity ei ∈ EA that has the highest θv,ei ,t , i.e., P (ei |               tribution of viewpoints at time period t. Inspired by Wan [44], we
+v, t). The same procedure is adapted to obtain ej ∈ EB for another                  employ a co-ranking based algorithm to calculate the saliency of
+viewpoint vB ∈ VB . We compute the similarity between vA and                        each tweet by considering both novelty and coverage. Novelty con-
+vB by comparing the similarity between two entities ei and ej ,                     cerns the semantic divergence of viewpoint probabilities between a
+shown in Eq. 3:                                                                     candidate document di ∈ Dt and previous summaries {Ss }. Cov-
+       simt (vA , vB | t) = sim(ei , ej ) · θvA ,ei ,t · θvB ,ej ,t ,   (3)         erage concerns the relevance of a candidate document di ∈ Dt to a
+                                                                                    given viewpoint. Each document di ’s total saliency score sco(di ) is
+where sim(ei , ej ) is the similarity between ei and ej in two lan-                 composed of a novelty score nov(di ) and a coverage score cov(di ).
+guages. To compute sim(ei , ej ), we compute the similarity be-                        As in co-ranking, Markov random walks are employed to iter-
+tween two linked Wikipedia documents. Using links to English                        atively optimize the ranked list. Three matrices are constructed
+Wikipedia documents on Wikipedia pages, we translate a non-Eng-                     to capture the transmission probability between two documents.
+lish Wikipedia document to an English Wikipedia document, i.e.,                     Given a viewpoint v ∈ VC ∪ VL , item Mi,j   A
+                                                                                                                                   in matrix M A is about
+a corresponding English Wikipedia document W     ce for document
+                                                    j                               the similarity between two candidate documents di and dj in Dt :
+Wej . We use LDA [7] to represent each Wikipedia document W                                                               P P z,l,v z,l,v
+                                                                                                            sim(e, e0 ) ·
+                                                                                                        P
+as a K-dimension topic vector ϕ ~ W . Then sim(ei , ej ) is computed                                                              φdi ,t · φdj ,t
+                                                                                              A       e,e0               z∈Z l∈L
+proportionally to the inner product of the two vectors:                                      Mi,j =                                                ,        (7)
+                                                                                                                  kΦvdi ,t k · kΦvdj ,t k
+                                      ϕWei · ϕ
+                                     |~      ~Wce |
+                                                    j
+                  sim(ei , ej ) =                       ,               (4)         where entity e and e0 belong to Edi and Edj , respectively; Φvdi ,t is
+                                     ϕWei | · |~
+                                    |~         ϕWej |
+                                                                                    a matrix over topics and sentiment labels; each item for z, l, i.e.,
+      ~ Wei indicates the topic vector for entity ei ’s Wikipedia
+where ϕ                                                                             φz,l,v                                                     z,l,v
+                                                                                      di ,t in Eq. 7, is calculated by averaging the value of φt,w of all
+document, and ϕ
+              ~Wce indicates the topic vector for entity ej ’s trans-
+                                                                                    words w ∈ di . Since the transmission matrix must be a stochastic
+                      j                                                             matrix [13], we normalize M A to M   cA by making the sum of each
+lated Wikipedia document. We sum up the similarities between vA
+                                                                                    row equal to 1.
+                       P to obtain the similarity between vA and
+and vB at all time periods                                                                                 cB to represent the transmission matrix among
+vB : sim(vA , vB ) = t simt (vA , vB ). Thus, for each viewpoint                       Similarly, we use M
+vA ∈ VA , we find the most similar viewpoint vB ∈ VB to match                       summaries during the previous t − 1 time periods; we use M AB
+with the highest sim(vA , vB ). By generating such viewpoint pairs,                 to represent the similarity between Dt and {Ss }t−1
+                                                                                                                                      s=1 . We normalize
+                                                                                       AB        AB
+we extract a set of viewpoint pairs Vs from V. To remove redun-                     M       to M
+                                                                                               c      by making the sum of each row equal to 1.
+dant viewpoint pairs from Vs , we employ a random walk-based                           The third and last matrix, W AB , is about the divergence be-
+ranking strategy [14] to rank Vs iteratively, in which each view-                   tween Dt and {Ss }t−1  s=1 ; given a viewpoint v, we calculate each
+                                                                                              AB    c AB using Eq. 8:
+point pair’s score, sa, receives votes from other pairs. As shown                   item Wi,j    in W
+in Eq. 5, we use the similarity between two viewpoint pairs as the
+transition probability from one to another:                                                  AB
+                                                                                                      |t − s| · |πv,t − πv,s | · kΦvdi ,t − Φvdj ,t k
+                                                                                            Wi,j =                                                      ,   (8)
+                                      0                     0                                                     kΦvdi ,t k · kΦvdj ,t k
+                   0    0       |sim(vA , vB ) · sim(vA , vB    )|
+  tr((vA , vB ), (vA , vB )) =                         0      0
+                                                                    . (5)
+                               |sim(vA , vB )| · |sim(vA , vB    )|                 After row-normalization, we obtain W c AB from W AB . Using a co-
+At the beginning of the iterative process, an initial score for each                ranking based update summarization algorithm [44], given a view-
+pair is set to 1/|Vs |, and at the c-th iteration, the score of a view-             point v, for each iteration we use two column vectors nov(d) =
+point pair i is computed in Eq. 6:                                                  [nov(di )]i∈Dt and cov(d) = [cov(di )]i∈Dt to denote the novelty
+                                                                                    scores and coverage scores of the documents in Dt , respectively.
+                  X       tr (i, j)                     (1 − µ)                     In order to compute the viewpoint-biased scores of the documents,
+   sa(i)(c) = µ          P               · sa(j)(c−1) +          , (6)
+                             tr(i, j 0 )                  |Vs |                     we use column vectors κd,v = [κdi ,v ]i∈Dt to reflect the relevance
+                  i6=j
+                          j 0 ∈Vs
+                                                                                    of the documents to the viewpoint v, where each entry in κd,v cor-
+where |Vs | equals the number of viewpoint pairs; µ denotes a decay                 responds to the conditional probability of the given viewpoint in
+parameter that is usually set to 0.85. The iterative process will                   documents, i.e., kΦvdi ,t k. Then κ is normalized to κ
+                                                                                                                                         b to make the
+stop when it convergences. Then we extract the top |VC | viewpoint                  sum of all elements equal to 1.
+pairs from the ranked list, and merge two viewpoints in a pair into                    After computing the above matrices and vectors, we can compute
+a single viewpoint. Below, we write VC to denote |VC | common                       the update scores and the coverage scores of the documents in a co-
+                                                                                    ranking process. So at the c-th iteration, the update and coverage
+
+
+
+
+                                                                              391
+scores of di are calculated as:                                                     marization method (TAMVS) perform? Does it outperform base-
+                           i6=j                                                     lines? What is the effect if we only consider novelty or coverage?
+                                                                                    (See §6.3.)
+                           X
+     nov(di )(c) = ε1              M A
+                                   ci,j · nov(dj )(c−1) +
+                          j∈Dt
+                                                                        (9)         5.2      Dataset
+            X          AB                    (1 − ε1 − ε2 )
+      ε2             Ŵi,j · nov(dj )(c−1) +                · κdi ,v                   In order to assess the performance of our methods, we collect
+                                                    D+S                             a dataset of microblogs in two languages. We define multilin-
+           j∈{Ss }
+                                                                                    gual queries about 6 well-known topics in 2014 and crawl English
+and                                                                                 and Chinese microblogs via the Twitter streaming API1 and a Sina
+                          i6=j
+                          X                                                         Weibo2 crawler, respectively. Table 2 provides descriptive statis-
+ cov(di )(c) = γ1                 M A
+                                  ci,j · cov(dj )(c−1) +                            tics about the dataset. The tweets and weibos are posted between
+                         j∈Dt
+                                                                       (10)         January, 2014 and August, 2014.
+           X          AB                   (1 − γ1 − γ2 )
+     γ2             M
+                    ci,j · cov(dj )(c−1) +                · κdi ,v ,                Table 2: Six topics in our dataset. The first column shows the
+                                              D+S
+          j∈{Ss }                                                                   topic name. The second and third column shows the number of
+                                                                                    English tweets and Chinese weibos per topic respectively. Each
+where we set γ and ε as decay parameters in random walks. Ini-
+                                                                                    item is divided into two parts: the number of documents anno-
+tially, we set nov(di ) and cov(di ) as D1t , respectively. After each
+                                                                                    tated, and the number of documents for each topic.
+iteration c, we normalize nov(di )(c) and cov(di )(c) and calculate
+                                                                                      Topic                                # tweets      # weibos
+the saliency score of each document di as follows:
+                                                                                        1. The World Economic Forum        2,000/2,000     1,978/1,978
+                     sco(di )(c) = nov(di )(c) + cov(di )(c)           (11)             2. Whaling hunting                     566/566     1,072/1,072
+Following Eq. 9 and 10, for each given viewpoint v ∈ VC ∪ VL ,                          3. FIFA Worldcup 2014              1,120/1,963     1,801/1,801
+we rank documents in Dt to a ranking list Rv , thus we apply                            4. Missing MH370                   3,124/6,308     4,725/4,725
+Algorithm 1 to select documents to generate the viewpoint sum-                          5. Anti-Chinese in Vietnam 2014      825/2,001     1,095/1,095
+mary at time t. Eventually, we generate a set of summaries S =                          6. Sinking of the MV Sewol           403/2,000     1,400/1,881
+{S1 , S2 , . . . , ST } as the time-aware summarization result.
+                                                                                    To evaluate the effectiveness of time-aware viewpoint summariza-
+ Algorithm 1: Time-aware multi-viewpoint summarization at                           tion methods in our dataset, we used a crowdsourcing platform and
+ time period t                                                                      had workers to label the ground truth in our dataset in their native
+                                                                                    language (i.e., Chinese or English); §5.3 details the annotations we
+   Input:                                                                           obtained. In total, 8,308 English tweets and 12,071 Chinese weibos
+   Viewpoints VC and VL , ranking list {Rv }v∈VC ∪VL ,                              were annotated.
+   summaries {Ss }t−1s=1 , Dt , probability distributions πt , θt , φt ,
+   probability distributions {πs }t−1          t−1        t−1
+                                    s=1 , {θs }s=1 , {φs }s=1                       5.3      Crowdsourcing labeling
+   Output: Multi-viewpoint summary St at t;                                            We obtain our annotations using the CrowdTruth platform [24]
+   Ω ← null; T ← predefined threshold; L ← length of summary                        and assess the annotations using the CrowdTruth metrics [5].
+   while |Ω| < L do                                                                    The Topic annotation task gathers relevant tweets for each topic
+       for each v do                                                                introduced in Table 2, and relevant topic mentions from each given
+           di = top document in Rv ;
+                                                                                    tweet. Based on the answers gathered from the crowd we construct
+           Rv = Rv − d i ;
+                                                                                    for each topic type a set of relevant tweets and a set of relevant
+           if maxdj ∈Ω sim(di , dj | v, t) < T then
+                                                                                    topic mentions. Following the CrowdTruth approach, each tweet is
+               Ω = Ω + di ;
+                                                                                    assigned a topic type relevance score and each topic mention a rel-
+           if |Ω| = L then                                                          evance score. The Sentiment annotation task captures the sentiment
+                St = Ω;                                                             and the intensity (i.e., high, medium, low) of the tweets and their
+                Break;                                                              topic mentions. The crowd provides the sentiment and the intensity
+                                                                                    of each topic mention and the overall sentiment and intensity of the
+                                                                                    tweet. The Novelty ranking task provides a ranking of the tweets
+                                                                                    based on how much new information they bring in with regard to
+5.        EXPERIMENTAL SETUP                                                        a given topic. As data preparation, the tweets of a given topic are
+                                                                                    sorted chronologically and split by day. The crowdsourcing task
+   In §5.1, we formulate three research questions to guide our ex-                  is a pair-wise comparison of the tweets by following the approach:
+periments; we describe our dataset in §5.2 and specify how data                     every tweet of a particular day is compared to all the following
+was labeled in §5.3; §5.4 details the parameters used, and §5.5 de-
+                                                                                    tweets, resulting in n(n−1)
+                                                                                                             2
+                                                                                                                   comparison pairs per day, where n is
+tails our evaluation metrics; the baselines are described in §5.6.
+                                                                                    the total number of tweets published on that day. Given the sum-
+5.1        Research questions                                                       mary of the topic, for each pair of tweets, the crowd indicates which
+                                                                                    tweet is more salient with regard to the topic. By analyzing these
+   The research questions that guide the remainder of the paper are:
+                                                                                    judgments we provide, per day, a ranked list of salient tweets.
+(RQ1) How does our viewpoint tweet topic model (VTTM) per-
+                                                                                       Table 3 provides an overview of the annotations gathered. On
+form in time-aware viewpoint modeling? Does it help detect time-
+                                                                                    each task we applied the CrowdTruth metrics [5] in order to iden-
+aware viewpoint drift? (See §6.1.) (RQ2) What is the performance
+                                                                                    tify and remove spam, low-quality workers and their annotations.
+of cross-language viewpoint alignment? Can it help detect com-
+                                                                                    1
+mon viewpoints from multilingual social text streams? (See §6.2.)                       https://dev.twitter.com/docs/streaming-apis
+                                                                                    2
+(RQ3) How does our end-to-end time-aware multi-viewpoint sum-                           Chinese microblogging platform, http://www.weibo.com.
+
+
+
+
+                                                                              392
+          Table 3: Crowdsourcing task results overview.                         Table 4: Our methods and baselines used for comparison.
+   Task                 Topic Sentiment Novelty ranking                        Acronym Gloss                                   Reference
+   Units                  6,225        5,317               5,211               Dynamic viewpoint modeling
+   Jobs                      92           77                  82               VTTM       Dynamic viewpoint modeling in (A)            §4.2
+   #Total workers         6,337        6,555               5,336               VTTM-S Stationary viewpoint modeling in (A)             §4.2
+   #Unique workers          557          500                 341               Cross-language viewpoint alignment
+   #Spam workers          1,085        1,334               1,284               CLVA       LDA-based strategy in (B)                    §4.3
+   #Total judgments      43,575       53,170              78,165               CLVA-T Term similarity based strategy in (B)            §4.3
+   #Spam judgments        7,562       10,519              14,475               CLVA-E Entity similarity based strategy in (B)          §4.3
+   Total cost            $1,136       $1,328              $1,444               Time-aware multi-viewpoint summarization
+                                                                               TaMVS      Summarization strategy defined in (C)        §4.4
+Only the quality annotations were used as ground truth basis for               TaMVS-V TaMVS without phase B                           §4.4
+further experiments. We validate the results by performing manual              TaMVSN TaMVS only considering novelty in (C)            §4.4
+evaluation of the annotations. We extract a pool of workers, evenly            TaMVSC TaMVS only considering coverage in (C)           §4.4
+distributed between low and high-quality, and annotate them in the             Topic models
+following way: 0 for quality work and 1 for low-quality work.                  Sen-TM Sentiment LDA based contrastive                  [28]
+These scores are then used to compute the precision, recall, ac-                         summarization
+curacy and F1-score, in order to confirm the CrowdTruth metrics                TAM       Topic-aspect model based contrastive          [36]
+accuracy. Overall, we obtain high scores for each of the measures                        summarization
+(above 0.85) and across tasks, which indicates that the low-quality            Summarization
+workers were correctly separated from quality workers.                         CoRUS     Co-Ranking update summarization               [44]
+                                                                               IUS       Incremental update summarization              [33]
+5.4    Parameters                                                              LexRank LexRank algorithm for summarization             [13]
+   Following existing topic models [20], for the weighted parameter
+αv,t and βt , we set αu,t to 50/V and βt to 0.5. For the hyperpa-             context of RQ3 we use TaMVSN and TaMVSC to denote variations
+rameters χ and δ in VTTM, we set χ = δ = 0.5. The default                     of TaMVS that only consider Novelty and Coverage, respectively.
+number of viewpoints in VTTM is set to 20. To optimize the num-                  No previous work has addressed the same task as we do in this
+ber of viewpoints, we compare the performance at different values             paper. However, some existing work can be considered as base-
+(see below). In time-aware multi-viewpoint summarization we set               lines in our experiments. To assess the contribution of VTTM in
+the parameter ε1 = ε2 = 0.4 in Eq. 9 and γ1 = γ2 = 0.4 in                     dynamic viewpoint modeling, our baselines include recent work
+Eq. 10; the convergence threshold in co-ranking is set to 0.0001.             on stationary viewpoint modeling. We use the Topic-aspect model
+The length of the summary L is set to 200 words per time period.              [36, TAM] and the Sentiment-topic model [28, Sen-TM] as base-
+5.5    Evaluation metrics                                                     lines for topic models. As baselines for summarization, we use
+                                                                              three representative summarization algorithms, i.e., LexRank, IUS
+   To assess VTTM, we adapt the purity and accuracy evaluation                and CoRUS, as baselines: (1) the LexRank algorithm [13] ranks
+metrics, which are widely used in topic modeling and clustering               sentences via a Markov random walk strategy; (2) the IUS algo-
+experiments [37, 40]. To evaluate the performance of time-aware               rithm [33] generates an incremental update summary for given text
+multi-viewpoint summarization, we measure the quality of sum-                 streams; (3) the CoRUS algorithm [44] generates an update sum-
+maries by counting overlapping textual units between the gener-               mary using a co-ranking strategy, but without VTTM.
+ated results and the ground truth results. We adopt the ROUGE
+evaluation metrics: ROUGE-1 (unigram), ROUGE-2 (bigram) and
+ROUGE-W (weighted longest common sequence).                                   6.    RESULTS AND DISCUSSION
+   Statistical significance of observed differences between the per-             We compare VTTM to baselines for viewpoint modeling in so-
+formance of two runs is tested using a two-tailed paired t-test and           cial text streams, examine the performance of CLVA for cross-
+is denoted using N (or H ) for strong significance for α = 0.01; or M         language viewpoint alignment as well as the end-to-end summa-
+(or O ) for weak significance for α = 0.05.                                   rization performance of TaMVS.
+
+5.6    Baselines and comparisons                                              6.1    Viewpoint modeling
+   We list the methods and baselines that we consider in Table 4.                First, Table 5 shows three example viewpoints output by VTTM.
+We divide our methods into 3 groups according to the phases A,                Column 1 shows the entities included by each viewpoint, column 2
+B, and C specified in §4. We write VTTM for the dynamic view-                 shows topics attached with the entity in the viewpoint, columns 3,
+point model we proposed in §4.2. In the context of RQ1, we write              4, 5 show the probability of positive, neutral and negative senti-
+VTTM-S for the stationary viewpoint modeling method. We write                 ment, respectively; column 6 shows the time period of the view-
+CLVA for the LDA-based viewpoint alignment method in phase                    point. For a viewpoint about “China-Japan_relations” in Table 5,
+B. In the context of RQ2, we write CLVA-T for the alignment                   we find that its topic changes from “#The World Economic Forum”
+method that applies term frequency in viewpoint similarity calcu-             on 2014-01-26 to “#Anti-Chinese in Vietnam” on 2014-06-03.
+lation, CLVA-E for the alignment method that only checks the con-                Next, we address RQ1 and test whether VTTM is effective for
+sistency of entities. We write TaMVS for the overall process de-              the viewpoint modeling task in social text streams. Table 6 shows
+scribed in §4, which includes dynamic viewpoint modeling, cross-              the evaluation results for viewpoint modeling in terms of purity
+language viewpoint alignment and time-aware viewpoint summa-                  and accuracy for English tweets and Chinese weibos. For both
+rization, and TaMVS-V for the viewpoint summarization method                  languages, we find that VTTM outperforms TAM for all topics in
+without considering cross-language viewpoint alignment. In the                terms of purity and accuracy. VTTM achieves an increase in pu-
+
+
+
+
+                                                                        393
+Table 5: Task: dynamic viewpoint modeling. RQ1: Example viewpoints produced by VTTM. Column 1 lists the entities correspond-
+ing to the viewpoints; Column 2 list the topics in viewpoints, Columns 3, 4 and 5 list the probabilities of positive, neutral and negative
+labels for each topic, respectively. Column 6 shows the time interval of each viewpoint.
+      Entity                                       Topic                          Positive Neutral Negative Time interval
+      Search_for_Malaysia_Airlines_Flight_370           #Missing MH370                                    0.077              0.422                     0.501           2014-03-27
+      Whaling_in_ Japan                                 #Whaling hunting                                  0.015              0.317                     0.668           2014-05-05
+      China-Japan_relations                             #The World Economic Forum                         0.110              0.166                     0.724           2014-01-26
+                                                        #Anti-Chinese in Vietnam                          0.017              0.621                     0.362           2014-06-03
+
+rity over TAM of up to 23.4%, while accuracy increases by up to                   13 show the performance of TaMVS, TaMVSN, and TaMVSC, re-
+21.4%. Compared with Sen-LDA, VTTM offers an increase of up                       spectively in terms of the ROUGE metrics. Recall that TaMVSN
+to 12.0%, whereas accuracy increases by up to 12.6%. We look                      only considers novelty in phase C and that TaMVSC only considers
+at those unsuccessful results made by VTTM, and find that for                     coverage in phase C. We find that TaMVS, which combines nov-
+67.2% of those documents the sentiment labeling results are incor-                elty and coverage, outperforms both TaMVSN and TaMVSC on all
+rect, whereas for 75.4% of those documents the topic prediction                   topics. After TaMVS, TaMVSN, which only includes novelty dur-
+results are incorrect. Another aspect of RQ1 concerns viewpoint                   ing the summarization process, performs best. Thus, novelty is the
+drift, i.e., changes of statistical properties. Table 7 contrasts the av-         most important part of our multi-viewpoint summarization process.
+erage performance of VTTM and VTTM-S (the stationary version                         Turning to Table 10, we find that TaMVS outperforms the base-
+of VTTM) for all periods in terms of Accuracy. For both languages,                lines on all test topics in terms of ROUGE-1, and in several cases
+VTTM outperforms VTTM-S for each topic. We conclude that                          significantly so. In terms of ROUGE-2, we see a similar picture:
+VTTM responds better to topic drift than VTTM-S, which neglects                   TaMVS outperforms the baselines, and in several cases signifi-
+the dependency of viewpoints between two adjacent intervals.                      cantly so. Among the baselines, LexRank gets the worst perfor-
+                                                                                  mance simply because it ignores the dynamic patterns during view-
+6.2      Cross-language viewpoint alignment                                       point modeling. And CoRUS achieves the second best performance,
+   To detect the number of common viewpoints between documents                    which indicates the importance of update summarization in our
+in two languages, we evaluate the ROUGE performance of TaMVS                      viewpoint summarization. TaMVS achieves 3.2% and 7.5% in-
+with varying numbers of common viewpoints |VC |. Using the same                   creases over CoRUS in terms of ROUGE-1 and ROUGE-2, re-
+numbering of topics as in Table 2, Fig. 4 shows the number of                     spectively, and 12.1% and 37.1% increases over IUS in terms of
+shared viewpoints VC for our 6 test topics; we find that Weibo                    ROUGE-1 and ROUGE-2. Compared to Sen-TM, TaMVS achieves
+users have more common viewpoints with Twitter users on the top-                  a statistical significant improvement of up to 28.1% in terms of
+ics “#Missing MH370” and “#FIFA Worldcup 2014” than on other                      ROUGE-1 and 63.4% in terms of ROUGE-2. Interestingly, TaMVS
+topics. To test the effectiveness of our cross-language viewpoint                 performs better on test topics that have higher scores for dynamic
+alignment strategy in RQ2, we examine the performance of CLVA                     viewpoint modeling (phase A, see Table 6), which underlines the
+for every topic; see Table 8. CLVA outperforms the other two meth-                importance of dynamic viewpoint modeling in time-aware multi-
+ods, CLVA-T and CLVA-E, for each topic. CLVA-T outperforms                        viewpoint summarization.
+CLVA-E on the cross-language viewpoint alignment task.                               We now analyze the influence of the number of viewpoints. Fig. 5
+                                                                                  plots the average ROUGE performance curves for TaMVS and TaM-
+                              20
+       Number of Viewpoints
+
+
+
+
+                              15                                                             0.4                                                       0.09
+
+
+                              10                                                            0.38                                                       0.08
+
+                              5
+                                                                                                                                             ROUGE−2
+                                                                                  ROUGE−1
+
+
+
+
+                                                                                            0.36                                                       0.07
+
+                              0
+                                   1   2   3   4   5    6                                   0.34                                                       0.06
+
+                                                                                                                                                                                            TaMVS
+Figure 4: Task: cross-language viewpoint alignment. RQ2:                                    0.32                                  TaMVS
+                                                                                                                                  TaMVSN
+                                                                                                                                                       0.05                                 TaMVSN
+
+Length of common viewpoints VC in 6 topics. The numbers                                      0.3                                                       0.04
+                                                                                               10    20   30   40      50    60    70   80                10   20   30   40      50    60    70   80
+on the x-axis correspond to the topic numbers in Table 2.                                                  Number of Viewpoints                                      Number of Viewpoints
+
+                                                                                           (a) ROUGE-1                (b) ROUGE-2
+6.3      Overall performance                                                      Figure 5: Task: time-aware multi-viewpoint summarization.
+                                                                                  RQ3: Performance with different numbers of viewpoints, in
+   Tables 9 and 10 show the per topic time-aware multi-viewpoint                  terms of ROUGE-1 (a) and ROUGE-2 (b).
+summarization performance of all methods in terms of the ROUGE
+metrics. We begin by examining the importance of cross-language                   VSN with varying numbers of viewpoints. We that find for both
+viewpoint alignment. Looking at Table 9, we see that TaMVS                        metrics and methods, the performance peaks when the number of
+(columns 2–4) significantly outperforms TaMVS-V in which we                       viewpoints equals 40, i.e., higher than our default value of 20.
+leave out the cross-language viewpoint alignment step for each
+topic, and that it does so for all metrics (columns 5–7). This shows
+the importance of cross-language viewpoint alignment in multi-                    7.                CONCLUSION AND FUTURE WORK
+viewpoint summarization.                                                            We have considered the task of time-aware multi-viewpoint sum-
+   Turning to RQ3, to determine the contribution of novelty and                   marization of social text streams. We have identified four main
+coverage, we turn to Table 9, where columns 2–4, 8–10 and 11–                     challenges: ambiguous entities, viewpoint drift, multi-linguality,
+
+
+
+
+                                                                            394
+Table 6: Task: dynamic viewpoint modeling. RQ1: Comparison of methods. Purity is abbreviated as pur., Accuracy as acc. We use
+N
+  to denote statistically significant improvements of VTTM over the baseline TAM.
+                                                 English tweets                             Chinese weibos
+                                        VTTM                     TAM          Sen-LDA                 VTTM                  TAM             Sen-LDA
+Topic                             pur.         acc.        pur.    acc.     pur.       acc.       pur.        acc.       pur.     acc.      pur.     acc.
+                                         N            N                                                  N           N
+The World Economic Forum        0.497        0.516        0.401    0.415    0.419     0.425     0.441        0.472       0.352   0.371     0.391    0.407
+Whaling hunting                 0.454        0.463        0.432    0.435    0.451     0.462     0.493        0.505       0.442   0.458     0.501    0.513
+FIFA Worldcup 2014              0.472M       0.423M       0.432    0.442    0.445     0.451     0.541N       0.561N      0.432   0.442     0.483    0.497
+Missing MH370                   0.463N       0.471N       0.391    0.403    0.427     0.445     0.501N       0.542N      0.343   0.352     0.451    0.462
+Anti-Chinese in Vietnam         0.491N       0.511N       0.406    0.415    0.452     0.557     0.522N       0.541N      0.482   0.495     0.503    0.517
+Sinking of the MV Sewol         0.425        0.438        0.361    0.372    0.407     0.411     0.625N       0.642N      0.497   0.507     0.559    0.572
+Overall                         0.474N       0.482N       0.384    0.397    0.417     0.428     0.524N       0.543N      0.437   0.452     0.482    0.504
+
+                                                                                 online user evaluation would give deeper insights into the perfor-
+Table 7: Task: dynamic viewpoint modeling. RQ1: Contrast-                        mance of our approach. A novel graphical model that includes dy-
+ing the performance of VTTM and VTTM-S in the Chinese                            namic time bins instead of the fixed time granularities, is another
+viewpoint modeling task.                                                         direction for future research. Finally, discovering new entities that
+                                VTTM          VTTM-S                             are not included by Wikipedia will help our approach to explore
+Topic                            pur.         acc.        pur.     acc.          realtime viewpoints.
+                                                                                 Acknowledgments. We thank Kai Wu, Wei Zhang, Hongya Song and
+The World Economic Forum       0.497         0.516        0.496   0.513          Shanshan Huang at Shandong University for collecting the dataset for us.
+Whaling hunting                0.454         0.463        0.449   0.459          This research was supported by Ahold, Amsterdam Data Science, Blendle,
+FIFA Worldcup 2014             0.472         0.423        0.441   0.459          the Bloomberg Research Grant program, the Dutch national program COM-
+Missing MH370                  0.463         0.471        0.433   0.448          MIT, Elsevier, the European Community’s Seventh Framework Programme
+Anti-Chinese in Vietnam        0.491         0.511        0.456   0.471          (FP7/2007-2013) under grant agreement nr 312827 (VOX-Pol), the ESF
+Sinking of the MV Sewol        0.425         0.438        0.422   0.435          Research Network Program ELIAS, the Royal Dutch Academy of Sciences
+                                                                                 (KNAW) under the Elite Network Shifts project, the Microsoft Research
+Overall                        0.474         0.482        0.461   0.474          Ph.D. program, the Netherlands eScience Center under project number 027.-
+                                                                                 012.105, the Netherlands Institute for Sound and Vision, the Netherlands
+                                                                                 Organisation for Scientific Research (NWO) under project nrs 727.011.005,
+                                                                                 612.001.116, HOR-11-10, 640.006.013, 612.066.930, CI-14-25, SH-322-
+Table 8: Task: cross-language viewpoint alignment. RQ2:                          15, 652.002.001, 612.001.551, 652.001.003, the Yahoo Faculty Research
+Performance of CLVA in cross-language viewpoints alignment                       and Engagement Program, and Yandex. All content represents the opinion
+task, in terms of Accuracy.                                                      of the authors, which is not necessarily shared or endorsed by their respec-
+  Topic                       CLVA CLVA-T CLVA-E                                 tive employers and/or sponsors.
+
+  The World Economic Forum        0.754        0.613          0.591              8.    REFERENCES
+  Whaling hunting                 0.737        0.671          0.622
+  FIFA Worldcup 2014              0.643        0.588          0.521               [1] A. Ahmed and E. P. Xing. Timeline: A dynamic hierarchical
+  Missing MH370                   0.727        0.611          0.524                   dirichlet process model for recovering birth/death and evolution of
+  Anti-Chinese in Vietnam         0.787        0.732          0.655                   topics in text stream. In UAI, 2012.
+  Sinking of the MV Sewol         0.854        0.712          0.659               [2] M. Albakour, C. Macdonald, I. Ounis, et al. On sparsity and drift for
+  Overall                         0.711        0.669          0.615                   effective real-time filtering in microblogs. In CIKM. ACM, 2013.
+                                                                                  [3] J. Allan. Introduction to topic detection and tracking. In Topic
+                                                                                      detection and tracking, pages 1–16. Springer, 2002.
+and the shortness of social text streams. We have proposed a dy-                  [4] L. AlSumait, D. Barbará, and C. Domeniconi. On-line LDA:
+namic viewpoint modeling strategy to infer multiple viewpoints                        Adaptive topic models for mining text streams with applications to
+in the given multilingual social text steams, in which we jointly                     topic detection and tracking. In ICDM, 2008.
+                                                                                  [5] L. Aroyo and C. Welty. The three sides of CrowdTruth. Journal of
+model topics, entities and sentiment labels. After cross-language
+                                                                                      Human Computation, 1:31–34, 2014.
+viewpoint alignment, we apply a random walk ranking strategy to                   [6] D. M. Blei and J. D. Lafferty. Dynamic topic models. In ICML, 2006.
+extract documents to tackle the time-aware multi-viewpoint sum-                   [7] D. M. Blei, A. Y. Ng, and M. I. Jordan. Latent dirichlet allocation.
+marization problem. We have demonstrated the effectiveness of                         Journal of Machine Learning Research, 3:993–1022, 2003.
+our proposed method by showing a significant improvement over                     [8] D. M. Blei, T. L. Griffiths, and M. I. Jordan. The nested chinese
+various baselines tested with a manually annotated dataset. Our                       restaurant process and bayesian nonparametric inference of topic
+                                                                                      hierarchies. Journal of the ACM, 57(2), 2010.
+viewpoint tweet topic model is helpful for detecting the viewpoint
+                                                                                  [9] D. Chakrabarti and K. Punera. Event summarization using tweets. In
+drift phenomenon and summarizing viewpoints over time.                                ICWSM, 2011.
+   Although we focused mostly on microblogs, our methods are                     [10] T. Copeck, A. Kazantseva, A. Kennedy, A. Kunadze, D. Inkpen, and
+broadly applicable to other settings with opinionated content, such                   S. Szpakowicz. Update summary update. In TAC, 2008.
+as comment sites or product reviews. Limitations of our work in-                 [11] J.-Y. Delort and E. Alfonseca. Dualsum: a topic-model based
+clude its ignorance of viewpoint dependencies, viewpoint diversity                    approach for update summarization. In EACL, 2012.
+                                                                                 [12] Q. Diao and J. Jiang. Recurrent Chinese restaurant process with a
+and, being based on LDA, its predefined number of viewpoints. As
+                                                                                      duration-based discount for event identification from Twitter. In
+to future work, contrastive viewpoints in multilingual text streams                   SDM, 2014.
+are worth considering. Also, the transfer of our approach to a                   [13] G. Erkan and D. Radev. Lexrank: Graph-based lexical centrality as
+non-parametric extension should give new insights and an extrinsic                    salience in text summarization. J. Artif. Int. Res., 22:457–479, 2004.
+
+
+
+
+                                                                           395
+Table 9: Task: time-aware multi-viewpoint summarization. RQ2 and RQ3: ROUGE performance of all VTTM-based methods
+in time-aware viewpoint summarization. ROUGE-1 is abbreviated as R-1, ROUGE-2 as R-2 and ROUGE-W as R-W. Statistically
+significant differences are with respect to TaMVS-V.
+                                          TaMVS            TaMVS-V               TaMVSN             TaMVSC
+ Topic                               R-1        R-2       R-W        R-1         R-2     R-W       R-1      R-2      R-W       R-1       R-2     R-W
+                                           N          N        N
+ The World Economic Forum          0.383       0.082      0.184     0.316    0.055      0.131     0.369    0.057     0.136    0.351     0.052    0.145
+ Whaling hunting                   0.294N      0.047N     0.152N    0.197    0.037      0.092     0.221    0.032     0.138    0.221     0.032    0.138
+ FIFA Worldcup 2014                0.436N      0.094N     0.202N    0.351    0.068      0.142     0.404    0.083     0.194    0.404     0.083    0.194
+ Missing MH370                     0.425N      0.087M     0.232N    0.324    0.074      0.132     0.402    0.082     0.170    0.394     0.079    0.162
+ Anti-Chinese in Vietnam           0.409N      0.065N     0.169N    0.226    0.046      0.127     0.403    0.047     0.139    0.395     0.042    0.129
+ Sinking of the MV Sewol           0.373N      0.064N     0.171N    0.314    0.051      0.131     0.362    0.055     0.134    0.341     0.046    0.133
+ Overall                           0.387N      0.085N     0.188N    0.318    0.061      0.132     0.377    0.062     0.139    0.359     0.056    0.150
+
+Table 10: Task: time-aware multi-viewpoint summarization. RQ3: Per topic performance of all methods. ROUGE-1 is abbreviated
+as R-1 and ROUGE-2 as R-2. We use N (M ) to denote strong (weak) statistically significant improvements of TaMVS over CoRUS.
+                                   TaMVS              TAM           Sen-TM             LexRank         IUS         CoRUS
+  Topic                               R-1        R-2       R-1       R-2         R-1     R-2      R-1       R-2      R-1       R-2      R-1       R-2
+  The World Economic Forum           0.383M    0.082M     0.295     0.047    0.298      0.051    0.321     0.072    0.347     0.066    0.372     0.077
+  Whaling hunting                    0.294     0.047      0.237     0.038    0.224      0.032    0.221     0.032    0.273     0.042    0.292     0.044
+  FIFA Worldcup 2014                 0.436N    0.094M     0.347     0.076    0.355      0.081    0.342     0.073    0.378     0.080    0.383     0.089
+  Missing MH370                      0.425N    0.087N     0.297     0.049    0.314      0.062    0.341     0.072    0.358     0.071    0.352     0.082
+  Anti-Chinese in Vietnam            0.409N    0.065N     0.222     0.039    0.239      0.042    0.238     0.040    0.269     0.046    0.253     0.052
+  Sinking of the MV Sewol            0.373M    0.064      0.284     0.044    0.295      0.049    0.251     0.040    0.327     0.071    0.369     0.062
+  Overall                            0.387M    0.085      0.297     0.047    0.302      0.052    0.309     0.052    0.345     0.062    0.375     0.079
+
+
+[14] G. Erkan and D. R. Radev. LexPageRank: Prestige in                          [31] Y. Lu, C. Zhai, and N. Sundaresan. Rated aspect summarization of
+     multi-document text summarization. In EMNLP, 2004.                               short comments. In WWW. ACM, 2009.
+[15] Y. Fang, L. Si, N. Somasundaram, et al. Mining contrastive opinions         [32] R. McCreadie, C. Macdonald, I. Ounis, et al. Scalable distributed
+     on political texts using cross-perspective topic model. In WSDM,                 event detection for Twitter. In IEEE Int. Conf. on Big Data, 2013.
+     2012.                                                                       [33] R. McCreadie, C. Macdonald, and I. Ounis. Incremental update
+[16] S. Fisher and B. Roark. Query-focused supervised sentence ranking                summarization: Adaptive sentence selection based on prevalence and
+     for update summaries. TAC, 2008.                                                 novelty. In CIKM. ACM, 2014.
+[17] K. Ganesan, C. Zhai, and J. Han. Opinosis: a graph-based approach           [34] Q. Mei, X. Ling, M. Wondra, H. Su, and C. Zhai. Topic sentiment
+     to abstractive summarization of highly redundant opinions. In                    mixture: modeling facets and opinions in weblogs. In WWW. ACM,
+     COLING, 2010.                                                                    2007.
+[18] K. Ganesan, C. Zhai, and E. Viegas. Micropinion generation: an              [35] E. Meij, W. Weerkamp, and M. de Rijke. Adding semantics to
+     unsupervised approach to generating ultra-concise summaries of                   microblog posts. In WSDM. ACM, 2012.
+     opinions. In WWW. ACM, 2012.                                                [36] M. Paul and R. Girju. A two-dimensional topic-aspect model for
+[19] W. Gao, P. Li, and K. Darwish. Joint topic modeling for event                    discovering multi-faceted topics. AAAI, 2010.
+     summarization across news and social media streams. In CIKM.                [37] M. J. Paul, C. Zhai, and R. Girju. Summarizing contrastive
+     ACM, 2012.                                                                       viewpoints in opinionated text. In EMNLP, 2010.
+[20] T. Griffiths and M. Steyvers. Finding scientific topics. PNAS, 101:         [38] M.-H. Peetz, M. de Rijke, and R. Kaptein. Estimating reputation
+     5228–5235, 2004.                                                                 polarity on microblog posts. Inf. Proc. & Man., 52(2):193–216, 2016.
+[21] T. Hofmann. Probabilistic latent semantic indexing. In SIGIR. ACM,          [39] D. Ramage, S. T. Dumais, and D. J. Liebling. Characterizing
+     1999.                                                                            microblogs with topic models. In ICWSM, 2010.
+[22] M. Hu and B. Liu. Mining opinion features in customer reviews. In           [40] Z. Ren and M. de Rijke. Summarizing contrastive themes via
+     AAAI, 2004.                                                                      hierarchical non-parametric processes. In SIGIR. ACM, 2015.
+[23] M. Hu and B. Liu. Opinion extraction and summarization on the               [41] Z. Ren et al. Personalized time-aware tweets summarization. In
+     web. In AAAI, 2006.                                                              SIGIR. ACM, 2013.
+[24] O. Inel et al. CrowdTruth: Machine-human computation framework              [42] L. Shou, Z. Wang, K. Chen, and G. Chen. Sumblr: Continuous
+     for harnessing disagreement in gathering annotated data. In ISWC.                summarization of evolving tweet streams. In SIGIR. ACM, 2013.
+     Springer, 2014.                                                             [43] O. van Laere et al. DEESSE: entity-driven exploratory and
+[25] T. Iwata, S. Watanabe, T. Yamada, and N. Ueda. Topic tracking                    serendipitous search system. In CIKM. ACM, 2014.
+     model for analyzing consumer purchase behavior. In IJCAI 2009,              [44] X. Wan. Update summarization based on co-ranking with
+     volume 9, pages 1427–1432, 2009.                                                 constraints. In COLING, 2012.
+[26] H. D. Kim and C. Zhai. Generating comparative summaries of                  [45] C. Wang and D. M. Blei. Collaborative topic modeling for
+     contradictory opinions in text. In CIKM. ACM, 2009.                              recommending scientific articles. In KDD. ACM, 2011.
+[27] H. D. Kim, M. G. Castellanos, M. Hsu, et al. Ranking explanatory            [46] D. Wang et al. Comparative document summarization via
+     sentences for opinion summarization. In SIGIR. ACM, 2013.                        discriminative sentence selection. TKDD, 6(3):12, 2012.
+[28] F. Li et al. Structure-aware review mining and summarization. In            [47] X. Wei, J. Sun, and X. Wang. Dynamic mixture models for multiple
+     COLING, 2010.                                                                    time series. In IJCAI 2007, pages 2909–2914, 2007.
+[29] P. Li et al. Generating aspect-oriented multi-document                      [48] S.-H. Yang et al. Large-scale high-precision topic modeling on
+     summarization with event-aspect model. In EMNLP, 2011.                           twitter. In KDD. ACM, 2014.
+[30] B. Liu, M. Hu, and J. Cheng. Opinion observer: analyzing and                [49] K. Zhai and J. Boyd-Graber. Online latent dirichlet allocation with
+     comparing opinions on the web. In WWW, 2005.                                     infinite vocabulary. In ICML, 2013.
+
+
+
+
+                                                                           396
+

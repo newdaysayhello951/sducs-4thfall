@@ -1,0 +1,8 @@
+{
+  "ciao": {
+    "valid_users": 2512,
+    "mean_correlation": 0.32394756684686105,
+    "fraction_ge_05": 0.37539808917197454,
+    "fraction_ge_09": 0.12619426751592358
+  }
+}

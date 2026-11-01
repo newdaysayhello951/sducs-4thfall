@@ -1,0 +1,203 @@
+UNAVAILABLE: ciao: missing C:\Users\86134\Desktop\������\�罻����ʵ����\datasets\ciao\ratings.txt or C:\Users\86134\Desktop\������\�罻����ʵ����\datasets\ciao\trust.txt; no substitute data are generated.
+UNAVAILABLE: flixster: missing C:\Users\86134\Desktop\������\�罻����ʵ����\datasets\flixster\ratings.txt or C:\Users\86134\Desktop\������\�罻����ʵ����\datasets\flixster\trust.txt; no substitute data are generated.
+1/200 ('filmtrust', 'UserAvg', 5, 0): RMSE=0.832861 MAE=0.642088 0.1s CACHED
+2/200 ('filmtrust', 'UserAvg', 5, 1): RMSE=0.826945 MAE=0.636350 0.1s CACHED
+3/200 ('filmtrust', 'UserAvg', 5, 2): RMSE=0.828346 MAE=0.639257 0.1s CACHED
+4/200 ('filmtrust', 'UserAvg', 5, 3): RMSE=0.820575 MAE=0.634572 0.1s CACHED
+5/200 ('filmtrust', 'UserAvg', 5, 4): RMSE=0.815583 MAE=0.632028 0.1s CACHED
+6/200 ('filmtrust', 'UserAvg', 10, 0): RMSE=0.832861 MAE=0.642088 0.1s CACHED
+7/200 ('filmtrust', 'UserAvg', 10, 2): RMSE=0.828346 MAE=0.639257 0.1s CACHED
+8/200 ('filmtrust', 'UserAvg', 10, 1): RMSE=0.826945 MAE=0.636350 0.1s CACHED
+9/200 ('filmtrust', 'UserAvg', 10, 3): RMSE=0.820575 MAE=0.634572 0.1s CACHED
+10/200 ('filmtrust', 'UserAvg', 10, 4): RMSE=0.815583 MAE=0.632028 0.1s CACHED
+11/200 ('filmtrust', 'ItemAvg', 5, 1): RMSE=0.936087 MAE=0.729222 0.1s CACHED
+12/200 ('filmtrust', 'ItemAvg', 5, 0): RMSE=0.936581 MAE=0.730665 0.1s CACHED
+13/200 ('filmtrust', 'ItemAvg', 5, 2): RMSE=0.914194 MAE=0.717530 0.1s CACHED
+14/200 ('filmtrust', 'ItemAvg', 5, 3): RMSE=0.925138 MAE=0.726719 0.2s CACHED
+15/200 ('filmtrust', 'ItemAvg', 5, 4): RMSE=0.930888 MAE=0.729860 0.1s CACHED
+16/200 ('filmtrust', 'ItemAvg', 10, 0): RMSE=0.936581 MAE=0.730665 0.1s CACHED
+17/200 ('filmtrust', 'ItemAvg', 10, 1): RMSE=0.936087 MAE=0.729222 0.1s CACHED
+18/200 ('filmtrust', 'ItemAvg', 10, 2): RMSE=0.914194 MAE=0.717530 0.1s CACHED
+19/200 ('filmtrust', 'ItemAvg', 10, 3): RMSE=0.925138 MAE=0.726719 0.1s CACHED
+20/200 ('filmtrust', 'ItemAvg', 10, 4): RMSE=0.930888 MAE=0.729860 0.1s CACHED
+21/200 ('filmtrust', 'PMF', 5, 0): RMSE=0.884508 MAE=0.682928 2.4s CACHED
+22/200 ('filmtrust', 'PMF', 5, 1): RMSE=0.902498 MAE=0.683128 2.5s CACHED
+23/200 ('filmtrust', 'PMF', 5, 2): RMSE=0.884031 MAE=0.693160 0.5s CACHED
+24/200 ('filmtrust', 'PMF', 5, 3): RMSE=0.923310 MAE=0.710084 1.1s CACHED
+25/200 ('filmtrust', 'PMF', 5, 4): RMSE=0.944855 MAE=0.728569 0.5s CACHED
+26/200 ('filmtrust', 'PMF', 10, 0): RMSE=0.890731 MAE=0.688436 0.4s CACHED
+27/200 ('filmtrust', 'PMF', 10, 1): RMSE=0.922749 MAE=0.740161 0.4s CACHED
+28/200 ('filmtrust', 'PMF', 10, 3): RMSE=0.927559 MAE=0.709601 0.6s CACHED
+29/200 ('filmtrust', 'PMF', 10, 2): RMSE=0.988534 MAE=0.740682 1.3s CACHED
+30/200 ('filmtrust', 'PMF', 10, 4): RMSE=0.881280 MAE=0.696216 0.5s CACHED
+31/200 ('filmtrust', 'RSTE', 5, 0): RMSE=0.914286 MAE=0.695701 0.9s CACHED
+32/200 ('filmtrust', 'RSTE', 5, 1): RMSE=0.896984 MAE=0.695251 0.4s CACHED
+33/200 ('filmtrust', 'RSTE', 5, 2): RMSE=0.894944 MAE=0.697725 0.5s CACHED
+34/200 ('filmtrust', 'RSTE', 5, 3): RMSE=1.286965 MAE=0.966725 2.5s CACHED
+35/200 ('filmtrust', 'RSTE', 5, 4): RMSE=0.904164 MAE=0.707753 0.5s CACHED
+36/200 ('filmtrust', 'RSTE', 10, 0): RMSE=0.888890 MAE=0.685152 0.7s CACHED
+37/200 ('filmtrust', 'RSTE', 10, 1): RMSE=1.251705 MAE=0.948519 1.6s CACHED
+38/200 ('filmtrust', 'RSTE', 10, 2): RMSE=1.176283 MAE=0.890994 3.8s CACHED
+39/200 ('filmtrust', 'RSTE', 10, 3): RMSE=0.913535 MAE=0.718498 0.4s CACHED
+40/200 ('filmtrust', 'SoRec', 5, 0): RMSE=0.885558 MAE=0.683992 0.7s CACHED
+41/200 ('filmtrust', 'RSTE', 10, 4): RMSE=0.899030 MAE=0.699324 0.8s CACHED
+42/200 ('filmtrust', 'SoRec', 5, 1): RMSE=0.901867 MAE=0.682630 0.7s CACHED
+43/200 ('filmtrust', 'SoRec', 5, 2): RMSE=0.893748 MAE=0.690801 0.6s CACHED
+44/200 ('filmtrust', 'SoRec', 5, 3): RMSE=0.921858 MAE=0.708490 1.1s CACHED
+45/200 ('filmtrust', 'SoRec', 5, 4): RMSE=0.937505 MAE=0.724203 0.5s CACHED
+46/200 ('filmtrust', 'SoRec', 10, 0): RMSE=0.890658 MAE=0.688380 0.7s CACHED
+47/200 ('filmtrust', 'SoRec', 10, 1): RMSE=0.922481 MAE=0.739910 1.0s CACHED
+48/200 ('filmtrust', 'SoRec', 10, 2): RMSE=0.990545 MAE=0.741305 2.1s CACHED
+49/200 ('filmtrust', 'SoRec', 10, 3): RMSE=0.927638 MAE=0.709644 0.7s CACHED
+50/200 ('filmtrust', 'SoRec', 10, 4): RMSE=0.881628 MAE=0.696432 0.7s CACHED
+51/200 ('filmtrust', 'SoReg', 5, 0): RMSE=1.001933 MAE=0.717838 4.8s CACHED
+52/200 ('filmtrust', 'SoReg', 5, 2): RMSE=0.973086 MAE=0.702641 1.7s CACHED
+53/200 ('filmtrust', 'SoReg', 5, 1): RMSE=1.000412 MAE=0.722294 4.9s CACHED
+54/200 ('filmtrust', 'SoReg', 5, 3): RMSE=0.994666 MAE=0.721433 1.7s CACHED
+55/200 ('filmtrust', 'SoReg', 10, 2): RMSE=1.042602 MAE=0.763576 1.5s CACHED
+56/200 ('filmtrust', 'SoReg', 10, 0): RMSE=1.033386 MAE=0.747436 2.0s CACHED
+57/200 ('filmtrust', 'SoReg', 10, 1): RMSE=1.063973 MAE=0.779233 1.9s CACHED
+58/200 ('filmtrust', 'SoReg', 5, 4): RMSE=1.008985 MAE=0.725057 2.0s CACHED
+59/200 ('filmtrust', 'SocialMF', 5, 0): RMSE=0.875837 MAE=0.690443 0.7s CACHED
+60/200 ('filmtrust', 'SocialMF', 5, 1): RMSE=0.880340 MAE=0.677313 0.6s CACHED
+61/200 ('filmtrust', 'SocialMF', 5, 2): RMSE=0.877501 MAE=0.683392 0.6s CACHED
+62/200 ('filmtrust', 'SocialMF', 5, 3): RMSE=0.888762 MAE=0.686207 0.6s CACHED
+63/200 ('filmtrust', 'SocialMF', 5, 4): RMSE=0.880630 MAE=0.690517 1.2s CACHED
+64/200 ('filmtrust', 'SocialMF', 10, 0): RMSE=0.867621 MAE=0.684872 1.1s CACHED
+65/200 ('filmtrust', 'SocialMF', 10, 1): RMSE=0.881735 MAE=0.686113 1.3s CACHED
+66/200 ('filmtrust', 'SocialMF', 10, 2): RMSE=0.865698 MAE=0.676590 1.0s CACHED
+67/200 ('filmtrust', 'SoReg', 10, 4): RMSE=1.059903 MAE=0.767468 1.4s CACHED
+68/200 ('filmtrust', 'SoReg', 10, 3): RMSE=1.027628 MAE=0.748439 1.5s CACHED
+69/200 ('filmtrust', 'SocialMF', 10, 3): RMSE=0.862063 MAE=0.677731 0.8s CACHED
+70/200 ('filmtrust', 'SocialMF', 10, 4): RMSE=0.863724 MAE=0.687342 0.7s CACHED
+71/200 ('filmtrust', 'TrustMF', 5, 0): RMSE=0.869170 MAE=0.667415 1.4s CACHED
+72/200 ('filmtrust', 'TrustMF', 5, 1): RMSE=0.864232 MAE=0.669243 1.3s CACHED
+73/200 ('filmtrust', 'TrustMF', 5, 3): RMSE=0.862772 MAE=0.669665 2.0s CACHED
+74/200 ('filmtrust', 'TrustMF', 5, 2): RMSE=0.869591 MAE=0.678729 1.4s CACHED
+75/200 ('filmtrust', 'TrustMF', 10, 0): RMSE=0.899589 MAE=0.698976 2.2s CACHED
+76/200 ('filmtrust', 'TrustMF', 5, 4): RMSE=0.869658 MAE=0.678474 1.8s CACHED
+77/200 ('filmtrust', 'TrustMF', 10, 1): RMSE=0.891316 MAE=0.692026 1.9s CACHED
+78/200 ('filmtrust', 'TrustMF', 10, 2): RMSE=0.874778 MAE=0.686651 1.6s CACHED
+79/200 ('filmtrust', 'TrustMF', 10, 3): RMSE=0.868265 MAE=0.678811 1.9s CACHED
+80/200 ('filmtrust', 'TrustMF', 10, 4): RMSE=0.866313 MAE=0.682504 1.6s CACHED
+81/200 ('filmtrust', 'SVD++', 5, 0): RMSE=0.808818 MAE=0.625080 0.9s CACHED
+82/200 ('filmtrust', 'SVD++', 5, 1): RMSE=0.805547 MAE=0.627608 0.9s CACHED
+83/200 ('filmtrust', 'SVD++', 5, 2): RMSE=0.806624 MAE=0.631058 0.9s CACHED
+84/200 ('filmtrust', 'SVD++', 5, 3): RMSE=0.801326 MAE=0.625799 1.2s CACHED
+85/200 ('filmtrust', 'SVD++', 5, 4): RMSE=0.788292 MAE=0.615006 1.3s CACHED
+86/200 ('filmtrust', 'SVD++', 10, 0): RMSE=0.808140 MAE=0.624348 1.3s CACHED
+87/200 ('filmtrust', 'SVD++', 10, 1): RMSE=0.802213 MAE=0.620874 1.3s CACHED
+88/200 ('filmtrust', 'SVD++', 10, 2): RMSE=0.804132 MAE=0.626380 1.2s CACHED
+89/200 ('filmtrust', 'SVD++', 10, 3): RMSE=0.799245 MAE=0.618173 2.4s CACHED
+90/200 ('filmtrust', 'SVD++', 10, 4): RMSE=0.788070 MAE=0.614902 1.6s CACHED
+91/200 ('filmtrust', 'TrustSVD', 5, 1): RMSE=0.801606 MAE=0.616316 0.8s CACHED
+92/200 ('filmtrust', 'TrustSVD', 5, 0): RMSE=0.809291 MAE=0.622635 1.4s CACHED
+93/200 ('filmtrust', 'TrustSVD', 5, 2): RMSE=0.803959 MAE=0.623052 0.5s CACHED
+94/200 ('filmtrust', 'TrustSVD', 5, 3): RMSE=0.800827 MAE=0.621790 0.4s CACHED
+95/200 ('filmtrust', 'TrustSVD', 5, 4): RMSE=0.796322 MAE=0.613728 0.5s CACHED
+96/200 ('filmtrust', 'TrustSVD', 10, 0): RMSE=0.810875 MAE=0.622037 0.7s CACHED
+97/200 ('filmtrust', 'TrustSVD', 10, 1): RMSE=0.801088 MAE=0.617387 1.3s CACHED
+98/200 ('filmtrust', 'TrustSVD', 10, 2): RMSE=0.803257 MAE=0.618762 1.0s CACHED
+99/200 ('filmtrust', 'TrustSVD', 10, 3): RMSE=0.825611 MAE=0.635381 1.3s CACHED
+100/200 ('filmtrust', 'TrustSVD', 10, 4): RMSE=0.794729 MAE=0.626648 0.6s CACHED
+101/200 ('epinions', 'UserAvg', 5, 1): RMSE=1.203181 MAE=0.928817 2.4s CACHED
+102/200 ('epinions', 'UserAvg', 5, 0): RMSE=1.204797 MAE=0.930988 2.6s CACHED
+103/200 ('epinions', 'UserAvg', 5, 3): RMSE=1.198446 MAE=0.927705 2.1s CACHED
+104/200 ('epinions', 'UserAvg', 5, 2): RMSE=1.205523 MAE=0.931291 2.1s CACHED
+105/200 ('epinions', 'UserAvg', 5, 4): RMSE=1.202868 MAE=0.929268 2.3s CACHED
+106/200 ('epinions', 'UserAvg', 10, 1): RMSE=1.203181 MAE=0.928817 2.1s CACHED
+107/200 ('epinions', 'UserAvg', 10, 0): RMSE=1.204797 MAE=0.930988 2.3s CACHED
+108/200 ('epinions', 'UserAvg', 10, 3): RMSE=1.198446 MAE=0.927705 2.2s CACHED
+109/200 ('epinions', 'UserAvg', 10, 2): RMSE=1.205523 MAE=0.931291 2.3s CACHED
+110/200 ('epinions', 'UserAvg', 10, 4): RMSE=1.202868 MAE=0.929268 2.2s CACHED
+111/200 ('epinions', 'ItemAvg', 5, 0): RMSE=1.095659 MAE=0.825294 1.9s CACHED
+112/200 ('epinions', 'ItemAvg', 5, 1): RMSE=1.095689 MAE=0.826908 1.9s CACHED
+113/200 ('epinions', 'ItemAvg', 5, 2): RMSE=1.095591 MAE=0.825540 1.8s CACHED
+114/200 ('epinions', 'ItemAvg', 5, 4): RMSE=1.092889 MAE=0.823193 1.6s CACHED
+115/200 ('epinions', 'ItemAvg', 5, 3): RMSE=1.092044 MAE=0.824867 1.8s CACHED
+116/200 ('epinions', 'ItemAvg', 10, 0): RMSE=1.095659 MAE=0.825294 1.5s CACHED
+117/200 ('epinions', 'ItemAvg', 10, 1): RMSE=1.095689 MAE=0.826908 1.8s CACHED
+118/200 ('epinions', 'ItemAvg', 10, 2): RMSE=1.095591 MAE=0.825540 2.0s CACHED
+119/200 ('epinions', 'ItemAvg', 10, 3): RMSE=1.092044 MAE=0.824867 1.9s CACHED
+120/200 ('epinions', 'ItemAvg', 10, 4): RMSE=1.092889 MAE=0.823193 1.7s CACHED
+121/200 ('epinions', 'PMF', 5, 0): RMSE=1.512246 MAE=1.180262 18.0s CACHED
+122/200 ('epinions', 'PMF', 5, 2): RMSE=1.494918 MAE=1.180496 17.0s CACHED
+123/200 ('epinions', 'PMF', 5, 1): RMSE=1.487214 MAE=1.168088 17.5s CACHED
+124/200 ('epinions', 'PMF', 5, 3): RMSE=1.525881 MAE=1.209913 18.1s CACHED
+125/200 ('epinions', 'PMF', 5, 4): RMSE=1.523703 MAE=1.179649 18.0s CACHED
+126/200 ('epinions', 'PMF', 10, 0): RMSE=1.668561 MAE=1.341014 18.6s CACHED
+127/200 ('epinions', 'PMF', 10, 1): RMSE=1.627493 MAE=1.305354 14.6s CACHED
+128/200 ('epinions', 'PMF', 10, 2): RMSE=1.661066 MAE=1.332866 14.8s CACHED
+129/200 ('epinions', 'PMF', 10, 3): RMSE=1.679118 MAE=1.307153 13.7s CACHED
+130/200 ('epinions', 'PMF', 10, 4): RMSE=1.674300 MAE=1.348686 13.1s CACHED
+131/200 ('epinions', 'RSTE', 5, 0): RMSE=1.421884 MAE=1.058095 25.6s CACHED
+132/200 ('epinions', 'RSTE', 5, 2): RMSE=1.430278 MAE=1.062540 26.3s CACHED
+133/200 ('epinions', 'RSTE', 5, 1): RMSE=1.619349 MAE=1.156711 68.7s CACHED
+134/200 ('epinions', 'RSTE', 5, 4): RMSE=1.681957 MAE=1.165648 18.0s CACHED
+135/200 ('epinions', 'RSTE', 5, 3): RMSE=1.655727 MAE=1.143800 27.8s CACHED
+136/200 ('epinions', 'RSTE', 10, 0): RMSE=1.654678 MAE=1.159292 25.2s CACHED
+137/200 ('epinions', 'RSTE', 10, 2): RMSE=1.459111 MAE=1.058179 107.2s CACHED
+138/200 ('epinions', 'RSTE', 10, 1): RMSE=1.446566 MAE=1.067008 107.9s CACHED
+139/200 ('epinions', 'RSTE', 10, 4): RMSE=1.662505 MAE=1.167433 20.3s CACHED
+140/200 ('epinions', 'RSTE', 10, 3): RMSE=1.637476 MAE=1.139754 115.1s CACHED
+141/200 ('epinions', 'SoRec', 5, 0): RMSE=1.410448 MAE=1.076928 20.5s CACHED
+142/200 ('epinions', 'SoRec', 5, 1): RMSE=1.316427 MAE=1.010069 19.7s CACHED
+143/200 ('epinions', 'SoRec', 5, 2): RMSE=1.406555 MAE=1.074684 22.7s CACHED
+144/200 ('epinions', 'SoRec', 5, 3): RMSE=1.432742 MAE=1.083167 22.5s CACHED
+145/200 ('epinions', 'SoRec', 5, 4): RMSE=1.344750 MAE=1.050887 17.7s CACHED
+146/200 ('epinions', 'SoRec', 10, 0): RMSE=1.528718 MAE=1.155344 18.0s CACHED
+147/200 ('epinions', 'SoRec', 10, 1): RMSE=1.477658 MAE=1.147207 19.2s CACHED
+148/200 ('epinions', 'SoRec', 10, 2): RMSE=1.516401 MAE=1.161331 19.6s CACHED
+149/200 ('epinions', 'SoRec', 10, 3): RMSE=1.497605 MAE=1.144412 18.0s CACHED
+150/200 ('epinions', 'SoRec', 10, 4): RMSE=1.520686 MAE=1.150381 17.9s CACHED
+151/200 ('epinions', 'SoReg', 5, 0): RMSE=1.840759 MAE=1.387004 129.3s CACHED
+152/200 ('epinions', 'SoReg', 5, 1): RMSE=1.870272 MAE=1.415314 125.5s CACHED
+153/200 ('epinions', 'SoReg', 5, 2): RMSE=1.845702 MAE=1.397931 129.3s CACHED
+154/200 ('epinions', 'SoReg', 5, 3): RMSE=1.832957 MAE=1.377115 124.2s CACHED
+155/200 ('epinions', 'SoReg', 10, 0): RMSE=2.126602 MAE=1.702575 70.1s CACHED
+156/200 ('epinions', 'SoReg', 5, 4): RMSE=1.844120 MAE=1.394696 123.1s CACHED
+157/200 ('epinions', 'SoReg', 10, 3): RMSE=2.043736 MAE=1.612503 157.5s
+158/200 ('epinions', 'SocialMF', 5, 0): RMSE=1.214968 MAE=0.976902 86.4s
+159/200 ('epinions', 'SoReg', 10, 2): RMSE=2.035933 MAE=1.603346 312.3s
+160/200 ('epinions', 'SoReg', 10, 1): RMSE=2.003343 MAE=1.567617 316.2s
+161/200 ('epinions', 'SoReg', 10, 4): RMSE=2.031713 MAE=1.598702 317.2s
+162/200 ('epinions', 'SocialMF', 5, 1): RMSE=1.229515 MAE=0.963359 81.0s
+163/200 ('epinions', 'SocialMF', 5, 3): RMSE=1.228974 MAE=0.975941 76.1s
+164/200 ('epinions', 'SocialMF', 5, 2): RMSE=1.215728 MAE=0.984320 100.9s
+165/200 ('epinions', 'SocialMF', 5, 4): RMSE=1.210193 MAE=0.943740 103.6s
+166/200 ('epinions', 'SocialMF', 10, 0): RMSE=1.231229 MAE=0.957887 172.9s
+167/200 ('epinions', 'SocialMF', 10, 1): RMSE=1.245064 MAE=0.956221 152.2s
+168/200 ('epinions', 'SocialMF', 10, 3): RMSE=1.255631 MAE=0.970281 127.0s
+169/200 ('epinions', 'SocialMF', 10, 2): RMSE=1.227897 MAE=0.984141 136.9s
+170/200 ('epinions', 'SocialMF', 10, 4): RMSE=1.227124 MAE=0.987758 134.3s
+171/200 ('epinions', 'TrustMF', 5, 1): RMSE=1.311170 MAE=1.042358 158.3s
+172/200 ('epinions', 'TrustMF', 5, 0): RMSE=1.332118 MAE=1.083318 174.5s
+173/200 ('epinions', 'TrustMF', 5, 2): RMSE=1.334372 MAE=1.087758 276.2s
+174/200 ('epinions', 'TrustMF', 5, 4): RMSE=1.340791 MAE=1.086110 159.5s
+175/200 ('epinions', 'TrustMF', 5, 3): RMSE=1.360458 MAE=1.107484 237.4s
+176/200 ('epinions', 'TrustMF', 10, 0): RMSE=1.421399 MAE=1.184615 290.2s
+177/200 ('epinions', 'TrustMF', 10, 3): RMSE=1.342062 MAE=1.079280 263.9s
+178/200 ('epinions', 'TrustMF', 10, 1): RMSE=1.358169 MAE=1.100104 351.5s
+179/200 ('epinions', 'TrustMF', 10, 2): RMSE=1.383656 MAE=1.127603 370.6s
+180/200 ('epinions', 'SVD++', 5, 0): RMSE=1.049374 MAE=0.818262 218.8s
+181/200 ('epinions', 'TrustMF', 10, 4): RMSE=1.395780 MAE=1.148563 345.0s
+182/200 ('epinions', 'SVD++', 5, 1): RMSE=1.048664 MAE=0.815647 209.3s
+183/200 ('epinions', 'SVD++', 5, 2): RMSE=1.049740 MAE=0.816870 205.4s
+184/200 ('epinions', 'SVD++', 5, 3): RMSE=1.049340 MAE=0.822176 177.9s
+185/200 ('epinions', 'SVD++', 5, 4): RMSE=1.045972 MAE=0.813998 227.9s
+186/200 ('epinions', 'SVD++', 10, 0): RMSE=1.048680 MAE=0.816896 331.6s
+187/200 ('epinions', 'SVD++', 10, 1): RMSE=1.049248 MAE=0.816871 360.7s
+188/200 ('epinions', 'TrustSVD', 5, 0): RMSE=1.054005 MAE=0.813974 31.4s CACHED
+189/200 ('epinions', 'TrustSVD', 5, 1): RMSE=1.055645 MAE=0.816556 34.4s CACHED
+190/200 ('epinions', 'TrustSVD', 5, 2): RMSE=1.057873 MAE=0.818783 39.1s CACHED
+191/200 ('epinions', 'TrustSVD', 5, 3): RMSE=1.051355 MAE=0.816317 43.9s CACHED
+192/200 ('epinions', 'TrustSVD', 5, 4): RMSE=1.056012 MAE=0.811075 40.5s CACHED
+193/200 ('epinions', 'TrustSVD', 10, 0): RMSE=1.055386 MAE=0.816527 41.2s CACHED
+194/200 ('epinions', 'TrustSVD', 10, 1): RMSE=1.059144 MAE=0.813462 77.7s CACHED
+195/200 ('epinions', 'TrustSVD', 10, 2): RMSE=1.057793 MAE=0.815352 71.7s CACHED
+196/200 ('epinions', 'TrustSVD', 10, 3): RMSE=1.054021 MAE=0.812053 76.9s CACHED
+197/200 ('epinions', 'TrustSVD', 10, 4): RMSE=1.052104 MAE=0.811827 61.0s CACHED
+198/200 ('epinions', 'SVD++', 10, 2): RMSE=1.051926 MAE=0.820733 348.8s
+199/200 ('epinions', 'SVD++', 10, 3): RMSE=1.045553 MAE=0.817336 332.7s
+200/200 ('epinions', 'SVD++', 10, 4): RMSE=1.045975 MAE=0.814191 249.7s
+FINISHED 200 tasks, 0 failed; unavailable=['ciao', 'flixster']

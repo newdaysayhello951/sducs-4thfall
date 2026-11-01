@@ -1,0 +1,89 @@
+{
+  "arguments": {
+    "datasets": [
+      "filmtrust",
+      "epinions",
+      "ciao",
+      "flixster"
+    ],
+    "models": [
+      "UserAvg",
+      "ItemAvg",
+      "PMF",
+      "RSTE",
+      "SoRec",
+      "SoReg",
+      "SocialMF",
+      "TrustMF",
+      "SVD++",
+      "TrustSVD"
+    ],
+    "dims": [
+      5,
+      10
+    ],
+    "folds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "maxiter": 200,
+    "validation": 0.1,
+    "patience": 5,
+    "seed": 20261026,
+    "jobs": 4,
+    "optimizer": "gd",
+    "run": "gradient_descent",
+    "force": false
+  },
+  "python": "3.12.7",
+  "platform": "Windows-11-10.0.22000-SP0",
+  "numpy": "1.26.4",
+  "available": {
+    "filmtrust": {
+      "counts": [
+        1508,
+        2071,
+        35497,
+        1853
+      ],
+      "expected": [
+        1508,
+        2071,
+        35497,
+        1853
+      ],
+      "duplicate_pairs": 3,
+      "matches_paper": true,
+      "user_union": 1642,
+      "ratings_sha256": "241167424e24d588e8871d68641e94ead98d5b3a4f0db01ef3181a74ad35e7a1",
+      "trust_sha256": "64573a033add72b988a0fb140fdbc0ad3464cb9821f940007aff6fda44b09603"
+    },
+    "epinions": {
+      "counts": [
+        40163,
+        139738,
+        664824,
+        487183
+      ],
+      "expected": [
+        40163,
+        139738,
+        664824,
+        487183
+      ],
+      "duplicate_pairs": 0,
+      "matches_paper": true,
+      "user_union": 49289,
+      "ratings_sha256": "6da14f79369cf882911a271efd5f4575bc4292d0497ccf3190b6421a6d198e42",
+      "trust_sha256": "7562075fdcc27d04cd1d88d592e04f4fa57e5d7043246187789d0ccc3e1985f0"
+    }
+  },
+  "missing": {
+    "ciao": "ciao: missing C:\\Users\\86134\\Desktop\\大四上\\社交网络实验七\\datasets\\ciao\\ratings.txt or C:\\Users\\86134\\Desktop\\大四上\\社交网络实验七\\datasets\\ciao\\trust.txt; no substitute data are generated.",
+    "flixster": "flixster: missing C:\\Users\\86134\\Desktop\\大四上\\社交网络实验七\\datasets\\flixster\\ratings.txt or C:\\Users\\86134\\Desktop\\大四上\\社交网络实验七\\datasets\\flixster\\trust.txt; no substitute data are generated."
+  },
+  "independence": "No released model code read/imported/copied."
+}

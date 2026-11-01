@@ -1,0 +1,880 @@
+              Personalized Time-Aware Tweets Summarization
+
+                                             Zhaochun Ren                              Shangsong Liang
+                                    ISLA, University of Amsterdam                 ISLA, University of Amsterdam
+                                     Amsterdam, The Netherlands                    Amsterdam, The Netherlands
+                                               z.ren@uva.nl                              s.liang@uva.nl
+
+                                                 Edgar Meij                            Maarten de Rijke
+                                              Yahoo! Research                     ISLA, University of Amsterdam
+                                              Barcelona, Spain                     Amsterdam, The Netherlands
+                                       emeij@yahoo-inc.com                               derijke@uva.nl
+
+ABSTRACT                                                                              One task that is aimed at addressing this dual problem is tweets
+We focus on the problem of selecting meaningful tweets given a                     summarization [6]: to extract a group of representative tweets from
+user’s interests; the dynamic nature of user interests, the sheer vol-             a set of tweets. The task is similar to tweet recommendation, but
+ume, and the sparseness of individual messages make this an chal-                  tweets summarization pays more attention to the quality of selected
+lenging problem. Specifically, we consider the task of time-aware                  results, including notions such as representativeness and diversity.
+tweets summarization, based on a user’s history and collaborative                  So far, tweets summarization methods are typically query and user-
+social influences from “social circles.” We propose a time-aware                   independent. How to adapt tweets summarization to a specific user
+user behavior model, the Tweet Propagation Model (TPM), in which                   is still a topic of ongoing research [4, 5, 7, 22, 31, 36]. Current
+we infer dynamic probabilistic distributions over interests and top-               methods, whether personalized or not, also neglect to explicitly
+ics. We then explicitly consider novelty, coverage, and diversity                  model the temporal nature of the microblogging environment; time-
+to arrive at an iterative optimization algorithm for selecting tweets.             awareness is a key feature of Twitter in general and tweets summa-
+Experimental results validate the effectiveness of our personalized                rization in particular.
+time-aware tweets summarization method based on TPM.                                  We put forward a model for personalized, time-aware tweets
+                                                                                   summarization (TaTS). We investigate three key aspects of tweets
+Categories and Subject Descriptors                                                 summarization: (a) novelty, preventing near-duplicate tweets to
+                                                                                   be included, (b) coverage, so as to be representative to candidate
+H.3.3 [Information Search and Retrieval]: Information filtering                    tweets, (c) diversity, covering as many aspects as possible. When
+                                                                                   working with Twitter data, several methodological challenges arise.
+Keywords                                                                           In order to perform effective tweets summarization, we require a
+Twitter, tweets summarization, data enrichment, topic modeling                     notion of a user’s interest. Most Twitter users, however, mostly
+                                                                                   consume information without producing a lot of information. That
+                                                                                   is, they rarely post tweets of their own [22]. Hence, in order to in-
+1.    INTRODUCTION                                                                 fer a user’s interest in a robust manner, we need to use other signals
+   Twitter has amassed over half a billion users in 2012, who pro-                 than just the user’s tweets. To address the issue, we incorporate
+duce (“tweet”) over 300 million tweets per day.1 Twitter users                     intuitions from the field of collaborative filtering and base our es-
+can subscribe to updates from other users by following them, es-                   timation of a person’s interest on those of their friends on Twitter,
+sentially forming a unidirectional friend relationship. Moreover,                  following [5]. We assume that for each user there exist one or more
+tweets can be “retweeted,” basically copying a tweet posted by an-                 “social circles,” in which three or more users follow each other and
+other user to one’s own timeline. From an information retrieval                    form cliques. We find that people are usually connected to specific
+point of view, the sheer volume of users and tweets presents inter-                communities and assume that each user’s behavior on Twitter is af-
+esting challenges. On the one hand, interesting, relevant, or mean-                fected by: (a) a user’s private taste, (b) a collaborative effect from
+ingful tweets can easily be missed due to a large number of fol-                   social circles, and (c) a bursty component, reflecting current events.
+lowed users. On the other hand, users may miss interesting tweets                     Clearly, a user’s interest can change over time. Topic modeling
+when none of the users they follow retweet an interesting piece of                 has proven effective for topic detection and user behavior modeling
+information.                                                                       on Twitter [8, 25, 32]. As a dynamic extension of the author-topic
+1
+                                                                                   model [26], our proposed Tweet Propagation Model (TPM) aims to
+  http://blog.twitter.com/2012/03/                                                 track both a user’s interests and any topic drift arising with the pass-
+twitter-turns-six.html.
+                                                                                   ing of time. Based on “social circles", TPM derives the user’s in-
+Permission to make digital or hard copies of all or part of this work for          terest from a dirichlet mixture over interests of someone who share
+personal or classroom use is granted without fee provided that copies are not
+                                                                                   “social circles.” It does so by inferring distributions over topics and
+made or distributed for profit or commercial advantage and that copies bear
+this notice and the full citation on the first page. Copyrights for components     interests that change over time. Following existing topic modeling
+of this work owned by others than ACM must be honored. Abstracting with            approaches for Twitter [8, 37], we extend TPM and classify the top-
+credit is permitted. To copy otherwise, or republish, to post on servers or to     ics as (a) personal topics, (b) common topics, or (c) bursty topics.
+redistribute to lists, requires prior specific permission and/or a fee. Request    Gibbs Expectation Maximization (EM) sampling [29] is used to
+permissions from permissions@acm.org.                                              infer the posterior probabilities and to estimate the value of hyper-
+SIGIR’13, July 28–August 1, 2013, Dublin, Ireland.
+                                                                                   parameters in our topic models. After inferring the probabilities of
+Copyright 2013 ACM 978-1-4503-2034-4/13/07 ...$15.00.
+each tweet, we employ an iterative algorithm to optimize the tweet
+selection procedure, considering coverage, novelty, and diversity.                              Table 1: Glossary.
+   Our contributions in this paper are as follows. (1) We propose         Symbol       Description
+the task of personalized time-aware tweets summarization, select-         K            number of topics
+ing personalized meaningful tweets from a collection of tweets.           U            number of users
+(2) We leverage a user’s “collaborative influence” in order to derive     V            the size of the vocabulary
+the user’s interests. (3) We introduce a tweet propagation model          T            number of time periods
+to address the potential drift in a user’s interests as well as topics    Dt           candidate tweets at time t
+over time. (4) We employ a tweet selection algorithm that jointly         Dt           number of candidate tweets at time t, i.e., |Dt |
+optimizes for coverage, diversity, and novelty.                           u            user u on Twitter, u ∈ U
+   The rest of this paper is organized as follows. We introduce re-       Cu,t         social circle for user u at t
+lated work in Section 2. Our problem formulation is detailed in           Du,t         tweets posted by u at time t
+Section 3. Our strategy for tweet summary generation, is described        Du,t         number of tweets posted by u at time t, i.e., |Du,t |
+in Section 4. Section 5 details our experimental setup and Section 6      Fu,t         number of friends of u at time t
+presents and discusses the experimental results and Section 7 con-        Cu,t         number of social circles around u at time t
+cludes the paper.                                                         dt           tweet published at time t, dt ∈ Dt
+                                                                          w            token/word present in some tweet, w ∈ W
+2.    RELATED WORK                                                        zt           latent topic at t time, zt ∈ Zt
+  Our approach builds on earlier work in tweets summarization,            cu,t         social circle around u at time t, cu,t ∈ Cu,t
+tweet recommendation and topic modeling.                                  θu,t         distribution of u’s interests over topics at time t
+                                                                          ϑt           distribution of topics within a tweet at time t
+2.1    Tweets Summarization                                               φt           distribution of words over topics at time t
+   Several publications have focused on tweets summarization: the         Z            classification of individual topics in θ or ϑ
+task of selecting a list of meaningful tweets that are most represen-     β, α, σ, r   hyper-parameters in TPM
+tative for some topic. Most work in the literature concerns tweets        N            maximum number of tweets returned
+as basic constituents to compose a summary. Some authors bring            λu,c,t       weight of social circle c for user u at t
+feature-based or graph-based summarization technologies to bear
+on this task [6, 27], while other methods use a term-frequency           propose a method to recommend “novel" tweets to users by follow-
+based method [28] or a strategy based on mutual reinforcement be-        ing users’ interests and using the tweet content. However, many of
+tween users’ influence and qualifications of tweets [9]. Recently,       these methods ignore the dynamic nature of the problem; with the
+time-aware summarization has been studied by several authors, of-        change of time, user interests may also change.
+ten in the form of timeline generation on Twitter. Chakrabarti and
+Punera [4] separate topic related tweets into various periods as an      2.3    Topic Models
+event evolution map, and generate an update-summarization result.           Topic models [2, 12] are employed to reduce the high dimen-
+Yan et al. [33] propose an evolutionary timeline summarization           sionality of terms appearing in text into low-dimensional, “latent”
+strategy based on dynamic programming. Evolutionary summa-               topics. Ever since Hofmann [12] presented probabilistic latent se-
+rization approaches segment post streams into event chains and           mantic indexing (pLSI), many extensions have been proposed. In
+select tweets from various chains to generate a tweet summary;           latent Dirichlet allocation (LDA, [2]) each document is generated
+Nichols et al. [21] propose an effective method to separate time-        by choosing a distribution over topics and then each word in the
+lines using Twitter. To the best of our knowledge, existing work on      document is chosen from a selected topic. To handle users’ connec-
+tweets summarization focuses on the extraction of representative         tions with particular documents and topics, the author-topic model
+tweets for specific topics, without considering personalization.         has been proposed [26]. However, for data with topic evolution the
+   Other work integrates the task of selecting tweets with other web     underlying “bag of words” representation may be insufficient. To
+documents: Yang et al. [35] use mutual reinforcement to train both       analyze topic evolution, other models have been proposed, such as
+the selection of related web documents and tweets via a single           the Dynamic Topic Model [1], Dynamic Mixture Models [30] and
+graph factor model. Zhao et al. [37] extract representative key-         the Topic Tracking Model [13]. Topic models have not yet been
+words from tweets based on a topic model. Tweet ranking has also         considered very frequently in the setting of Twitter. Twitter-LDA
+attracted attention: Weng et al. [31] proposed a graph-based rank-       is an interesting exception; it classifies latent topics into “back-
+ing strategy for ranking tweets based on the author-topic model.         ground" topic and “personal" topics [37], while an extension of
+                                                                         Twitter-LDA has been proved to be effective in burst detection [8].
+2.2    Collaborative Tweet Recommendations
+                                                                         Our work is different from the related work mentioned above in
+   In recent years, collaborative filtering on Twitter has attracted     the following important ways: (1) our work focuses on person-
+increased attention. Yang et al. [34] address recommendation and         alized and time-aware tweets summarization and (2) we propose
+link prediction tasks based on a joint-propagation model, FTP, be-       a tweet propagation model by jointly modeling time-aware prop-
+tween social friendship and interests. Ye et al. [36] propose a gen-     agation and collaborative filtering from “social circles,” which is
+erative model to describe users’ behavior, given influences from         different from existing topic models.
+social communities, for recommendation [18, 19]. To track so-
+cial influence of users in a social network, Xu et al. [32] propose
+a graphical mixture model to describe user’s behavior in posting         3.    PROBLEM FORMULATION
+tweets and analyze the original topic domain for a specific proposed        Before introducing our method for time-aware tweets summa-
+tweet. Chen et al. [5] propose a collaborative filtering method to       rization, we introduce our notation and key concepts. Table 1 lists
+generate personalized recommendations in Twitter through a col-          the notation we use. Given two users ui and uj on Twitter, there are
+laborative ranking precedure. Similarly, Pennacchiotti et al. [22]       two main reasons for ui and uj to follow each other: either because
+                              Friend                                Friend
+                                                user B                                user C
+                                                                                                        u ,t 1                                     u ,t
+          user A
+
+
+
+                   Friend              Friend            Friend              Friend
+
+                            user D                                user E
+
+
+
+                                                                                                                                              w      z
+
+                             C                                      C
+
+
+
+Figure 1: Example of social circles on Twitter: there are two
+social circles (indicated using the ‘c’) among the five users in
+this graph, where each pair of vertices in each social circle is
+connected through the “friend” relationship.
+                                                                                                            Figure 2: Graphical representation of TPM.
+they have similar interests or they have some relationship outside
+                                                                                               time-aware tweets summarization is defined similar to time-aware
+Twitter [32]. If two users ui and uj follow each other, we define
+                                                                                               tweets summarization, but in this case the tweets selected for inclu-
+them to be friends on Twitter. Given this definition, we define a
+                                                                                               sion in RTt need to be relevant based on u’s interests θu at time
+social circle around a user u to be a set of friends of u such that
+                                                                                               t.
+every pair of users in this set is in the friend relation. See Figure 1
+for a schematic representation.
+   Similar to the author-topic model [26], we assume that each                                 4.     METHOD
+Twitter user’s interests are represented by a multinomial distribu-                               In this section, we detail our tweets summarization method, in-
+tion θu,t , which may, however, change over time. That is, the time-                           cluding the required methods for joint user-tweets topic modeling,
+aware interests of user u are represented as a multinomial distri-                             inference and parameter estimation. As input, our method has prob-
+bution θu,t over topics, where each topic is represented as a prob-                            abilistic distributions from topic modeling. The output is the time-
+abilistic distribution over words [2]. Formally, we have θu,t =                                aware tweets summary, i.e., a selection of tweets (per period) satis-
+{θu,t,z1 , · · · , θu,t,zK }, where θu,t,zi , denotes the distribution of                      fying the user’s interest.
+topic zi for user u at time t.
+   We further assume that each tweet can be represented as a prob-                             4.1      Topic Modeling: Tweets Propagation
+abilistic distribution over topics. To cater for the phenomenon of                                We start by proposing the tweets propagation model (TPM) to
+user interests changing over time, we assume that topic distribu-                              jointly track dynamic user’s interests and topics. The interests of
+tions are dynamic and may differ between time periods. Given                                   a user u are assumed to be reflected by a multinomial distribution
+a user u, we split the topic set Zt at time t into three classes:                              θu,t over topics. We assume that the distribution of topics φt over
+Zt = Ztu ∪ Ztcom ∪ ZtB : there exist “private” topics Ztu that solely                          words follows a dynamic propagation process with changes over
+depend on the user, there are common topics Ztcom that are influ-                              time. Figure 2 provides a graphical overview of TPM.
+enced by friends from shared social circles, and there are topics                                 In the graphical structure of TPM, we see a number of ingredi-
+from event-related, bursty sources, ZtB . The latter type of topic                             ents. Among the variables related to user u in the graph, z, θ and
+will typically transfer from initially being observed at time t into                           γ are random variables and w is the observed variable. In the can-
+Z com at some later time t0 .                                                                  didate tweets part, ϑ, z and σ are random variables; Du,t and Dt
+   The dynamic interests of user u at time t, reflected by θu,t ,                              indicate the number of variables in the model. As usual, directed
+evolve in different ways depending on the class that a topic zt ∈ Zt                           arrows in a graphical model indicate the dependency between two
+belongs to. For each user, θu,t is affected by the following three                             variables; the variables cu,t−1 depend on variables {θui ,t−1 |ui ∈
+classes.                                                                                       Cu,t−1 }. The variables φcom t     and φut depend on variables {φcom t−1 ,
+                                                                                               φBt−1 } and  φ u
+                                                                                                              t−1 , respectively.
+                                                 u
+  (a) If zt ∈ Ztu is a “private" topic, then θu,t,z   only depends on                             Now, let us give a more detailed technical account of our model.
+        u
+      θu,t−1,z at time t − 1.                                                                  Around user u, there exist multiple social circles. For each social
+  (b) If zt ∈ Ztcom then the topic is dependent on friends in the                              circle cu,t in time period t, there is a random parameter λcu,t indi-
+                                com
+      user’s social circle(s). θu,t,z t
+                                        is computed from the collab-                           cating the importance of cu,t to u at t. User u’s interests θu,t are
+                       com
+      orative effect θui ,t−1 at time t − 1 from the social circles                            composed of three parts: the personal aspect, com theu common      topic
+      {ui |ui ∈ Cu,t−1 }.                                                                      aspect and the bursty aspect, i.e., θu,t = θu,t              B
+                                                                                                                                                  , θu,t , θu,t , where
+  (c) If zt ∈ ZtB is a “burst” topic, θuBi ,z,t is generated according                         the common topics are not only influenced by the user’s social cir-
+      to a distribution of “burst" words in ui ’s tweets at time t.                            cles, but also by his own previous interests. Therefore, we use a
+                                                                                                                                                       com
+                                                                                               Dirichlet distribution to derive the probability of θu,t      over xcom
+                                                                                                                                                                     u,t
+Typically, traditional summarization does not cover the evolution
+                                                                                               as:
+of a specific event. Given a split of a user’s history into time pe-
+riods, the task of time-aware tweets summarization is to select the                                                                            X
+most representative tweets for each time period, covering the whole                                 xcom         com+B
+                                                                                                     u,t = αu,t θu,t−1 + (1 − αu,t )                         λci θccom+B
+                                                                                                                                                                    i ,t−1
+                                                                                                                                                                             (1)
+event evolution on a timeline. More precisely, given a set of tweets                                                                       ci ∈Cu,t−1
+D, a set of time periods T , and a maximum number of tweets per                                        com+B                          com       B
+period, N , time-aware tweets summarization aims to extract multi-                             where θu,t−1      refers to the set {θu,t−1 , θu,t−1   } at period t − 1,
+ple sets of tweets RTt (1 ≤ t ≤ T ) from D, where for each time                                which reflects user u’s interests for common      and  burst   topics at time
+                                                                                               t − 1, and θccom+B
+                                                                                                                                         com           B
+period t, RTt = {dt,x1 , dt,x2 , . . . , dt,xN } is a set of representa-                                     i ,t−1   refers to the set   θ ci ,t−1 , θ ci ,t−1   at period
+                                                                                                                                                                    com+B
+tive tweets that summarize the period. Furthermore, personalized                               t − 1. The hyperparameter αu,t indicates the weight of θu,t−1
+1. For each topic z, z ∈ Ztcom ∪ ZtB ∪ Ztu :                                 4.2       Inference and Parameter Estimation
+                                                                                Sampling-based methods for LDA rarely include methods for
+     • Draw φB        B
+             t ∼ Dir(βt ) ;
+                                                                             optimizing hyper-parameters. In the TPM model, since αu,t and
+                                                                               fl
+     • Draw φcom ∼ Dir(βtcom φcom    B                                            indicate the weight of the results for period t − 1 for com-
+                            
+             t                t−1 , φ t−1 );                                 βz,t
+                                                                             putations for period t, it is necessary to find an optimized process
+     • Draw φut ∼ Dir(βtu φut−1 )                                            for hyper-parameters αu,t and βz,t
+                                                                                                                fl
+                                                                                                                   during our posterior inference.
+2. For each candidate tweet dt ∈ Dt :                                        Therefore, unlike many previous dynamic topic models, to infer
+                                                                             weighted priors we use a Gibbs EM algorithm [29] to handle the
+     • Draw ϑt ∼ Dir(αt , αtB ); rt ∼ Dir(γt );                              approximate posterior inference step. For user u at time interval t,
+                                                                             we first jointly sample topic zi and parameter qi from the ith word
+     • For each word w in dt                                                 in tweet d (d ∈ Du,t ) over other variables. So for u’s tweets we
+                                                                             obtain:
+           – Draw q ∈ M ulti(r); zw ∼ M ulti(ϑt );
+                ∗ if q = 0: Draw w ∼ M ulti(φcom                                                                                             nu,t
+                                                                                                                                              d,l,−i + σ
+                                             z,t );                           p(ei = l, zi = z|W, e−i , Z−i , xu,t , σ, βtu ) ∝                                  ·
+                ∗ if q = 1: Draw w ∼ M ulti(φuz,t );                                                                                         nu,t
+                                                                                                                                              d,−i + 3σ
+
+                ∗ if q = 2: Draw w ∼ M ulti(φBt );                                     nu,t        l  f
+                                                                                                                                   nu,t         l  f                 (2)
+                                                                                        d,z,−i + xu,z,t                             w,z,−i + βt
+                                                                                                        fl
+                                                                                                                     ·                                fl
+                                                                                                                                                             ,
+                                                                                          (nu,t                                     nu,t
+                                                                                   P                                        P
+3. For user u, u ∈ U :                                                                      d,z,0 −i + xu,z 0 ,t )                   w0 ,z,−i + Nu,t βt
+                                                                              z 0 ∈Z fl                                  w0 ∈Nu,t
+     • Draw θu,t ∼ Dir( xuu,t , xcom    B
+                       
+                                 u,t , αt );
+                                                                             where l indicates the possible values of variable e for the ith word
+     • Draw πt ∼ Dir(σt );                                                   in tweet p, and the fl indicate the corresponding kind of topics
+                                                                             when ei = l. For private and common topics in u, i.e., l = 0, 1, in
+     • For each word w ∈ du,t , where du,t ∈ Du,t :                          Equation 2, nu,t
+                                                                                            d,l,−i indicates the number of times that words in d
+
+           – Draw e ∼ M ulti(π); zw,t ∼ M ulti(θu,t )                        are assigned to label l except for the ith word, whereas nu,td,−i indi-
+                                                                             cates the sum of nu,t      for all values of l. Furthermore, nu,t
+                                                                                                                                           d,z,−i is
+                ∗ if e = 0: Draw w ∼ M ulti(φcom
+                                             z,t );
+                                                                                                 d,l,−i
+                                                                             the number of times that tweet d is assigned to topic z excluding the
+                ∗ if e = 1: Draw w ∼ M ulti(φuz,t );                         ith word in d, whereas nu,t w,z,−i indicates the number of times that
+                ∗ if e = 2: Draw w ∼ M ulti(φBt );                           word w is assigned by topic z excluding the ith word. According to
+                                                                             Figure 3, if ei = 2, we are dealing with a “bursty" topic, so the vo-
+                                                                             cabulary only refers to the set of “bursty" keywords in {Du,t , Dt },
+       Figure 3: Generative process for the TPM model.                       then xB                          B
+                                                                                    u,t in Eq. 2 equals to αt .
+
+                                              com+B
+                                                                                For the process of sampling candidate tweets from Dt , we have
+in Equation 1 that we use to calculate θu,t          . Here, the value of    a similar procedure, as follows:
+  com+B                    1
+                                P
+θci ,t−1 is equal to C            θui ,t−1 , where ui ∈ Cu,t−1 .
+                        | u,t |                                                                                                              ntd,l,−i + γ
+   For private topical aspects θu,t u
+                                        , we use a Dirichlet distribution      p(qi = l, zi = z|W, d−i , Z−i , αt , γ, βtu ) ∝                            ·
+        u       u                                                                                                                            ntd,−i + 3γ
+over xt = θu,t−1 that is derived from values in period t − 1. For
+bursty topics in period t , we only focus on those “burst" words that                     ntd,z,−i + αt l
+                                                                                                          f                                    f
+                                                                                                                                  ntw,z,−i + βt l                    (3)
+have a high term frequency within period t. Similar to [32], we de-                                             f
+                                                                                                                     ·                                 f
+                                                                                                                                                         .
+                                                                                           ntd,z,0 −i + Z fl αt l                 nu,t
+                                                                                   P                                      P                           l
+                                                                                                                                   w0 ,z,−i + Nu,t βt
+fine a keyword to be “bursty" if its frequency nw,t at time t is above         z 0 ∈Z fl                                 w0 ∈Nt
+                                   B
+a threshold value. We derive θu,t      from a Dirichlet distribution over
+the hyperparameter αt .   B                                                  Meanwhile, every time after sampling for p(ei = l, zi = z) and
+                                                                                                                           fl
+   For a tweet in Dt that is posted during time period t, a probabilis-      p(qi = l, zi = z), we optimize α   bu,t and βbz,t,t−1 by maximizing
+tic distribution ϑt over topics Zt = Ztu ∪ Ztcom ∪ ZtB is derived            the likelihood posterior distribution
+from a Dirichlet distribution over the hyperparameter αt .                                        p(W |Φt−1 , xu,t−1 , αB , βt , σ, γ),
+   For each word w in tweet dt , dt ∈ {Du,t , Dt } proposed dur-
+ing period t, we assign a specific topic z from u’s interests θu,t           so we get
+or distribution ϑt for candidate documents. For topic aspects z                                     P
+                                                                                                              (θu,t−1,z −
+                                                                                                                                    P
+                                                                                                                                           λθci ,t−1 )Au,z,t
+(z ∈ Ztcom ∪ ZtB ∪ Ztu ), we introduce three kinds of multinomial                                z∈Ztcom                      ci ∈Cu,t−1
+distribution φcom    , φut and φBt to reflect the probability over Z
+                                                                     com
+                                                                         ,    α      bu,t ·
+                                                                              bu,t = α                                                                               (4)
+                 t                                                                                            Ψ(ncom
+                                                                                                                 u,t + αu,t ) − Ψ(αu,t )
+Z B and Z u , respectively. Based on [13, 30], we assume that the
+common and personal topic propagations follow a Dirichlet distri-            and
+bution over the value from the previous interval’s distributions, with                          P      fl
+                                                                                                             
+                                                                                                                  fl       w,z          w,z
+                                                                                                                                               
+a weighted prior βt = {βtcom , βtu }: for common topics z ∈ Ztcom ,                                  φt−1,w   Ψ(nw,z,t + yt,t−1 ) − Ψ(yt,t−1 )
+                                                                               f           f   w∈Nt
+we use the Dirichlet distribution to infer from φcom            B
+                                                        t−1 , φt−1 ; for
+                                                                                l
+                                                                             β̂z,t      l
+                                                                                   = β̂z,t ·                         f
+                                                                                                                                                                     (5)
+                         u   u
+private topics z ∈ Zt , φt is derived from φt−1 . u                                                                l
+                                                                                                               Ψ(nz,t + βz,t ) − Ψ(βz,t )
+   This concludes the technical account of the graphical model de-
+                                                                             where Ψ(x) is defined by Ψ(x) = ∂ log∂xΓ(x) , Au,z,t refers to
+picted in Figure 2. After computing the models for period t for
+all users in U, we update the edge weights for the social circles                                  Ψ(ncom      com          com
+                                                                                                      u,z,t + xu,z,t ) − Ψ(xu,z,t ),
+(λu,ci ,t ), using related users’ interests θ and current social circles.         w,z                        com+B
+Inference for our topic modeling process will then move on to pe-            and yt,t−1 is defined as βtcom φt−1   .
+riod t + 1. The generative process for the TPM model at time                   Algorithm 1 summarizes the Gibbs EM sampling inference based
+interval t, 0 < t < T , is described in Figure 3.                            on the equations that we have just derived. During the Gibbs EM
+ Algorithm 1: Gibbs EM Sampling Process during period t                      We calculate the saliency of ci after normalizing SIM into SIM   [:
+
+  Input: βt , β B , αB , αt , Xu,t , Φft−1 , dt , U, Dt and R                  λu,ci ,t = µ
+                                                                                            X
+                                                                                                d ci ,t , θcj ,t |θu,t ) · λu,ci ,t + (1 − µ) (8)
+                                                                                                sim(θ
+              f
+  Output: β̂t l ,bαt ,he, zi and hq, zi                                                                                                |Cu,t |
+                                                                                            i6=j
+  Initialize βt , β B , αB , αt ; Topic assignment for all words
+  for u ∈ U do                                                               4.3    Time-Aware Summarization
+       r = 0;
+       for r<R do                                                               After Gibbs EM sampling, for each candidate tweet dt at time
+           E-Step:                                                           t, we have two parametric distributions ϑt and φt that reflect the
+           for d = 1 to Du,t do                                              topic-tweet distribution and the word-topic distribution, respectively.
+                for i = 1 to Nd do                                           I.e., P (zt |dt ) = θzt ,dt and P (w|zt ) = φz,t,w . For user u at time
+                    Draw hei , zi i from Eq. 2                               t, we now derive the distribution of interests over topics θu,t , i.e.,
+                    Update nu,t         u,t         u,t                      P (zt |u, t).
+                               e,0,i , ne,z,i and nw,z,i
+                end                                                             Given the distribution θu,t , one intuitive way to get the most
+                                                                             meaningful tweets is to extract the most similar tweets with θu,t
+           end
+                                                                             from among a candidate set Dt . However, a high-degree relevance
+           for d = 1 to Dt do
+                                                                             in latent topic distributions cannot be taken as the only criterion in
+                for i = 1 to Nd do
+                    Draw hqi , zi i from Eq. 3                               our tweet selection. Thus after extracting a set of relevant tweets
+                    Update ntq,l,i , ntd,z,i and ntw,z,i ;                   Rt from Dt , there are three key requirements for an ideal sum-
+                                                                             mary [16] that we need to consider in generating a tweet summary:
+                end
+                                                                             novelty, the coverage and the diversity.
+           end                                                                  Novelty calculates the semantic divergence between the currently
+           M-Step:                                                           selected set RTu,t and the results in previous time periods RTt0 .
+                         fl    fl      fl
+           Calculate θu,t   , φw,t , ϑd,t , and λu,ci from Eq. 6, 8;         Our intention is to make the current results as different as possible
+                             (r)   lf ,(r)
+                       bu,t and β̂z,t
+              Maximize α               from Eq. 4, 5;                        from previous results as much as possible. Therefore, we have:
+              r = r + 1 and go to E-Step;                                                                X
+        end                                                                      LN (RTt |RTt0 ) =           minp0 ∈RTt0 (div(ϑp , ϑp0 |θu,t )) (9)
+  end                                                                                                 p∈RT
+
+                                                                             where the divergence div(ϑp , ϑp0 |θu,t ) between ϑp and ϑp0 are
+                                                                             calculated based on Equation 7.
+                                                                                Furthermore, a tweet summary should contain important aspects
+                                                                             from all related tweets and minimize the information loss with the
+                                                                             set of all candidate tweets. Thus, given θu,z,t , the coverage be-
+sampling process, we estimate the parameters of user u’s interests
+ e=l                                                         q=l             tween RT and Dt is calculated as follows:
+θu,z,t , the probability of topics over candidate tweets ϑd,z,t  , topic                                           P
+                             fl                                                                           −minz            div(ϑd,z ,ϑd0 ,z |θu,z,t )
+distributions over words φw,z,t and {πd,l,t , rd,l,t } as follows:
+                                                                                                   X
+                                                                                                                  d0 ∈Dt
+                                                                               LC (RT |Dt ) =             e                                             (10)
+                                               fl                                                  d∈RT
+                     f
+                     l
+                                      nu,t
+                                        z + xu,z,t
+                   θu,z,t      =    P u,t         fl                         where the divergence div(ϑd,z , ϑd0 ,z |θu,z,t ) is calculated as fol-
+                                          nz0 + xu,z 0 ,t
+                                   z∈Z fl
+                                                                             lows:
+                                     n      + αz,t                                                                      ϑd,z               ϑd,z
+                     f
+                     l
+                   ϑd,z,t      =    P d,z,t                                   div(ϑd,z , ϑd0 ,z |θu,z,t ) = ϑd,z ln           − ϑd0 ,z ln               (11)
+                                       nd,z0 ,t + αz0 ,t                                                               θu,z,t             θu,z,t
+                                   z∈Z fl
+                                                  f
+                                                                             Diversity calculates the information divergence among all tweets
+                                                l
+                    fl               nw,z,t + βw,t                           within the current candidate result set. Ideally, the tweet summary
+                   φw,z,t      =                   fl
+                                                                       (6)
+                                                                             results have the largest possible difference in topic distributions
+                                    P
+                                       nw,z,t + βw,t
+                                   z∈Z fl                                    with each other. The equation is as follows:
+                                   nu,t
+                                    d,l + σ
+                                                                                              X                                   Y
+                    πd,l,t     =                                               LD (RT ) =            maxz div(φw,z,t , φw0 ,z,t |      ϑd,z ) (12)
+                                   nu,t
+                                    d + 3σ                                                  w,w0 ∈RT                                      d∈Dt
+
+                                   ntd,l + γ
+                                                                                                                                      Q
+                                                                             where we compute the divergence div(φw,z,t , φw0 ,z,t | d∈Dt ϑd,z )
+                    rd,l,t     =
+                                   ntd + 3γ                                  in the same way as Equation 11.
+                                                                                The exact process for generating RTu,t given user u is shown
+   To compute the weight λcu,t , we use a Markov random walk
+                                                                             in Algorithm 2. Illuminated by a previous work [33], an iterative
+strategy, which calculates saliency of a social circle based on “vot-
+                                                                             optimization algorithm is used to select the set RTu,t . During each
+ing” from others. Since each social circle can be considered as a
+                                                                             iteration n, we extract tweet dx such that dx ∈ Rt ∩ dx ∈ / RTu,t to
+set of users, an interest distribution θccom+B
+                                           i ,t−1
+                                                    for each social cir-                          (n)
+                                                                             substitute dy ∈ RT u,t when the saliency gain S((RTu,t −)∪dx )−
+cle ci can be computed as u0 ∈ci θucom+B
+                               P
+                                          0 ,t−1  .  Thus we compute
+                                                                             S(RT u,t ) gets a maximum value. The algorithm will converge
+    com+B                                   u,t
+a θu,t     -based similarity matrix SIM         among different social       when S(RT u,t ) reaches its maximum value.
+circles, where each item SIM u,ti,j is computed based on the diver-
+gence between two items:
+                                                                             5.    EXPERIMENTAL SETUP
+                           X            θc ,z              θc ,z               For our experiments we employ a Twitter dataset that includes
+     div(θci , θcj |θu ) =     θci ,z ln i − θcj ,z ln i            (7)
+                           z∈Z
+                                        θu,z               θu,z              both social relations and tweets: we crawl tweets via the Twitter
+                                                                                                    6
+                                                                                                 x 10
+    Algorithm 2: Iterative Process for RTu,t Generation.
+     Input : Dt , RTu,t0 , θu,t , φt , N ;                                                 3.5
+
+     Output: RTu,t ;                                                                                                             800
+
+
+
+
+                                                                            User Numbers
+                                                                                           2.5
+     Calculate Kullback-Leibler divergence KL(ϑd,t , θu,t );
+     Rank and extract relevant tweets to Rt by e−KL(ϑd,t ,θu,t ) ;                         1.5
+                                                                                                                                 400
+     Initialize: Extract N tweets from Rt to RT u,t ;
+     repeat
+                                                                                           0.5
+         Extract Xt = {dx ∈ Rt ∩ dx ∈   / RTu,t };
+         for dx ∈ Xt , ∀dy ∈ RT u,t do                                                            100        500           900         1000   3000   5000
+                                                                                                        Number of Tweets
+              Calculate SRT u,t = F (LC · LN · LD );
+              Calculate                                                                   (a)                            (b)
+              ∆Sdx ,dy = S((RTu,t − dy ) ∪ dx ) − S(RT u,t );               Figure 4: Histograms of the number of users and tweets in our
+         end                                                                dataset: the left (a) indicates the number of tweets per user
+              D       E     D        E
+         Get dˆx , dˆy that dˆx , dˆy = arg maxdx ,dy ∆Sdx ,dy ;            in our dataset where the y-axis denotes the number of tweets;
+                                                                            while the right (b) indicates the number of tweets per user
+         RTu,t = (RTu,t − dˆy ) ∪ dˆx ;                                     with its number of friends in Twitter, where y-axis indicates
+     until ∀∆Sdx ,dy < ε;                                                   the number of tweets the user wrote and the x-axis indicates
+     return RT u,t .                                                        the number of friends.
+
+streaming API,2 which contains a random sample of around 10%                lar to [10], to each Wikipedia article to ranking sentences, using the
+of all items posted on Twitter. Timestamps in our dataset are from          tweet dt as the query. This calculates the score of each sentence via
+November 1, 2009 to December 31, 2010; the 2009 part contains               “votes” from other sentences in a document. Figure 5 shows 4 ex-
+47,373,408 tweets and 562,361 users, while the numbers for 2010             ample tweets and the appended sentences. Here, the left text box
+are 295,145,421 and 5,828,356, respectively. Figure 4(a) shows the          in each item is a tweet and on the right we show the identified sen-
+statistics of the number of tweets per user in our dataset, where we        tences from the linked Wikipedia articles.
+can find that most users (75.2%) in our dataset wrote fewer than
+100 tweets. For crawling the social relations, we use the dataset
+                                                                            5.2                    Experimental Setup
+from [15], which includes social relations for all users on Twitter            Following existing topic models [11], we set pre-defined values
+until July 2009. In our experiments, we use only those tweets and           for the hyperparameters αt and βt in our graphical model: for the
+users that appear in both datasets. In our experiments we assume            weighted parameter αu,t and βt , we set 50/Ktu to αu,t and 0.5 to
+social relations among users to remain the same over the entire time        βt respectively. And we set 50/KtB to αB and 0.5 to β B respec-
+period.                                                                     tively. For the hyperparameters γ and σ in TPM, as defined in [14],
+   Since it is impossible to evaluate the effectiveness if a user posted    we set σu = γcom = 0.5 and γu = σcom = 0.3. For burst topics
+nothing on Twitter, sparse postings obstruct our experimental eval-         we set γB = σB = 0.2 in our experiments. The initial value of
+uation. We therefore only consider users who posted a sufficient            λu,ci ,t−1 for each social circle of u is set to 1/Cu,t , the parameter
+number of tweets for our evaluation: we collect users who post              µ is set as 0.85; and ε in Algorithm 2 is set to 0.0001. For the num-
+over 100 tweets in our dataset. This results in a subset containing         ber of topics in our topic modeling process, the default values for
+32,659 users. Thereafter we use social relations to build the social        Z0u and Z0com in our experiments are set to 100, respectively. To
+circles around those users. Figure 4(b) shows the number of tweets          optimize the number of topics, we compare performance in various
+of these users (y-axis) versus the number of friends on the x-axis.         values and discuss it latter.
+We further remove non-English tweets through automatic language                Statistical significance of observed differences between two com-
+identification [3]. We remove stop words and apply Porter stem-             parisons is tested using a two-tailed paired t-test. In our experi-
+ming [23].                                                                  ments, statistical significance is denoted using N for significant dif-
+                                                                            ferences for α = 0.01, or M for α = 0.05.
+5.1       Data Enrichment
+   Since each tweet is only up to 140 characters long, the amount of        5.3                    Evaluation Metrics
+textual evidence to work with is very limited. To remedy this, we              Evaluating the effectiveness of time-aware tweets summariza-
+employ a state-of-the-art method for linking tweets to Wikipedia            tion is a challenging task, especially in the absence of explicit user
+articles [20]. In particular, we employ the so-called CMNS method           feedback. One possible solution is to use evidence from users them-
+that uses the prior probability that Wikipedia article c is the target      selves: we use a user’s retweeted post(s) at time t + 1 as the ground
+of a link with anchor text q within Wikipedia:                              truth to evaluate performance of comparisons at time t.
+                                                                               We measure the quality of summaries by counting overlapping
+                                       |Lq,c |                              textual units between the generated results and the ground truth re-
+                  CMNS (c, q) = P                    ,               (13)
+                                       c0 |Lq,c |
+                                                 0
+                                                                            sults. In our experiments, we adopt the ROUGE evaluation metrics
+where Lq,c denotes the set of all links with anchor text q and target       [17], a widely-used recall-oriented metric in the task of document
+c.                                                                          summarization that evaluates the overlap between a gold standard
+   After we have obtained three Wikipedia articles with the high-           and candidate selections.3 In our experiments, ROUGE-1 (unigram
+est CMNS score, we extract the most central sentences from these            based method), ROUGE-2 (bigram based method) and ROUGE-W
+Wikipedia articles and append them to the tweet. In particular, we          (weighted longest common sequence) are used as evaluation met-
+apply a query-sensitive graph-based summarization method, simi-             rics.
+2                                                                           3
+    https://dev.twitter.com/docs/streaming-apis.                                Version 1.5.5 is used in this paper.
+                   She is Executive Assistant to
+                  the President, and is portrayed
+                  by noted actor and comedienne
+   whenever i               Lily Tomlin
+     see lily      She appeared on the dramatic
+    tomlin, i      series The West Wing for four
+                      years (2002–2006) in the
+    call her        recurring role of presidential
+     debbie          secretary Deborah Fiderer.
+                     Nominated—Screen Actors
+     fiderer        Guild Award for Outstanding
+                   Performance by an Ensemble
+                  in a Drama Series (2003, 2005)
+
+                    Sheen has since become a
+                  prominent advocate of the 9/11
+                          Truth movement.
+                   He was characterized by the
+    Waiting for     press as believing the 9/11
+                  Commission was a whitewash
+     Charlie       and that the administration of
+    Sheen to       former President George W.
+                       Bush may have been
+     say the        responsible for the attacks.
+      Bush          After the terrorist attacks on
+                    September 11, 201
+   administrati
+     on was
+   behind the
+    attack on
+    his wife.
+
+
+
+
+Figure 5: Four examples for entity linking and ranking corre-
+sponding to four individual tweets, where the textbox on left
+side indicates the original tweet while the textbox on the right
+side shows the extracted related sentences. A mixture of the
+tweet and extracted wiki sentences will replace the original
+tweet in our experiments.
+
+5.4     Baseline Comparisons
+   Given the TPM modeling introduced in Section 4.1, our contri-
+bution is twofold: (1) we introduce collaborative influence to user’s
+interests detection; (2) we adopt time-aware propagation to infer
+topics. To evaluate the influence of social circles and time-aware
+topics, besides our overall TPM-based strategy, we also evaluate
+the performance of the model that only includes (1) the collabora-
+tive influence or only the (2) time-aware propagation, respectively.
+   We write TPM-ALL for the overall process as described in Sec-
+tion 4.1, which includes both the social influence modeling and
+time-aware topic and interests tracking. We write TPM-SOC for
+the model that only considers users’ social influence (so excluding
+time-aware topic propagation and it doesn’t consider if some topic
+is private or not). We write TPM-TOP for the model that uses a
+user’s own tweets (without social circles but considering topic and
+interests propagation with the time).
+   To evaluate our proposed method in more detail, in our exper-
+iments the baselines not only include widely-used topic models,
+but also recent user behavior models on Twitter. For those topic
+and the TPM-SOC model with differing numbers of topics on our            of tweets selected per period (40 or 60). We separate users into
+held-out test set. After the number of topics becomes larger than        3 classes by counting their tweets: (1) less than 400 tweets; (2) be-
+300, the perplexity of both approaches starts to flatten out. We         tween 400 to 800; and (3) more than 800 tweets. As shown in
+find that TPM-SOC outperforms the author-topic model with bet-           Figure 10(a) and (c) that focusing on ROUGE-1, the difference be-
+ter generalization performance. For TPM-ALL and TPM-TOP we               tween TPM-ALL and TPM-TOP is bigger for users with up to 400
+set the number of “private" topics and “common" topics to 150,           tweets than for those with more than 400. This can be explained by
+separately.                                                              the fact that the collaborative filtering used in TPM-ALL becomes
+                                                                         more effective when there is a bigger data sparseness issue to over-
+6.    RESULTS AND DISCUSSION                                             come. In terms of ROUGE-2, similar results can be found in Figure
+                                                                         10(b) and (d).
+   In this section we provide an answer to the following research
+questions. (1) How does the TPM-based TaTS strategy perform on           6.3    Overall Performance
+time-aware tweets summarization (§6.1)? (2) How does the TPM-
+                                                                            Table 2 shows the average performance of our TPM-based strate-
+based TaTS strategy perform on social-aware tweets summariza-
+                                                                         gies and baselines, in terms of ROUGE-1, ROUGE-2 and ROUGE-
+tion? (§6.2)? And (3) what is the overall performance for TPM on
+                                                                         W, based on all candidate tweets in all time periods. We find that
+the task of personalized TaTS (§6.3)?
+                                                                         our method outperforms the baselines in every case. Except for our
+6.1    Time-Aware Comparisons                                            TPM-based strategies, UBM get the best performance than others.
+                                                                         Since summarization baselines are not sensitive to users’ interests,
+   To illustrate the performance at different time periods, the eval-
+                                                                         thus we find that Centroid, Lex-R (short for LexRank), and SUM-
+uation results of the TPM-ALL, TPM-TOP, UBM and AT strate-
+                                                                         TF do not perform well. Among the topic models, we found that
+gies at different time periods are shown in Figure 8, in terms of
+                                                                         the AT-based method yields almost the worst performance. This
+ROUGE-1, ROUGE-2 and ROUGE-W, respectively. We select 10
+                                                                         can be explained by the fact that the topic modeling procedure in
+contiguous weeks from November 1, 2009 onwards as the test pe-
+                                                                         AT does not capture topic drift and users’ social circles.
+riod and separate it into 10 periods.
+                                                                            We evaluated the performance of the various approaches in terms
+   In Figure 8 we observe that the AT model obtains the worst
+                                                                         of the three ROUGE metrics for a varying number of tweets se-
+performance, while both TPM-ALL and TPM-TOP outperform all
+                                                                         lected per period, i.e., N = 40 and N = 60. As shown in Table
+other strategies in terms of ROUGE metrics at all time intervals.
+                                                                         2, TPM-ALL performs better than all baselines on all metrics. For
+This demonstrates the advantage of TPM-based strategies in time-
+                                                                         N = 40, TPM-ALL achieves an increase of 10.6%, 11.6% and
+aware comparisons. In Figure 8, we observe a “cold-start” phe-
+                                                                         8.9% over UBM in terms of ROUGE-1, ROUGE-2, and ROUGE-
+nomenon, which results from the sparseness of the context in the
+                                                                         W respectively. For N = 60, TPM-ALL gives an increase of
+first time period. In that condition, TPM-ALL and TPM-TOP are
+                                                                         11.2%, 11.2% and 10.1% over UBM. For the dynamic version
+nearly equivalent to the UBM and AT since there are neither social
+                                                                         without social influence, TPM-TOP outperforms all other baselines
+circles nor burst topics during the first time period. After that, the
+                                                                         also, which indicates the effectiveness of detecting dynamic topics.
+performance of the TPM based methods keeps increasing over time
+                                                                         We further compare TPM-TOP with UBM: for N = 40, TPM-
+until it achieves a stable performance after t = 3. We find that TPM
+                                                                         TOP offers relative performance improvements of 4.1%, 6.25% and
+based strategies are sensitive to time-aware topic drifting. Mean-
+                                                                         4.8%, respectively, for the ROUGE-1, ROUGE-2 and ROUGE-W
+while, we find that TPM-ALL performs better than TPM-TOP in
+                                                                         metrics, while the relative improvements are 7.8%, 6.7% and 7.3%
+Figure 8. TPM-ALL detects user’s interests using social circles
+                                                                         on the same metrics for N = 60. We find that TPM-ALL out-
+whereas TPM-TOP ignores them.
+                                                                         performs the UBM baselines with a statistical significance differ-
+6.2    Social-Aware Comparisons                                          ence at level α < 0.01 in terms of all ROUGE metrics, whereas
+                                                                         TPM-TOP and TPM-SOC outperforms UBM with a statistical sig-
+   To evaluate the influence of social circles in our proposed strat-
+                                                                         nificance difference at level α < 0.05.
+egy, we investigate the performance under various numbers of so-
+cial circles. From our dataset, we extract users with different num-
+bers of social circles and compare the performance of our methods        7.    CONCLUSION AND FUTURE WORK
+on these data sets in terms of ROUGE. In Figure 9 we plot the val-          We have considered the task of personalized time-aware tweets
+ues of ROUGE-1, ROUGE-2 and ROUGE-W in (a) to (c), respec-               summarization, based on user history and influences from “social
+tively. For each figure, we compare our strategies that do consider      circles.” To handle the dynamic nature of topics and user interests
+social circles, TPM-ALL and TPM-SOC, against the TPM-TOP                 along with the relative sparseness of individual messages, we have
+and UBM methods under varying number of social circles.                  proposed a time-aware user behavior model. Based on probabilistic
+   We observe from Figure 9(a) that the performance in terms of          distributions from our proposed topic model, the tweets propaga-
+ROUGE-1 changes with the number of social circles, and the value         tion model, we have introduced an iterative optimization algorithm
+increases and achieves a maximal value between 3 and 5 social            to select tweets subject to three key criteria: novelty, coverage and
+circles. After that, the value decreases rapidly; redundant and ir-      diversity. In our experiments we have verified the effectiveness of
+relevant “relations” seem to enter the picture. Another plausible        our proposed method, showing significant improvements over var-
+explanation concerns the difference of user characteristics in vari-     ious state-of-the-art baselines.
+ous social circles. Since the UBM and TPM-TOP models do not                 As to future work, we aim to employ a user-study to enhance the
+consider the social influence, their ROUGE values keep constant          accuracy of interest detection, e.g., via an online evaluation. An-
+for different numbers of social circles. We observe a similar behav-     other future direction is to take more information and features into
+ior in Figure 9(b) and 9(c) in terms of ROUGE-2 and ROUGE-W.             account for our task: our current experiments ignore, e.g., URLs
+   To evaluate the effect of collaborative filtering in TPM for vari-    appearing in tweets which could enhance our entity linking setup. It
+ous classes of users, especially for “passive” users on Twitter who      will also be interesting to consider other features for modeling, such
+rarely write a tweet, we compare the performance of different users      as geographic or profile information. Finally, our current model is
+in terms of ROUGE metrics with varying values of the number              evaluated based on fixed time intervals, which might not accurately
+                                                                                             TPM−ALL                                                                                            TPM−ALL                                                                                               TPM−ALL
+                 0.5                                                                         TPM−TOP                                                                                            TPM−TOP                                                                                               TPM−TOP
+                                                                                             UBM                                                                                                UBM                                                                                                   UBM
+                                                                                                                                                                                                                         0.17
+                                                                                             AT                                                                                                 AT                                                                                                    AT
+
+            0.45                                                                                                      0.15
+
+
+
+
+                                                                                                                                                                                                               ROUGE−W
+  ROUGE−1
+
+
+
+
+                                                                                                            ROUGE−2
+                                                                                                                      0.13
+                 0.4
+                                                                                                                                                                                                                         0.15
+
+
+                                                                                                                      0.11
+            0.35
+
+
+                                                                                                                      0.09
+                                                                                                                                                                                                                         0.13
+                 0.3
+                       1     2       3          4       5       6       7      8                9      10                    1       2     3       4        5       6          7        8         9       10                    1       2             3      4        5       6       7       8          9       10
+                                                        Timeline                                                                                            Timeline                                                                                                  Timeline
+
+                                           (a) ROUGE-1                                              (b) ROUGE-2                                                                                                                                           (c) ROUGE-W
+                                                                            Figure 8: Time-aware performance in terms of ROUGE metrics.
+
+                                                                                                                                                                                                                                                                                                                 
+                                                                                    TPM−ALL                                                                                                 TPM−ALL                                                                                               730í$//
+                                                                                    TPM−SOC                                                                                                 TPM−SOC                                                                                               730í62&
+                                                                                    TPM−TOP                                                                                                 TPM−TOP                                                                                           730í723
+                                                                                                                        0.14
+                                                                                    UBM                                                                                                     UBM                                                                                                   8%0
+            0.46
+                                                                                                                                                                                                                         
+                                                                                                                        0.13
+
+
+
+
+                                                                                                                                                                                                               528*(í:
+  ROUGE−1
+
+
+
+
+                                                                                                              ROUGE−2
+
+
+
+
+                                                                                                                                                                                                                         
+            0.42
+                                                                                                                        0.12
+                                                                                                                                                                                                                         
+
+                                                                                                                        0.11
+            0.38                                                                                                                                                                                                         
+
+
+                                                                                                                                                                                                                                    
+                       0             2                4           6                8                10                           0         2              4           6                     8         10                                                                                                 
+                                                    Number of Circles                                                                                   Number of Circles                                                                                        1XPEHURI&LUFOHV
+
+                                           (a) ROUGE-1                         (b) ROUGE-2                             (c) ROUGE-W
+                                               Figure 9: ROUGE-1 and ROUGE-2 performance with increasing numbers of social circles.
+
+                                                                     TPM−TOP                                                                     TPM−TOP                                                                    TPM−TOP                                                                    TPM−TOP
+                                                                     TPM−ALL                                                                     TPM−ALL                                                                    TPM−ALL                                                                    TPM−ALL
+                                                                                             0.15
+                                                                                                                                                                        0.56
+                  0.5                                                                                                                                                                                                                                 0.16
+                                                                                                                                                              ROUGE−1
+                                                                                   ROUGE−2
+
+
+
+
+                                                                                                                                                                                                                                            ROUGE−2
+       ROUGE−1
+
+
+
+
+                 0.45                                                                        0.13                                                                        0.5                                                                          0.15
+
+
+
+
+                  0.4                                                                                                                                                                                                                                 0.14
+                                                                                                                                                                        0.44
+                                                                                             0.11
+
+
+
+                            x<=400           400<x<=800             x>800                           x<=400                400<x<=800            x>800                          x<=400       400<x<=800                     x>800                             x<=400         400<x<=800                x>800
+                                         Number of Users’ Tweets                                                      Number of Users’ Tweets                                           Number of Users’ Tweets                                                         Number of Users’ Tweets
+
+                           (a) ROUGE-1, N=40              (b) ROUGE-2, N=40                (c) ROUGE-1, N=60                (d) ROUGE-2, N=60
+                            Figure 10: Performance for different kinds of users: users in our dataset are classified by their number of tweets.
+
+
+reflect bursty topics on Twitter. Therefore, a novel graphical model                                                                                                     (KNAW), and the Netherlands eScience Center under project num-
+that includes dynamic time bins instead of the fixed time granular-                                                                                                      ber 027.012.105.
+ities, will be another direction for future research.
+
+Acknowledgements. This research was supported by the European                                                                                                            8.        REFERENCES
+Community’s Seventh Framework Programme (FP7/2007-2013) un-
+der grant agreements nr 258191 (PROMISE Network of Excel-                                                                                                                  [1] D. Blei and J. Lafferty. Dynamic topic models. In ICML
+lence) and 288024 (LiMoSINe project), the Netherlands Organisa-                                                                                                                2006, pages 113–120, 2006.
+tion for Scientific Research (NWO) under project nrs 640.004.802,                                                                                                          [2] D. Blei, A. Ng, and M. Jordan. Latent dirichlet allocation.
+727.011.005, 612.001.116, HOR-11-10, the Center for Creation,                                                                                                                  Journal of machine Learning research, 3:993–1022, 2003.
+Content and Technology (CCCT), the BILAND project funded by                                                                                                                [3] S. Carter, W. Weerkamp, and M. Tsagkias. Microblog
+the CLARIN-nl program, the Dutch national program COMMIT,                                                                                                                      language identification: overcoming the limitations of short,
+the ESF Research Network Program ELIAS, the Elite Network                                                                                                                      unedited and idiomatic text. Language Resources and
+Shifts project funded by the Royal Dutch Academy of Sciences                                                                                                                   Evaluation, 2012.
+                                  Table 2: Overall ROUGE Performance for All Comparisons
+   Metrics     TPM-ALL       TPM-TOP TPM-SOC UBM TLDA             AT     TF-IDF Centroid                    Lex-R    SUM-TF      Random
+                                                 Cut-off of N = 40 tweets per period
+ ROUGE-1         0.428 N      0.403 N       0.395 N    0.387 0.374 0.355          0.341           0.302      0.291     0.274       0.252
+ ROUGE-2         0.125 N      0.119 M       0.116 M    0.114 0.112 0.102          0.095           0.081      0.077     0.079       0.037
+ ROUGE-W         0.159 N      0.153 N       0.149 M    0.146 0.142 0.144          0.137           0.118      0.115     0.105       0.076
+                                                 Cut-off of N = 60 tweets per period
+ ROUGE-1         0.513 N      0.497 N       0.482 N     0.461       0.457     0.423    0.411      0.362      0.369     0.329       0.281
+ ROUGE-2         0.149 N      0.142 M       0.139 M     0.134       0.127     0.122    0.116      0.097      0.102     0.095       0.041
+ ROUGE-W         0.197 N      0.191 N       0.189 N     0.178       0.176     0.166    0.161      0.131      0.135     0.119       0.081
+
+
+ [4] D. Chakrabarti and K. Punera. Event summarization using                [23] M. Porter. An algorithm for suffix stripping. Program:
+     tweets. In ICWSM 2011, pages 66–73, 2011.                                   electronic library and information systems, 1980.
+ [5] K. Chen, T. Chen, G. Zheng, O. Jin, E. Yao, and Y. Yu.                 [24] D. Radev, H. Jing, M. Styś, and D. Tam. Centroid-based
+     Collaborative personalized tweet recommendation. In SIGIR                   summarization of multiple documents. Information
+     2012, 2012.                                                                 Processing & Management, 2004.
+ [6] B. Connor, M. Krieger, and D. Ahn. Tweetmotif:                         [25] D. Ramage, S. Dumais, and D. Liebling. Characterizing
+     Exploratory search and topic summarization for twitter.                     microblogs with topic models. In ICWSM 2010, pages
+     ICWSM 2010, pages 2–3, 2010.                                                130–137, 2010.
+ [7] G. De Francisci Morales, A. Gionis, and C. Lucchese. From              [26] M. Rosen-Zvi, T. Griffiths, M. Steyvers, and P. Smyth. The
+     chatter to headlines: harnessing the real-time web for                      author-topic model for authors and documents. In UAI 2004,
+     personalized news recommendation. In WSDM 2012, 2012.                       pages 487–494, 2004.
+ [8] Q. Diao, J. Jiang, F. Zhu, and E. Lim. Finding bursty topics           [27] B. Sharifi, M. Hutton, and J. Kalita. Summarizing
+     from microblogs. In ACL 2012, 2012.                                         microblogs automatically. In NAACL 2010, 2010.
+ [9] Y. Duan, Z. Chen, F. Wei, M. Zhou, and H. Shum. Twitter                [28] H. Takamura, H. Yokono, and M. Okumura. Summarizing a
+     topic summarization by ranking tweets using social influence                document stream. Advances in Information Retrieval, pages
+     and content quality. In COLING 2012, pages 763–779, 2012.                   177–188, 2011.
+[10] G. Erkan and D. Radev. Lexrank: Graph-based lexical                    [29] H. Wallach. Topic modeling: beyond bag-of-words. In ICML
+     centrality as salience in text summarization. JAIR, 22:                     2006, pages 977–984, 2006.
+     457–479, 2004.                                                         [30] X. Wei, J. Sun, and X. Wang. Dynamic mixture models for
+[11] T. Griffiths and M. Steyvers. Finding scientific topics.                    multiple time series. In IJCAI 2007, pages 2909–2914, 2007.
+     National Academy of Sciences, 101:5228–5235, 2004.                     [31] J. Weng, E. Lim, J. Jiang, and Q. He. Twitterrank: finding
+[12] T. Hofmann. Probabilistic latent semantic indexing. In                      topic-sensitive influential twitterers. In WSDM 2010, pages
+     SIGIR 1999, pages 50–57, 1999.                                              261–270, 2010.
+[13] T. Iwata, S. Watanabe, T. Yamada, and N. Ueda. Topic                   [32] Z. Xu, Y. Zhang, Y. Wu, and Q. Yang. Modeling user posting
+     tracking model for analyzing consumer purchase behavior.                    behavior on social media. In SIGIR 2012, pages 545–554,
+     In IJCAI 2009, volume 9, pages 1427–1432, 2009.                             2012.
+[14] O. Jin, N. Liu, K. Zhao, Y. Yu, and Q. Yang. Transferring              [33] R. Yan, X. Wan, J. Otterbacher, L. Kong, X. Li, and
+     topical knowledge from auxiliary long texts for short text                  Y. Zhang. Evolutionary timeline summarization: a balanced
+     clustering. In CIKM 2011, 2011.                                             optimization framework via iterative substitution. In SIGIR
+[15] H. Kwak, C. Lee, H. Park, and S. Moon. What is twitter, a                   2011, pages 745–754, 2011.
+     social network or a news media? In WWW 2010, pages                     [34] S. Yang, B. Long, A. Smola, N. Sadagopan, Z. Zheng, and
+     591–600, 2010.                                                              H. Zha. Like like alike: joint friendship and interest
+[16] L. Li, K. Zhou, G. Xue, H. Zha, and Y. Yu. Enhancing                        propagation in social networks. In WWW 2011, pages
+     diversity, coverage and balance for summarization through                   537–546, 2011.
+     structure learning. In WWW 2009, 2009.                                 [35] Z. Yang, K. Cai, J. Tang, L. Zhang, Z. Su, and J. Li. Social
+[17] C. Lin. Rouge: A package for automatic evaluation of                        context summarization. In SIGIR 2011, 2011.
+     summaries. In ACL 2004, pages 74–81, 2004.                             [36] M. Ye, X. Liu, and W. Lee. Exploring social influence for
+[18] H. Ma, I. King, and M. Lyu. Learning to recommend with                      recommendation: a generative model approach. In SIGIR
+     social trust ensemble. In SIGIR 2009, pages 203–210, 2009.                  2012, 2012.
+[19] H. Ma, D. Zhou, C. Liu, M. Lyu, and I. King. Recommender               [37] X. Zhao, J. Jiang, J. He, Y. Song, P. Achananuparp, E. LIM,
+     systems with social regularization. In WSDM 2011, pages                     and X. Li. Topical keyphrase extraction from twitter. In ACL
+     287–296, 2011.                                                              2011, 2011.
+[20] E. Meij, W. Weerkamp, and M. de Rijke. Adding semantics
+     to microblog posts. In WSDM 2012, pages 563–572, 2012.
+[21] J. Nichols, J. Mahmud, and C. Drews. Summarizing sporting
+     events using twitter. In IUI 2012, pages 189–198, 2012.
+[22] M. Pennacchiotti, F. Silvestri, H. Vahabi, and R. Venturini.
+     Making your interests follow you on twitter. In CIKM 2012,
+     2012.
+

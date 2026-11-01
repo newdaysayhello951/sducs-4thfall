@@ -1,0 +1,112 @@
+{
+  "bins": 76,
+  "reference": [
+    [
+      "2023-02-07 10:00",
+      "initial M7.8 quake, mass casualties reported"
+    ],
+    [
+      "2023-02-08 00:00",
+      "international rescue teams arrive"
+    ],
+    [
+      "2023-02-09 00:00",
+      "death toll passes 15k"
+    ],
+    [
+      "2023-02-10 00:00",
+      "death toll passes 20k, aid surge"
+    ],
+    [
+      "2023-02-11 00:00",
+      "WHO warns of secondary disaster"
+    ],
+    [
+      "2023-02-13 00:00",
+      "death toll passes 35k, shelter crisis"
+    ],
+    [
+      "2023-02-15 00:00",
+      "focus shifts to survivors and housing"
+    ],
+    [
+      "2023-02-18 00:00",
+      "aid distribution and rebuilding debate"
+    ],
+    [
+      "2023-02-20 12:00",
+      "M6.4 aftershock in Hatay/Antakya"
+    ],
+    [
+      "2023-02-24 00:00",
+      "death toll passes 50k, reconstruction begins"
+    ]
+  ],
+  "tolerance_hours": 12.0,
+  "by_tau": {
+    "1.0": {
+      "n_nodes": 42,
+      "precision": 0.1667,
+      "recall": 0.7,
+      "f1": 0.2692,
+      "tp": 7,
+      "n_ref": 10
+    },
+    "1.012": {
+      "n_nodes": 37,
+      "precision": 0.1892,
+      "recall": 0.7,
+      "f1": 0.2979,
+      "tp": 7,
+      "n_ref": 10
+    },
+    "1.025": {
+      "n_nodes": 34,
+      "precision": 0.1765,
+      "recall": 0.6,
+      "f1": 0.2727,
+      "tp": 6,
+      "n_ref": 10
+    },
+    "1.04": {
+      "n_nodes": 24,
+      "precision": 0.25,
+      "recall": 0.6,
+      "f1": 0.3529,
+      "tp": 6,
+      "n_ref": 10
+    },
+    "1.06": {
+      "n_nodes": 9,
+      "precision": 0.4444,
+      "recall": 0.4,
+      "f1": 0.4211,
+      "tp": 4,
+      "n_ref": 10
+    },
+    "1.08": {
+      "n_nodes": 5,
+      "precision": 0.2,
+      "recall": 0.1,
+      "f1": 0.1333,
+      "tp": 1,
+      "n_ref": 10
+    },
+    "1.1": {
+      "n_nodes": 4,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "tp": 0,
+      "n_ref": 10
+    },
+    "1.15": {
+      "n_nodes": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "tp": 0,
+      "n_ref": 10
+    }
+  }
+}

@@ -1,0 +1,204 @@
+{
+  "dataset": "epinions",
+  "model": "RSTE",
+  "dim": 5,
+  "fold": 0,
+  "seed": 20261031,
+  "hyperparameters": {
+    "reg": 0.001,
+    "social": 1.0,
+    "alpha": 0.4
+  },
+  "n_train": 531859,
+  "n_test": 132965,
+  "status": "completed",
+  "data": {
+    "counts": [
+      40163,
+      139738,
+      664824,
+      487183
+    ],
+    "expected": [
+      40163,
+      139738,
+      664824,
+      487183
+    ],
+    "duplicate_pairs": 0,
+    "matches_paper": true,
+    "user_union": 49289,
+    "ratings_sha256": "6da14f79369cf882911a271efd5f4575bc4292d0497ccf3190b6421a6d198e42",
+    "trust_sha256": "7562075fdcc27d04cd1d88d592e04f4fa57e5d7043246187789d0ccc3e1985f0"
+  },
+  "optimizer": "L-BFGS-B",
+  "validation_fraction": 0.1,
+  "maxiter": 200,
+  "all": {
+    "n": 132965,
+    "mae": 1.1767228699559096,
+    "rmse": 1.5799709266397224
+  },
+  "cold_train_lt5": {
+    "n": 11047,
+    "mae": 1.4124587909934283,
+    "rmse": 1.8102220038446362
+  },
+  "cold_total_lt5": {
+    "n": 6621,
+    "mae": 1.4709618184287536,
+    "rmse": 1.8450959598229695
+  },
+  "all_unclipped": {
+    "n": 132965,
+    "mae": 1.20859978135005,
+    "rmse": 1.6351068898537953
+  },
+  "training": [
+    {
+      "iterations": 65,
+      "selected_iterations": 40,
+      "best_validation_rmse": 1.55984692801243,
+      "objective": 0.011221651348644661,
+      "gradient_norm": 5.2877866833613294e-05,
+      "message": "inner validation patience reached",
+      "seconds": 23.39087329999984,
+      "trace": [
+        {
+          "iteration": 5,
+          "objective": 0.03998093279605407,
+          "gradient_norm": 0.0002643624144000925,
+          "validation_rmse": 1.732256708518342
+        },
+        {
+          "iteration": 10,
+          "objective": 0.022218739872318517,
+          "gradient_norm": 0.00013777011085529828,
+          "validation_rmse": 1.6046524642137168
+        },
+        {
+          "iteration": 15,
+          "objective": 0.018115264565479468,
+          "gradient_norm": 0.00011763529261595917,
+          "validation_rmse": 1.5746983804075414
+        },
+        {
+          "iteration": 20,
+          "objective": 0.016362552453365476,
+          "gradient_norm": 0.00010072948202552935,
+          "validation_rmse": 1.5692240807273825
+        },
+        {
+          "iteration": 25,
+          "objective": 0.015084437773142346,
+          "gradient_norm": 8.430628244452292e-05,
+          "validation_rmse": 1.5631092132733
+        },
+        {
+          "iteration": 30,
+          "objective": 0.014221016584555312,
+          "gradient_norm": 0.0001484882713781109,
+          "validation_rmse": 1.5609662281503223
+        },
+        {
+          "iteration": 35,
+          "objective": 0.013669519969217914,
+          "gradient_norm": 9.706401890016018e-05,
+          "validation_rmse": 1.5606718148768792
+        },
+        {
+          "iteration": 40,
+          "objective": 0.013053726030186338,
+          "gradient_norm": 7.379002270934175e-05,
+          "validation_rmse": 1.55984692801243
+        },
+        {
+          "iteration": 45,
+          "objective": 0.012661409253469216,
+          "gradient_norm": 0.00010125787001018204,
+          "validation_rmse": 1.5635688812516437
+        },
+        {
+          "iteration": 50,
+          "objective": 0.01219268081857247,
+          "gradient_norm": 7.551432386829324e-05,
+          "validation_rmse": 1.565713982447138
+        },
+        {
+          "iteration": 55,
+          "objective": 0.01176003850274901,
+          "gradient_norm": 5.064233744318013e-05,
+          "validation_rmse": 1.5655054450886396
+        },
+        {
+          "iteration": 60,
+          "objective": 0.011465121336498121,
+          "gradient_norm": 9.83916803292481e-05,
+          "validation_rmse": 1.5661640731807793
+        },
+        {
+          "iteration": 65,
+          "objective": 0.011221651348644661,
+          "gradient_norm": 5.2877866833613294e-05,
+          "validation_rmse": 1.5663076342998767
+        }
+      ],
+      "stage": "selection",
+      "role": "truster"
+    },
+    {
+      "iterations": 40,
+      "selected_iterations": 40,
+      "best_validation_rmse": null,
+      "objective": 0.014707490606990552,
+      "gradient_norm": 7.107495652010935e-05,
+      "message": "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT",
+      "seconds": 15.514268699999775,
+      "trace": [
+        {
+          "iteration": 5,
+          "objective": 0.05107981568152434,
+          "gradient_norm": 0.00027572582976859384
+        },
+        {
+          "iteration": 10,
+          "objective": 0.024591120983359232,
+          "gradient_norm": 0.00014898359837814854
+        },
+        {
+          "iteration": 15,
+          "objective": 0.020451312314100762,
+          "gradient_norm": 0.0001235328486546263
+        },
+        {
+          "iteration": 20,
+          "objective": 0.018439696378445457,
+          "gradient_norm": 0.00010046596699480085
+        },
+        {
+          "iteration": 25,
+          "objective": 0.017121244096369517,
+          "gradient_norm": 0.0001000457989718039
+        },
+        {
+          "iteration": 30,
+          "objective": 0.016194952004123745,
+          "gradient_norm": 8.656235402139483e-05
+        },
+        {
+          "iteration": 35,
+          "objective": 0.015419996335781463,
+          "gradient_norm": 9.860785939116835e-05
+        },
+        {
+          "iteration": 40,
+          "objective": 0.014707490606990552,
+          "gradient_norm": 7.107495652010935e-05
+        }
+      ],
+      "stage": "refit",
+      "role": "truster"
+    }
+  ],
+  "seconds": 43.08247200000005
+}

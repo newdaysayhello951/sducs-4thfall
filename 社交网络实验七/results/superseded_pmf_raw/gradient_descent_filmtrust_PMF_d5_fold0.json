@@ -1,0 +1,292 @@
+{
+  "dataset": "filmtrust",
+  "model": "PMF",
+  "dim": 5,
+  "fold": 0,
+  "seed": 20261031,
+  "hyperparameters": {
+    "reg": 0.001,
+    "social": 1.0,
+    "alpha": 1.0
+  },
+  "n_train": 28397,
+  "n_test": 7100,
+  "status": "completed",
+  "data": {
+    "counts": [
+      1508,
+      2071,
+      35497,
+      1853
+    ],
+    "expected": [
+      1508,
+      2071,
+      35497,
+      1853
+    ],
+    "duplicate_pairs": 3,
+    "matches_paper": true,
+    "user_union": 1642,
+    "ratings_sha256": "241167424e24d588e8871d68641e94ead98d5b3a4f0db01ef3181a74ad35e7a1",
+    "trust_sha256": "64573a033add72b988a0fb140fdbc0ad3464cb9821f940007aff6fda44b09603"
+  },
+  "optimizer": "gd",
+  "validation_fraction": 0.1,
+  "maxiter": 200,
+  "all": {
+    "n": 7100,
+    "mae": 0.7219866843417896,
+    "rmse": 1.0069703960506857
+  },
+  "cold_train_lt5": {
+    "n": 250,
+    "mae": 1.2794244099868897,
+    "rmse": 1.7321172918874088
+  },
+  "cold_total_lt5": {
+    "n": 134,
+    "mae": 1.6748188178441057,
+    "rmse": 2.1315873008054007
+  },
+  "all_unclipped": {
+    "n": 7100,
+    "mae": 0.7524236975853122,
+    "rmse": 1.0634672694623872
+  },
+  "training": [
+    {
+      "iterations": 105,
+      "selected_iterations": 80,
+      "best_validation_rmse": 1.0176929410887643,
+      "objective": 0.1614059075881672,
+      "gradient_norm": 0.0011736973519175624,
+      "message": "inner validation patience reached",
+      "seconds": 1.2117627000002358,
+      "trace": [
+        {
+          "iteration": 5,
+          "objective": 1.6135188321548735,
+          "gradient_norm": 0.07736752022966814,
+          "validation_rmse": 1.6841053236243515
+        },
+        {
+          "iteration": 10,
+          "objective": 1.1283765381408057,
+          "gradient_norm": 0.029732542390893735,
+          "validation_rmse": 1.4580878879517734
+        },
+        {
+          "iteration": 15,
+          "objective": 0.7376085664912945,
+          "gradient_norm": 0.02828381032338823,
+          "validation_rmse": 1.2840924690323188
+        },
+        {
+          "iteration": 20,
+          "objective": 0.6212077811283985,
+          "gradient_norm": 0.03876766636259554,
+          "validation_rmse": 1.250403787607019
+        },
+        {
+          "iteration": 25,
+          "objective": 0.48506421769699737,
+          "gradient_norm": 0.016814161978796843,
+          "validation_rmse": 1.1850390461896578
+        },
+        {
+          "iteration": 30,
+          "objective": 0.43619894653332086,
+          "gradient_norm": 0.011061719636221774,
+          "validation_rmse": 1.156863240747179
+        },
+        {
+          "iteration": 35,
+          "objective": 0.3348847185967653,
+          "gradient_norm": 0.00793840607456786,
+          "validation_rmse": 1.0949331656727963
+        },
+        {
+          "iteration": 40,
+          "objective": 0.2423488279206391,
+          "gradient_norm": 0.009137873121130723,
+          "validation_rmse": 1.0422436537188389
+        },
+        {
+          "iteration": 45,
+          "objective": 0.23423175587299677,
+          "gradient_norm": 0.00514064846335398,
+          "validation_rmse": 1.0383902272964602
+        },
+        {
+          "iteration": 50,
+          "objective": 0.20952502282424884,
+          "gradient_norm": 0.004302913084110074,
+          "validation_rmse": 1.0234780179962897
+        },
+        {
+          "iteration": 55,
+          "objective": 0.2050250059565452,
+          "gradient_norm": 0.0029954778650593612,
+          "validation_rmse": 1.022074486122114
+        },
+        {
+          "iteration": 60,
+          "objective": 0.1991353694699994,
+          "gradient_norm": 0.0027041176228091157,
+          "validation_rmse": 1.0202049098362844
+        },
+        {
+          "iteration": 65,
+          "objective": 0.18737116723546776,
+          "gradient_norm": 0.002206919169756336,
+          "validation_rmse": 1.0182572807225632
+        },
+        {
+          "iteration": 70,
+          "objective": 0.18575782561961815,
+          "gradient_norm": 0.0021720512143605206,
+          "validation_rmse": 1.0177941887875186
+        },
+        {
+          "iteration": 75,
+          "objective": 0.18484284812263022,
+          "gradient_norm": 0.0020384114844930776,
+          "validation_rmse": 1.0178169103859462
+        },
+        {
+          "iteration": 80,
+          "objective": 0.17965795839748552,
+          "gradient_norm": 0.02363068920617392,
+          "validation_rmse": 1.0176929410887643
+        },
+        {
+          "iteration": 85,
+          "objective": 0.1642585102463459,
+          "gradient_norm": 0.009815844032107621,
+          "validation_rmse": 1.022958000806381
+        },
+        {
+          "iteration": 90,
+          "objective": 0.16299914395552095,
+          "gradient_norm": 0.004078714620759484,
+          "validation_rmse": 1.0228465066416637
+        },
+        {
+          "iteration": 95,
+          "objective": 0.16250167715820904,
+          "gradient_norm": 0.004769347583462018,
+          "validation_rmse": 1.0245484356132217
+        },
+        {
+          "iteration": 100,
+          "objective": 0.1616871651489152,
+          "gradient_norm": 0.002797253522721154,
+          "validation_rmse": 1.0236256390371632
+        },
+        {
+          "iteration": 105,
+          "objective": 0.1614059075881672,
+          "gradient_norm": 0.0011736973519175624,
+          "validation_rmse": 1.0239429815997731
+        }
+      ],
+      "stage": "selection",
+      "role": "truster"
+    },
+    {
+      "iterations": 80,
+      "selected_iterations": 80,
+      "best_validation_rmse": null,
+      "objective": 0.1794834992749353,
+      "gradient_norm": 0.0015551055327766047,
+      "message": "maximum iterations reached",
+      "seconds": 0.3896767999999611,
+      "trace": [
+        {
+          "iteration": 5,
+          "objective": 1.6853364606622054,
+          "gradient_norm": 0.06847271093163035
+        },
+        {
+          "iteration": 10,
+          "objective": 1.1370959387594322,
+          "gradient_norm": 0.02260890024869413
+        },
+        {
+          "iteration": 15,
+          "objective": 0.7566239656924082,
+          "gradient_norm": 0.01986719613217967
+        },
+        {
+          "iteration": 20,
+          "objective": 0.5955253968658052,
+          "gradient_norm": 0.0623200259831367
+        },
+        {
+          "iteration": 25,
+          "objective": 0.3939468573727717,
+          "gradient_norm": 0.045781874376560595
+        },
+        {
+          "iteration": 30,
+          "objective": 0.3248850762689093,
+          "gradient_norm": 0.015232838497393514
+        },
+        {
+          "iteration": 35,
+          "objective": 0.3069632967659101,
+          "gradient_norm": 0.007835010038578335
+        },
+        {
+          "iteration": 40,
+          "objective": 0.28502239554853565,
+          "gradient_norm": 0.0058515376327171005
+        },
+        {
+          "iteration": 45,
+          "objective": 0.2345471025931852,
+          "gradient_norm": 0.003939375351520005
+        },
+        {
+          "iteration": 50,
+          "objective": 0.21914851829233167,
+          "gradient_norm": 0.0035771350152487323
+        },
+        {
+          "iteration": 55,
+          "objective": 0.21667990086636701,
+          "gradient_norm": 0.003086989290769053
+        },
+        {
+          "iteration": 60,
+          "objective": 0.21231893320602513,
+          "gradient_norm": 0.0028723855050732856
+        },
+        {
+          "iteration": 65,
+          "objective": 0.18831224014080625,
+          "gradient_norm": 0.004563199138373872
+        },
+        {
+          "iteration": 70,
+          "objective": 0.18604314850024903,
+          "gradient_norm": 0.001989281887441631
+        },
+        {
+          "iteration": 75,
+          "objective": 0.18468047120824202,
+          "gradient_norm": 0.0016623542171488397
+        },
+        {
+          "iteration": 80,
+          "objective": 0.1794834992749353,
+          "gradient_norm": 0.0015551055327766047
+        }
+      ],
+      "stage": "refit",
+      "role": "truster"
+    }
+  ],
+  "seconds": 1.7764069999998355
+}

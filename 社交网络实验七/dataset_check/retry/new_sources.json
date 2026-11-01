@@ -1,0 +1,45 @@
+[
+  {
+    "name": "figshare_metadata",
+    "url": "https://api.figshare.com/v2/articles/5677741",
+    "bytes": 2928,
+    "status": 200,
+    "files": [
+      {
+        "id": 9928717,
+        "name": "Flixster-dataset.zip",
+        "size": 36140875,
+        "is_link_only": false,
+        "download_url": "https://ndownloader.figshare.com/files/9928717",
+        "supplied_md5": "867c0742cfec94591f12fdc6585cbaf9",
+        "computed_md5": "867c0742cfec94591f12fdc6585cbaf9",
+        "mimetype": "application/zip"
+      }
+    ]
+  },
+  {
+    "name": "librec_dataset_listing",
+    "url": "https://github.com/guoguibing/librec/tree/master/librec/demo/Datasets",
+    "bytes": 207837,
+    "status": 200,
+    "paths": []
+  },
+  {
+    "name": "flixster_snapshot",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "name": "ciao_asu_archive",
+    "url": "https://web.archive.org/cdx/search/cdx?url=www.public.asu.edu%2F~jtang20%2Fdatasetcode%2F%2A&output=json&filter=statuscode%3A200&filter=original%3A.%2A%5BcC%5Diao.%2A&collapse=urlkey",
+    "bytes": 283,
+    "status": 200,
+    "content": "[[\"urlkey\",\"timestamp\",\"original\",\"mimetype\",\"statuscode\",\"digest\",\"length\"],\n[\"edu,asu,public)/~jtang20/datasetcode/catalog_ciao.txt\",\"20150427184447\",\"http://www.public.asu.edu:80/~jtang20/datasetcode/catalog_ciao.txt\",\"text/plain\",\"200\",\"B2XPKPODGT3CLROKUP5NBVINX4RPAEXU\",\"549\"]]\n"
+  },
+  {
+    "name": "ciao_msu_archive",
+    "url": "https://web.archive.org/cdx/search/cdx?url=cse.msu.edu%2F~tangjili%2Fdatasetcode%2F%2A&output=json&filter=statuscode%3A200&filter=original%3A.%2A%5BcC%5Diao.%2A&collapse=urlkey",
+    "bytes": 471,
+    "status": 200,
+    "content": "[[\"urlkey\",\"timestamp\",\"original\",\"mimetype\",\"statuscode\",\"digest\",\"length\"],\n[\"edu,msu,cse)/~tangjili/datasetcode/catalog_ciao.txt\",\"20170609060321\",\"http://www.cse.msu.edu:80/~tangjili/datasetcode/catalog_ciao.txt\",\"text/plain\",\"200\",\"4XEDQUTA36WS5JRITZQIYOGBWJRF55JS\",\"587\"],\n[\"edu,msu,cse)/~tangjili/datasetcode/ciao.zip\",\"20220714012422\",\"https://www.cse.msu.edu/~tangjili/datasetcode/ciao.zip\",\"application/zip\",\"200\",\"JTICMSPVNVMGILS2JRRGYLG34PAUHIGM\",\"1276588\"]]\n"
+  }
+]

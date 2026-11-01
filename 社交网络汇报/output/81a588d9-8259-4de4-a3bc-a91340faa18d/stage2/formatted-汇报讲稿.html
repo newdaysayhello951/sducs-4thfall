@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="docx-page-size" content="A4">
+<title>NL ⇒ Schedule 论文汇报讲稿</title>
+<style>
+@page { @bottom-center { content: counter(page); } }
+@page cover { @bottom-center { content: none; } }
+section[role="cover"] { page: cover; }
+
+:root {
+  --ff-heading: "微软雅黑", "Microsoft YaHei", sans-serif;
+  --ff-body: "宋体", SimSun, serif;
+  --fs-body: 12pt;
+  --fs-h1: 18pt;
+  --fs-h2: 14pt;
+  --fs-h3: 13.5pt;
+  --fs-small: 10.5pt;
+  --fs-tiny: 10pt;
+  --fs-cover-title: 26pt;
+  --fs-cover-eyebrow: 11pt;
+  --fs-cover-sub: 12pt;
+  --fs-toc-title: 15pt;
+  --fs-toc-1: 11pt;
+  --fs-toc-2: 10pt;
+  --color-primary: #1565C0;
+  --color-heading: #1A237E;
+  --color-accent: #00897B;
+  --color-text: #212121;
+  --color-muted: #616161;
+  --color-surface: #F5F7FA;
+  --color-border: #D8DEE6;
+  --color-bg: #FFFFFF;
+  --sp-para: 0 0 0.55em 0;
+  --sp-h1: 1.4em 0 0.7em 0;
+  --sp-h1b: 0.25em;
+  --sp-h2: 1.3em 0 0.5em 0;
+  --sp-h2l: 0.45em;
+  --sp-h3: 1em 0 0.4em 0;
+  --sp-eyebrow: 0 0 1.6em 0;
+  --sp-title: 0 0 0.5em 0;
+  --sp-sub: 0 0 2.4em 0;
+  --sp-cell: 0.3em 0.6em;
+  --sp-toct: 0 0 1em 0;
+  --sp-toci: 1.4em;
+  --sp-toc1: 0.35em;
+  --sp-toc2: 0.15em;
+  --sp-cue: 0.45em 0.6em;
+  --sp-cue-m: 0.2em 0 0.7em 0;
+  --sp-label: 0 0 0.35em 0;
+  --sp-note: 0.5em 0.7em;
+  --sp-note-m: 0.4em 0 0.9em 0;
+  --sp-th: 0.4em 0.55em;
+  --sp-td: 0.38em 0.55em;
+  --page-width: 15.6cm;
+}
+
+body { font-family: var(--ff-body); font-size: var(--fs-body); line-height: 1.75; color: var(--color-text); background: var(--color-bg); max-width: var(--page-width); margin-left: auto; margin-right: auto; }
+
+p { font-family: var(--ff-body); font-size: var(--fs-body); line-height: 1.75; color: var(--color-text); text-indent: 2em; text-align: justify; margin: var(--sp-para); }
+
+h1 { font-family: var(--ff-heading); font-size: var(--fs-h1); font-weight: bold; color: var(--color-primary); text-indent: 0; text-align: center; margin: var(--sp-h1); padding-bottom: var(--sp-h1b); border-bottom: 1.5px solid var(--color-primary); }
+h2 { font-family: var(--ff-heading); font-size: var(--fs-h2); font-weight: bold; color: var(--color-primary); text-indent: 0; text-align: left; margin: var(--sp-h2); padding-left: var(--sp-h2l); border-left: 4px solid var(--color-primary); }
+h3 { font-family: var(--ff-heading); font-size: var(--fs-h3); font-weight: bold; color: var(--color-heading); text-indent: 0; text-align: left; margin: var(--sp-h3); }
+
+.cover-eyebrow { font-family: var(--ff-heading); font-size: var(--fs-cover-eyebrow); font-weight: bold; color: var(--color-primary); letter-spacing: 0.12em; text-indent: 0; text-align: center; margin: var(--sp-eyebrow); }
+.cover-title { font-family: var(--ff-heading); font-size: var(--fs-cover-title); font-weight: bold; color: var(--color-primary); text-indent: 0; text-align: center; line-height: 1.4; margin: var(--sp-title); }
+.cover-subtitle { font-family: var(--ff-heading); font-size: var(--fs-cover-sub); color: var(--color-muted); text-indent: 0; text-align: center; line-height: 1.6; margin: var(--sp-sub); }
+.cover-meta { width: 76%; margin-left: auto; margin-right: auto; border-collapse: collapse; }
+.cover-meta-line { font-family: var(--ff-body); font-size: var(--fs-small); color: var(--color-muted); text-indent: 0; text-align: center; margin: var(--sp-cell); line-height: 1.8; }
+.executive-summary { background: var(--color-surface); border-left: 4px solid var(--color-primary); padding: var(--sp-note); margin: var(--sp-note-m); }
+.sum-title { font-family: var(--ff-heading); font-size: var(--fs-small); font-weight: bold; color: var(--color-primary); text-indent: 0; text-align: left; margin: var(--sp-label); }
+.executive-summary p.body { font-family: var(--ff-body); font-size: var(--fs-body); color: var(--color-text); text-indent: 2em; text-align: justify; margin: var(--sp-para); line-height: 1.7; }
+
+.toc-title { font-family: var(--ff-heading); font-size: var(--fs-toc-title); font-weight: bold; color: var(--color-primary); text-indent: 0; text-align: center; margin: var(--sp-toct); }
+.toc-list, .toc-list ol, .toc-list ul { list-style: none; list-style-type: none; padding-left: var(--sp-toci); margin: 0; }
+.toc-list > li { font-family: var(--ff-heading); font-size: var(--fs-toc-1); text-indent: 0; margin-bottom: var(--sp-toc1); color: var(--color-text); }
+.toc-list ol > li { font-family: var(--ff-body); font-size: var(--fs-toc-2); text-indent: 0; margin-bottom: var(--sp-toc2); color: var(--color-muted); }
+.toc-list a { color: var(--color-text); text-decoration: none; }
+
+.cue { font-family: var(--ff-body); font-size: var(--fs-small); color: var(--color-muted); text-indent: 0; text-align: left; background: var(--color-surface); border-left: 3px solid var(--color-accent); padding: var(--sp-cue); margin: var(--sp-cue-m); line-height: 1.6; }
+.label { font-family: var(--ff-heading); font-size: var(--fs-tiny); font-weight: bold; color: var(--color-primary); text-indent: 0; text-align: left; margin: var(--sp-label); }
+.note { font-family: var(--ff-body); font-size: var(--fs-small); color: var(--color-muted); text-indent: 0; text-align: left; background: var(--color-surface); border-left: 3px solid var(--color-primary); padding: var(--sp-note); margin: var(--sp-note-m); line-height: 1.6; }
+
+table.data { width: 100%; border-collapse: collapse; margin: var(--sp-note-m); }
+table.data th { font-family: var(--ff-heading); font-size: var(--fs-small); font-weight: bold; color: var(--color-heading); background: var(--color-surface); border: 0.5px solid var(--color-border); padding: var(--sp-th); text-align: left; }
+table.data td { font-family: var(--ff-body); font-size: var(--fs-small); color: var(--color-text); border: 0.5px solid var(--color-border); padding: var(--sp-td); text-align: left; line-height: 1.55; }
+table.data td.c { text-align: center; }
+strong { font-weight: bold; color: var(--color-heading); }
+</style>
+</head>
+<body>
+
+<section role="cover">
+  <p class="cover-eyebrow" style="text-align:center">ACL 2026 · Long Paper · CCF-A</p>
+  <p class="cover-title" style="text-align:center">NL ⇒ Schedule<br>论文汇报逐页讲稿</p>
+  <p class="cover-subtitle" style="text-align:center">Evaluate Multitask Scheduling Capability of Large Language Models</p>
+  <p class="cover-meta-line" style="text-align:center">汇报人：黎贤栗　｜　课程：社交网络与舆情分析</p>
+  <p class="cover-meta-line" style="text-align:center">论文来源：ACL 2026 Long Paper，pp. 35620–35640</p>
+  <p class="cover-meta-line" style="text-align:center">作者单位：四川大学计算机学院、人工智能学院（SCUNLP）</p>
+  <p class="cover-meta-line" style="text-align:center">配套材料：黎贤栗2.pptx（共 25 页）</p>
+</section>
+
+<section role="cover">
+<nav class="doc-toc" aria-label="文档目录">
+  <p class="toc-title">目录</p>
+  <ol class="toc-list">
+    <li><a href="#section-1">一、汇报基本信息</a></li>
+    <li><a href="#section-2">二、全场节奏</a></li>
+    <li><a href="#section-3">三、逐页讲稿</a>
+      <ol>
+        <li><a href="#page-1">第 1 页｜封面</a></li>
+        <li><a href="#page-2">第 2 页｜OVERVIEW：一条主线</a></li>
+        <li><a href="#page-3">第 3 页｜任务定义</a></li>
+        <li><a href="#page-4">第 4 页｜任务细节：矩阵在说什么</a></li>
+        <li><a href="#page-5">第 5 页｜MOTIVATION：三个缺陷</a></li>
+        <li><a href="#page-6">第 6 页｜BENCHMARK：五步造数据</a></li>
+        <li><a href="#page-7">第 7 页｜数据来源</a></li>
+        <li><a href="#page-8">第 8 页｜形式化：135 个任务图</a></li>
+        <li><a href="#page-9">第 9 页｜Jaccard 聚类</a></li>
+        <li><a href="#page-10">第 10 页｜组合实例</a></li>
+        <li><a href="#page-11">第 11 页｜生成描述</a></li>
+        <li><a href="#page-12">第 12 页｜数据质量</a></li>
+        <li><a href="#page-13">第 13 页｜数据难度</a></li>
+        <li><a href="#page-14">第 14 页｜METRICS：三层指标</a></li>
+        <li><a href="#page-15">第 15 页｜RQ1：九个模型</a></li>
+        <li><a href="#page-16">第 16 页｜RQ2：错在哪一层</a></li>
+        <li><a href="#page-17">第 17 页｜RQ2：潜力分析</a></li>
+        <li><a href="#page-18">第 18 页｜RQ3：MANS 四智能体</a></li>
+        <li><a href="#page-19">第 19 页｜提示词</a></li>
+        <li><a href="#page-20">第 20 页｜设计：四个补丁</a></li>
+        <li><a href="#page-21">第 21 页｜结果：更快更稳</a></li>
+        <li><a href="#page-22">第 22 页｜稳健性</a></li>
+        <li><a href="#page-23">第 23 页｜输出格式</a></li>
+        <li><a href="#page-24">第 24 页｜LIMITATIONS</a></li>
+        <li><a href="#page-25">第 25 页｜致谢</a></li>
+      </ol>
+    </li>
+    <li><a href="#section-4">四、答辩备询</a></li>
+    <li><a href="#section-5">五、口径提醒</a></li>
+  </ol>
+</nav>
+</section>
+
+<section role="body" data-page-restart="1">
+<main>
+
+<h1 id="doc-title">NL ⇒ Schedule 论文汇报逐页讲稿</h1>
+
+<div class="executive-summary">
+  <p class="sum-title">汇报速览</p>
+  <p class="body">这份文档对应《黎贤栗2.pptx》的 25 页，每页给出画面提示、建议时长和可直接照念的口语化讲稿，全文按正文 15 分钟设计。</p>
+  <p class="body">论文要回答三个问题：大模型能不能端到端把自然语言排成调度方案，做不好的话错在哪一层，以及怎么补。答案是：最好的模型可行率只有 32.5%，错误分布在方案、任务、步骤、约束四层，补法是 MANS 的四个专职 agent。</p>
+  <p class="body">讲述主线建议固定为一句：先提问题、再找原因、最后给解决方式。所有数字都要落在具体格子上，避免笼统评价。</p>
+</div>
+
+<h2 id="section-1">一、汇报基本信息</h2>
+
+<table class="data">
+  <thead>
+    <tr><th style="width:22%">项目</th><th>内容</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>论文题目</td><td>NL ⇒ Schedule: Evaluate Multitask Scheduling Capability of Large Language Models</td></tr>
+    <tr><td>发表情况</td><td>ACL 2026 Long Paper（CCF-A），pp. 35620–35640</td></tr>
+    <tr><td>作者单位</td><td>四川大学计算机学院、人工智能学院（SCUNLP）</td></tr>
+    <tr><td>作者</td><td>廖文睿、杜伟宏、李毅、梁洪儒、雷文强</td></tr>
+    <tr><td>开源地址</td><td>https://github.com/SCUNLP/NL2Schedule</td></tr>
+    <tr><td>配套材料</td><td>黎贤栗2.pptx（25 页）</td></tr>
+    <tr><td>汇报人</td><td>黎贤栗</td></tr>
+    <tr><td>课程</td><td>社交网络与舆情分析</td></tr>
+  </tbody>
+</table>
+
+<h2 id="section-2">二、全场节奏</h2>
+
+<table class="data">
+  <thead>
+    <tr><th style="width:12%">段落</th><th style="width:14%">页码</th><th>内容</th><th style="width:18%">建议时长</th></tr>
+  </thead>
+  <tbody>
+    <tr><td class="c">开场</td><td class="c">1–5</td><td>封面、主线、任务定义、动机</td><td class="c">3 分钟</td></tr>
+    <tr><td class="c">造数据</td><td class="c">6–13</td><td>五步流程、数据来源、形式化、聚类、组合、描述生成、质量、难度</td><td class="c">4.5 分钟</td></tr>
+    <tr><td class="c">指标</td><td class="c">14</td><td>SER / TCR / SFR / RMD / WRT</td><td class="c">1.2 分钟</td></tr>
+    <tr><td class="c">发现</td><td class="c">15–17</td><td>RQ1 结果、RQ2 失败分析、RQ2 潜力分析</td><td class="c">3 分钟</td></tr>
+    <tr><td class="c">方法</td><td class="c">18–22</td><td>MANS 四 agent、提示词、设计映射、结果、稳健性</td><td class="c">3.5 分钟</td></tr>
+    <tr><td class="c">收尾</td><td class="c">23–25</td><td>输出格式、局限、致谢</td><td class="c">1 分钟</td></tr>
+    <tr><td class="c">合计</td><td class="c">25 页</td><td>正文讲述</td><td class="c">约 15 分钟</td></tr>
+  </tbody>
+</table>
+
+<p class="note">&nbsp;&nbsp;讲述原则：每页只讲一个结论，结论先行；数字必须落在具体格子上，不做笼统评价。全文留 5 分钟提问。</p>
+
+<h2 id="section-3">三、逐页讲稿</h2>
+
+<p>以下按 PPT 顺序逐页展开。每页先给一行画面提示，说明该指向哪张图、哪张表，再给建议时长与讲稿正文；讲稿为口语稿，可照念，也可按现场节奏删减。</p>
+
+<h3 id="page-1">第 1 页｜封面</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：标题 NL ⇒ Schedule，副标题为英文全称，右上角标注 ACL 2026 · Long Paper · CCF-A，底部是汇报人与课程名。</p>
+<p class="label">【讲稿 · 约 30 秒】</p>
+<p>各位老师、同学好，我是黎贤栗。今天汇报的是 ACL 2026 的一篇长文，题目是 NL ⇒ Schedule，评测大语言模型的多任务调度能力，作者是四川大学 SCUNLP 团队。</p>
+<p>这篇文章问的问题很朴素：如果车间主任用一段大白话把订单交代下去，大模型能不能直接排出一张真能用的排产表。接下来我按一条主线讲：先提问题，再找原因，最后给解决方式。</p>
+
+<h3 id="page-2">第 2 页｜OVERVIEW：一条主线</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：三张编号卡片，01 提问题、02 找原因、03 解决方式，底部一句立场句。</p>
+<p class="label">【讲稿 · 约 40 秒】</p>
+<p>整场汇报只有一条主线，三块内容对应三个问题。</p>
+<p>第一块，这个任务到底是什么，现有方法为什么不行。第二块，如果大模型做不好，它究竟错在哪一层，是任务没认全、步骤漏了、机器配错，还是排程时抢资源。第三块，针对每一层错误，我们怎么补。</p>
+<p>一句话概括全文立场：<strong>大模型看得懂、想得远，但落不了地</strong>；落地这一步，得拆开做。</p>
+
+<h3 id="page-3">第 3 页｜任务定义：从自然语言到可行调度</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：左侧输入与输出对照，右侧 Figure 1(a) 订单文本与矩阵、Figure 1(b) 甘特图。</p>
+<p class="label">【讲稿 · 约 70 秒】</p>
+<p>任务定义很直接。左边是输入，一段自然语言订单，比如一份汉堡、一份寿司卷、一份卷饼；右边是输出，一张排班表，精确到每一步在哪台机器、几点开始、几点结束。</p>
+<p>看 Figure 1(a)：左边是自然语言，右边那个 3 乘 10 的矩阵就是它的结构化形式；下面的 (b) 是排出来的甘特图，四条泳道对应四台设备。</p>
+<p>这里有个关键限定：<strong>要的是 feasible，不是 optimal</strong>。合法就行，不要求最优。但就是这个合法，最好的模型也只有 32.5%。</p>
+<p>它看起来像 NL2SQL，但比那难：不是抽取、不是翻译、也不是摘要，而是归纳推理，要理解多个目标，识别约束，还要多步推理，才能推出一个方案。</p>
+
+<h3 id="page-4">第 4 页｜任务细节：矩阵在说什么</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：左侧 3 行 6 列示例表与 M0 至 M3 四张机器卡片，右侧放大后的矩阵，底部一行提示三个任务都复用 M0。</p>
+<p class="label">【讲稿 · 约 60 秒】</p>
+<p>这一页把矩阵拆开。一行是一个任务，两两一组，前一个是机器、后一个是时长。比如汉堡这一行：M0 两分钟、M1 十分钟、M0 两分钟、M2 六分钟、M0 六分钟。</p>
+<p>四台机器是：M0 机械臂、M1 平底锅、M2 砧板、M3 灶具。你会看到，<strong>三个任务都在反复用 M0，它就是瓶颈</strong>。这也正好解释了后面统计里烹饪场景的瓶颈负载为什么是 1.00，也就是零空闲。</p>
+<p>而最要紧的一句在最下面：<strong>矩阵里每个数字都是人替模型填好的</strong>。理解这一步被人工代劳了，这就是 research gap。</p>
+
+<h3 id="page-5">第 5 页｜MOTIVATION：现有工作的三个缺陷</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：三张卡片依次为绕过语言、数据不真实、流水线太脆，下方 RQ1 至 RQ3，底部一行三块贡献。</p>
+<p class="label">【讲稿 · 约 60 秒】</p>
+<p>现有工作有三个缺口。</p>
+<p>缺口一，绕过语言：直接吃矩阵，把理解这一步交给人工。缺口二，数据不真实：实例随机生成或按规则生成，跟真实车间的分布对不上。缺口三，流水线太脆：LLM 加求解器那套是建模、生成代码、外部求解，任何一环断了全崩，论文里说 <strong>45% 的失败就发生在生成求解器代码这一步</strong>。</p>
+<p>三个缺口正好对应三个研究问题：能不能端到端做好，错在哪一层，怎么补。也对应本文三块贡献：任务定义、数据集、MANS 框架。</p>
+
+<h3 id="page-6">第 6 页｜BENCHMARK：五步造数据</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：Figure 2 三阶段流程图，下方五张编号卡片：数据来源、任务图、Jaccard 聚类、组合实例、生成描述。</p>
+<p class="label">【讲稿 · 约 60 秒】</p>
+<p>数据怎么造的？五步，从公开资料到 240 个实例。</p>
+<p>第一步数据来源：4 本书、3 个工业网站、3 款游戏；第二步形式化成 135 个基础任务图；第三步用 Jaccard 加 K-Medoids 聚成 13 个车间；第四步组合成 240 个实例，并用 OR-Tools 打最优解；第五步生成 240 段人话。</p>
+<p>请特别注意这句话：<strong>顺序是反的</strong>。正常理解是先有文字再抽出结构，而这里是先有结构化的任务图，再反向生成自然语言。所以它是半合成的数据集，这也是后面局限里作者自己承认的第一条。</p>
+
+<h3 id="page-7">第 7 页｜数据来源：一半手册，一半游戏</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：三列卡片，分别是 4 本专业书、3 个工业网站、3 款电子游戏。</p>
+<p class="label">【讲稿 · 约 50 秒】</p>
+<p>数据来源一半是工程手册，一半是电子游戏。</p>
+<p>四本书是 Pinedo 的《Scheduling》、Singh 的《Systems Approach》、Groover 的《Fundamentals》，还有《Automotive Handbook》。三个网站是 SAE 学会、DMG MORI 机床、丰田的虚拟工厂参观。三款游戏是 Overcooked! 2 对应烹饪、Big Pharma 对应制药、Construction Simulator 对应建筑。</p>
+<p>为什么用游戏？因为<strong>游戏里的流程是显式、干净、带机器和工时的</strong>，而真实手册很少把这一步用哪台设备、要多久写全。这也是下一页要说的取舍。</p>
+
+<h3 id="page-8">第 8 页｜形式化：135 个基础任务图</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：Table 1 四类场景的任务数、机器数与平均步数，右侧蓝框说明只收结构化图不收文本。</p>
+<p class="label">【讲稿 · 约 60 秒】</p>
+<p>一个任务就是一张有向无环图：节点是步骤，带机器和时长；边是先后约束。四类场景一共 135 个：制造 28、建筑 29、制药 32、烹饪 46。</p>
+<p>注意机器数的差异：建筑有 44 种机器、平均 8.69 步，链条最长；制药只有 12 种机器、平均 4.12 步，是高频短任务。</p>
+<p>右边这句是方法论上的关键：<strong>只收结构化图，不收文本</strong>。因为公开资料里没有哪份文档会把这一步用哪台机器、要多久写全，所以只能先有图，再反向生成文字。</p>
+<p>另外补一句：同一张图有三种写法，图、矩阵、JSON，三者等价，后面模型的输出格式就是 JSON。</p>
+
+<h3 id="page-9">第 9 页｜Jaccard 聚类：聚成 13 个车间</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：左侧三步流程与机器向量表、Jaccard 公式、K-Medoids 说明，右侧聚类结果表合计 13。</p>
+<p class="label">【讲稿 · 约 70 秒】</p>
+<p>第三步是把任务聚成车间，做法三步。</p>
+<p>第一步，把任务图变成机器向量：汉堡用到 M0、M1、M2，就是 1 1 1 0；薯条只用 M0、M1，就是 1 1 0 0。</p>
+<p>第二步，两两算 Jaccard，交集除以并集。汉堡和薯条是三分之二，等于 0.67，很像，放一起；薯条和寿司只有三分之一。</p>
+<p>第三步，用 K-Medoids 聚成 13 个车间：制造 7 个、建筑 4 个、制药和烹饪各 1 个。</p>
+<p>这里特意用了 K-Medoids 而不是 K-Means，因为<strong>二值向量的平均值是个虚构的点</strong>，而 K-Medoids 的中心必须是真实样本。</p>
+<p>一句话记住这一页：<strong>难度不来自任务多，而来自任务之间抢同一批资源</strong>。</p>
+
+<h3 id="page-10">第 10 页｜组合实例：240 个，用 OR-Tools 打最优解</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：左侧 4 乘 6 乘 10 等于 240 的算式与副本示意表，右侧 OR-Tools 说明与一个实例的三件套。</p>
+<p class="label">【讲稿 · 约 60 秒】</p>
+<p>第四步，组合实例。4 个场景乘 6 个规模（5 到 10 个任务）乘 10 个实例，等于 240。</p>
+<p>有个容易问的点：13 个车间为什么不进这个乘法？因为它<strong>只决定谁能和谁组合</strong>，每个实例的任务都从同一个车间里抽，保证它们真的在抢同一批机器。</p>
+<p>还有副本：n 是任务份数，同一个任务可以出现三次、四次。副本就是难度旋钮，把资源竞争拉满；也顺便解决了一个矛盾，一个车间平均只有 4 到 7 个任务图，想抽 10 个不重复的根本抽不出来。</p>
+<p>最后用 OR-Tools 打最优解，它给出的就是评测时的标准答案，RMD 拿它当分母。严格说是时限内最优。所以一个实例是三件套：问题描述、任务图列表、最优调度。</p>
+
+<h3 id="page-11">第 11 页｜生成描述：模板填充加 GPT-4 润色</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：左侧两步走说明，右侧模板来源 20 加 40，底部描述两段式与消融结论。</p>
+<p class="label">【讲稿 · 约 60 秒】</p>
+<p>最后一步才是生成自然语言，两步走：第一步模板填充，保证信息一条不少、一个字不编；第二步用 GPT-4 润色，只改语言、不改事实。</p>
+<p>为什么不直接让 GPT-4 写？因为它会编、会漏关键信息。</p>
+<p>模板从哪来？20 个调度需求模板，来自公开合同和点单对话；每个领域 10 个流程模板，来自工艺手册和菜谱，一共 40 个。</p>
+<p>描述是两段式：先一段调度需求概述，给约束和目标；再逐任务写流程，给任务图信息。</p>
+<p>这个分工有消融实验作证：只拼接模板、不做润色的版本，Accuracy 就已经有 4.20，说明事实靠模板保住了；而完整版提升最大的是简洁性。</p>
+
+<h3 id="page-12">第 12 页｜数据质量：造出来的数据可信吗</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：左侧 Figure 6 自动评测柱状图，右侧 Figure 7 人工评测五维对比，底部三个大数字 0.98、0.94、大于等于 0.75。</p>
+<p class="label">【讲稿 · 约 70 秒】</p>
+<p>造出来的数据可信吗？两组评测，一条机器线、一条人线。</p>
+<p>机器线看事实保真，用两个指标。ESA 是实体与动作覆盖率，本质是召回，源任务图里的实体和动作有多少被写进了文本，动作 0.98、实体 0.97，几乎没漏。FINE 用自然语言推理模型逐句判事实，专抓幻觉和遗漏，得分 0.94 和 0.93。两个配合起来，ESA 管该说的说了没，FINE 管说的是不是真的。</p>
+<p>人线看文本好不好用，三位标注者按可读性、准确性、清晰性、简洁性、可用性打分。完整版是 4.80、4.70、4.66、4.59、4.70；只拼接不润色的版本是 3.80、4.20、3.70、3.00、4.10。关键在对比：准确性只掉了 0.5，简洁性掉了 1.6，<strong>事实是模板保住的，通顺是润色买来的</strong>。</p>
+<p>最后那个 ICC 不是评文本，是评评分本身，三位专家彼此一致不一致。全部大于等于 0.75，按通用阈值就算可信，也就是说 4.80 不是某个人的口味。</p>
+
+<h3 id="page-13">第 13 页｜数据难度：四个场景四种难度</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：Table 8 四场景的重叠率、瓶颈负载、平均步数、共享度，下方四张场景卡片。</p>
+<p class="label">【讲稿 · 约 60 秒】</p>
+<p>四个场景不是凑数，而是刻意覆盖四种难度来源。</p>
+<p>制造：任务重叠率 80.49%，共享度 5.98，也就是平均一台机器被六个任务抢，竞争最激烈。建筑：平均 8.67 步，链条最长，考长链依赖。制药：平均 4.17 步，高频短任务，考吞吐。烹饪：瓶颈负载 1.00，零空闲，一点错都不能有。</p>
+<p>还有一个数字值得说：全局的 EmbSim 只有 0.4150，而各场景内部是 0.60 到 0.75。也就是说<strong>跨领域的语言差异极大</strong>，模型不能靠记住模板过关。</p>
+
+<h3 id="page-14">第 14 页｜METRICS：为什么是三层</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：左侧 SER、TCR、SFR 三张阶梯卡片，右侧手算例子与三个结果，底部补充 RMD 与 WRT。</p>
+<p class="label">【讲稿 · 约 70 秒】</p>
+<p>指标为什么是三层？因为它们回答三个递进的问题。</p>
+<p>SER 步骤执行率，对的步数除以总步数。TCR 任务完成率，全对的任务数除以任务总数。SFR 方案可行率，整张方案里所有任务都对，才算 1。</p>
+<p>右边手算一下。两个任务、共 4 步、做对 3 步：SER 是四分之三等于 0.75；汉堡全对、寿司差一步，TCR 是二分之一等于 0.50；但整张方案不可行，SFR 是 0。</p>
+<p>这就是关键：<strong>SER 0.75，SFR 却是 0</strong>。因为调度是全对才算交付，前面九成做对，最后一格抢了机器，方案就是废的。</p>
+<p>另外两个指标：RMD 是比最优慢多少，WRT 是最坏运行时间，这两个越低越好。</p>
+
+<h3 id="page-15">第 15 页｜RQ1：九个模型都做不出可行方案</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：Table 2 七行代表模型的 SER、TCR、SFR 与十任务列，右侧三个强调数字。</p>
+<p class="label">【讲稿 · 约 70 秒】</p>
+<p>RQ1 的答案是：<strong>端到端这条路整体走不通</strong>。表里挑了几个代表，完整九个在论文 Table 2。</p>
+<p>看最右一列 SFR。最好的是 Gemini-2.5-Pro 和 o4-mini，0.325；DeepSeek-R1 是 0.250；GPT-4.1 掉到 0.050；Qwen3 的两个模式都是 0，一个可行方案都没排出来。</p>
+<p>规模一变大更惨：十个任务时，最好的也只有 0.175。</p>
+<p>右边那个 31 个点，是这张表最扎心的地方：Gemini 的 SER 有 0.634，可 SFR 只有 0.325。它看懂了六成，但只有三成能交付。这个落差就是程序落地能力的缺口。</p>
+<p>还有一个反直觉的发现：<strong>思维链对弱模型是有害的</strong>，Qwen3 开 thinking 反而比不开更低。</p>
+
+<h3 id="page-16">第 16 页｜RQ2：错在哪一层</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：左侧四级卡片，右侧 Figure 3 三个模型乘四个层级的错误分布图。</p>
+<p class="label">【讲稿 · 约 70 秒】</p>
+<p>错在哪一层？作者借并行作业调度的经典框架，做了四级分析：方案级、任务级、步骤级、约束级。右边这张图，横着看是一个模型的四级，竖着看是同一级三个模型的对比。</p>
+<p>方案级：Qwen3 有 78.7% 的方案存在任务遗漏，它连题目里要做几件事都没数清。</p>
+<p>任务级：Gemini 认任务很准，87.9% 全对，但仍有 41.5% 的情况步骤不全。</p>
+<p>步骤级：机器错配是单一最大的属性错误，占 58.9%。</p>
+<p>约束级：一路筛下来，属性全对、又不违反先后和机器冲突的完美步骤，Gemini 只有 69.8%。</p>
+<p>所以结论是：<strong>弱模型死在第一关，强模型输在细节</strong>。这四层，正好是后面 MANS 的四个 agent 要各自去补的四个洞。</p>
+
+<h3 id="page-17">第 17 页｜RQ2：能交出来的方案质量其实很高</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：左侧 Figure 4 相对偏差柱状图，大模型与四种优先调度规则对比，右侧 0.085 与两句模型原话。</p>
+<p class="label">【讲稿 · 约 60 秒】</p>
+<p>但另一面是：<strong>能交出来的方案，质量其实很高</strong>。</p>
+<p>这里只看可行的那些，用 RMD 衡量比最优慢多少。大模型的偏差是 0.085，只比最优慢 8.5%，和最好的启发式规则基本持平；而最差的那条规则是 0.32，差了近四倍。</p>
+<p>这说明它不是死守一条规则，而是在动态挑规则。作者去翻了 DeepSeek-R1 的推理 token 和 Gemini 的思考摘要，找到三种能力：全局规划、局部优化、自我纠错，Gemini 甚至会用关键路径法。</p>
+<p>右边两句原话很能说明问题。一句是“We note that the RA, Robot Arm, is heavily used”，它在主动找瓶颈；一句是“This is a conflict! We must fix this”，它在自我纠错。顺便说，这两句也印证了 M0 就是机械臂。</p>
+
+<h3 id="page-18">第 18 页｜RQ3：MANS 的四个智能体</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：左侧 Figure 5 四阶段流程图，右侧四行 agent 职责，底部一句范式转换。</p>
+<p class="label">【讲稿 · 约 60 秒】</p>
+<p>既然大模型有能力、只是落不了地，那就把落地拆开。MANS 用四个 agent，每个只管一件事。</p>
+<p>Seeker 只认任务，从一段话里把要做的事全找出来，明确不碰步骤和机器；Weaver 只拆步骤，拿到任务清单，逐个抽步骤、机器、时长和顺序；Verifier 只做校验，拿抽取结果跟原文逐条对，对不上就改；Architect 只排程，拿到校验过的结构，排出无冲突的方案。</p>
+<p>右边这句是范式上的区别：从 LLM-as-Translator 到 LLM-as-Solver。旧范式把模型当翻译器，翻译成求解器代码，代码一错就全崩；MANS 把算法推理放回模型内部，不再依赖外部运行环境。</p>
+
+<h3 id="page-19">第 19 页｜提示词：每个 agent 只做一件事</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：上方四行提示词原文节选表，下方 Architect 的三条策略指南。</p>
+<p class="label">【讲稿 · 约 60 秒】</p>
+<p>这张表是四个 agent 的提示词原文节选，注意每一句都在限权。Seeker 是“your sole task is to identify the complete and accurate set of all tasks”，只认任务；Weaver 是“extract its sequence of steps, the specific machine, and its processing duration”，只拆步骤；Verifier 是“verify attribute accuracy, correct any discrepancies”，只做校验；Architect 是“create an optimal, conflict-free schedule”，只排程。</p>
+<p>下面三条是全文最漂亮的一个闭环。Architect 的策略指南只有三句：<strong>先找瓶颈、别做纯贪心、允许策略性空转</strong>。</p>
+<p>这三条不是拍脑袋写的，它们逐条来自 Figure 4 里模型自己冒出来的推理。作者是先观察到强模型会这么想，再把它写成提示词。<strong>观察策略，再固化策略</strong>。</p>
+
+<h3 id="page-20">第 20 页｜设计：四个 agent 对着四级错误</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：映射表，左列四级错误、中列对应 agent、右列各自在修什么，底部一句补丁论。</p>
+<p class="label">【讲稿 · 约 50 秒】</p>
+<p>把这张表和前面 RQ2 那张四级错误图并排看，会发现它是<strong>一一对应</strong>的：方案级对应 Seeker，任务级对应 Weaver，步骤级对应 Verifier，约束级对应 Architect。</p>
+<p>所以它不是四个模块，而是四个补丁：删掉哪个，对应的那一层错误就复活。右边有消融数据：删掉 Seeker 最致命，十个任务时可行率从 27.5% 掉到 7.5%；删 Verifier 掉到 15%；删 Weaver 掉到 22.5%。</p>
+<p>这也说明：<strong>开头把问题范围定对，是整个流程里最关键的一步</strong>。</p>
+
+<h3 id="page-21">第 21 页｜结果：赢在更快更稳</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：左侧两张表，Table 3 完整性与可行性、Table 4 运行时间与调度质量，右侧赢、快、输三块结论。</p>
+<p class="label">【讲稿 · 约 70 秒】</p>
+<p>结果分三块看，我用赢、快、输来概括。</p>
+<p>先说清楚基线：CoE 和 OptiMUS 都是 LLM 加求解器的框架，后面接 MOPNR、OR-Tools、FJSP-DRL 三个求解器，一共六个基线，表里挑了 MOPNR 和 OR-Tools 两端做代表。</p>
+<p>赢：在 6 个规模里，SER 有 4 档、TCR 有 5 档领先。十任务时 MANS 的 SER 是 0.682，CoE 是 0.587，SFR 是 0.275 对 0.225。</p>
+<p>快：WRT 是 79.59 秒，比 CoE 配 OR-Tools 的 154 秒和 OptiMUS 的 134 秒快四成左右。省下来的时间主要省在不用写代码、不用读报错、不用重试。</p>
+<p>输：调度质量 RMD 是 0.085，而两个 LLM 加求解器是 0.022 和 0.023。因为对方最后一步是 OR-Tools 求最优，这一项比的是求解器而不是模型，本来就不公平。</p>
+<p>所以作者很克制，只说 comparable 加 more stable，不说 better。<strong>赢的地方讲清楚，输的地方不藏</strong>。</p>
+
+<h3 id="page-22">第 22 页｜稳健性：换个骨干，收益差 5.6 倍</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：Table 11 四个骨干在三个规模下的 SER，右侧 5.6 倍强调。</p>
+<p class="label">【讲稿 · 约 50 秒】</p>
+<p>换个底模会怎样？同一套 MANS，只换骨干模型。</p>
+<p>十任务时：Qwen3 不开思考是 0.121，DeepSeek-V3 是 0.216，GPT-4.1 是 0.352，Gemini-Flash 是 0.682。最好和最差差 5.6 倍。</p>
+<p>结论要说清楚：<strong>四个 agent 放大的是底模已有的能力，不是凭空创造能力</strong>。框架能救的是会做但做不全的模型，救不了根本不会的模型。</p>
+<p>也正因为如此，正文只报了一个骨干，因为换骨干的结论会更保守。</p>
+
+<h3 id="page-23">第 23 页｜输出格式：模型交出的是一张排班表</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：上方 JSON 片段与五个字段说明，下方判分四步。</p>
+<p class="label">【讲稿 · 约 60 秒】</p>
+<p>最后一页技术细节，但这是最容易被问的一点：模型到底交出什么。</p>
+<p>它交的是一张排班表，JSON 列表，每条五个字段：第几个任务、第几步、哪台机器、开始时间、结束时间。注意<strong>模型不给 duration</strong>，它只给起止时间，时长由评测器算，这样就没法糊一个看起来合理的工时。</p>
+<p>判分四步：对号入座，把生成的行和标准答案的行按任务和步骤对齐；逐格判错，比机器、比时长、比先后；级联标记，前面错了后面跟着错，避免重复扣分；汇总指标，算出 SER、TCR、SFR。</p>
+<p>一句话：<strong>输出什么，决定了指标怎么算</strong>。</p>
+
+<h3 id="page-24">第 24 页｜LIMITATIONS：三条局限对应三块贡献</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：三行表格，左列贡献、右列局限，底部一行可追问点。</p>
+<p class="label">【讲稿 · 约 60 秒】</p>
+<p>最后是局限，作者写得挺诚实，而且三条局限恰好对应三块贡献。</p>
+<p>数据集这块：240 个实例是半合成的，语言是从任务图反向生成的，语料的自然度终究不是真实客户写的。任务定义这块：规模偏小，5 到 10 个任务、时长确定、没有并行分支。评测这块：五个指标还没标准化，没覆盖鲁棒性和公平性。</p>
+<p>另外还有几处可以追问：SER 的口径在不同表里略有出入；生成结果和标准答案的对齐靠时长指纹，也就是靠时长匹配；每个格子只有 10 个实例，方差会偏大；两个基线在适配时被削弱了。</p>
+<p>换句话说，<strong>作者对自己每块贡献的天花板都很清楚</strong>，这反而让结论更可信。</p>
+
+<h3 id="page-25">第 25 页｜致谢</h3>
+<p class="cue">&nbsp;&nbsp;<strong>画面</strong>：谢谢聆听。</p>
+<p class="label">【讲稿 · 约 20 秒】</p>
+<p>我的汇报到这里。总结一句：这篇论文的价值不在 MANS 有多强，而在它把大模型能不能排产这个问题第一次摆成了可测量的实验，任务定义了，数据造了，四层错误定位了，补丁也打了。</p>
+<p>谢谢各位，请批评指正。</p>
+
+<h2 id="section-4">四、答辩备询</h2>
+
+<table class="data">
+  <thead>
+    <tr><th style="width:38%">可能的提问</th><th>回答要点</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>为什么不用 BLEU、ROUGE 评数据质量</td><td>这类任务里 n-gram 重叠和事实对不对几乎不相关，换个说法分数就崩但信息没丢。所以用实体动作覆盖加 NLI 事实一致性。</td></tr>
+    <tr><td>ESA 和 FINE 有什么区别</td><td>ESA 管覆盖，只测提没提到，机器写错也照样满分；FINE 管对错，用 NLI 判蕴含还是矛盾，专抓幻觉和遗漏。两个互补。</td></tr>
+    <tr><td>ICC 是评什么的</td><td>不评文本，评评分本身。三位专家打分的一致性，通用阈值 0.75，过了才说明 4.80 不是个人口味。</td></tr>
+    <tr><td>0.93 的遗漏意味着 7% 事实没进文本，为什么还能用</td><td>论文没拆解这 7% 落在哪些成分上，这是可以追问的点；但下游评测以任务图本身为标准答案，不依赖文本，不影响主结论。</td></tr>
+    <tr><td>CoE 和 OptiMUS 是什么</td><td>两个 LLM 加求解器的框架，各接 MOPNR、OR-Tools、FJSP-DRL 三个求解器，共六个基线。LLM 只做建模和写代码，优化交给求解器。</td></tr>
+    <tr><td>MANS 也是多智能体，和 CoE 区别在哪</td><td>区别不在有几个 agent，而在最后一个 agent 吐出的是代码还是解。CoE 的终点是代码，MANS 的终点是排班表。</td></tr>
+    <tr><td>为什么 RMD 输给基线</td><td>对方最后一步是 OR-Tools 求最优，0.022 基本就是时限内最优本身；MANS 是模型自己排的。这一项比的是求解器不是模型。</td></tr>
+    <tr><td>公平吗，是不是用了更强的模型</td><td>所有方法统一用 Gemini-2.5-Flash-nothinking 作骨干，MANS 是在同一个非推理底模下赢的。</td></tr>
+    <tr><td>表里只有七个模型，说九个</td><td>表里挑了代表，完整九个在论文 Table 2，包含 Llama4-Maverick 与 DeepSeek-V3。</td></tr>
+    <tr><td>为什么换骨干差距这么大</td><td>框架放大已有能力，不创造能力。Qwen3 是根本不会，Gemini 是会做但做不全。</td></tr>
+    <tr><td>半合成数据算不算真 benchmark</td><td>承认是局限。作者的解释是真实工业数据私有且非结构化，先建立可控基线；下一步是脱敏后的真实日志。</td></tr>
+    <tr><td>任务规模为什么只到 10</td><td>为了先建立可评估的基线，更大规模、随机时长、序列相关准备时间都留作后续。</td></tr>
+  </tbody>
+</table>
+
+<h2 id="section-5">五、口径提醒</h2>
+
+<table class="data">
+  <thead>
+    <tr><th style="width:16%">位置</th><th>提醒</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>第 15 页</td><td>表格只放 7 个模型，标题说九个。讲时补一句“表里挑了几个代表，完整九个在论文 Table 2”。</td></tr>
+    <tr><td>第 21 页</td><td>PPT 写“快 35–48%”，按 WRT 实际换算 154.44 到 79.59 是 48%，133.70 到 79.59 是 40%。讲成“快四成左右”更稳。</td></tr>
+    <tr><td>第 21 页</td><td>论文表格里写 Optimus，正文与附录写 OptiMUS，是同一方法的拼写差异，被问到直接说明。</td></tr>
+    <tr><td>第 12 页</td><td>图 6 纵轴从 0.90 起画，视觉上差不多高，实际是 6% 到 7% 的残余错误，别被误读成满分。</td></tr>
+    <tr><td>第 17 页</td><td>RMD 只统计可行方案，不可行的方案不参与，所以这一页不能用来证明模型能交付。</td></tr>
+  </tbody>
+</table>
+
+</main>
+</section>
+
+</body>
+</html>

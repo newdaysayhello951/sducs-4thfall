@@ -1,0 +1,41 @@
+[
+  {
+    "name": "epinions_alchemy_archive",
+    "url": "https://alchemy.cs.washington.edu/data/epinions/epinions.tgz",
+    "final_url": "https://alchemy.cs.washington.edu/data/epinions/epinions.tgz",
+    "status": 200,
+    "bytes": 30000000,
+    "file": "dataset_check\\epinions_alchemy_archive.tgz"
+  },
+  {
+    "name": "flixster_new",
+    "url": "https://sites.google.com/view/mohsenjamali/flixter-data-set",
+    "final_url": "https://sites.google.com/view/mohsenjamali/flixter-data-set",
+    "status": 200,
+    "bytes": 107953,
+    "file": "dataset_check\\flixster_new.html"
+  },
+  {
+    "name": "douban_author",
+    "url": "https://www.cse.cuhk.edu.hk/irwin.king.new/pub/data/douban",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "name": "ciao_asu",
+    "url": "https://www.public.asu.edu/~jtang20/datasetcode/truststudy.htm",
+    "final_url": "https://asu.cloudflareaccess.com/cdn-cgi/access/login/www.public.asu.edu?kid=81a38d784ecf9d4637ce20c94540044d94ff2f3fae77275d6c4da1773d0da4af&meta=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ijc4NmE1YTIyYjZiMjVhYzZkM2FiMGFmMzQzMTNiMDgyYjI0ZGJmNzhiZjU5ZDVlYmRlNmFkOWVhYWNkYzQzYzQifQ.eyJ0eXBlIjoibWV0YSIsImF1ZCI6IjgxYTM4ZDc4NGVjZjlkNDYzN2NlMjBjOTQ1NDAwNDRkOTRmZjJmM2ZhZTc3Mjc1ZDZjNGRhMTc3M2QwZGE0YWYiLCJob3N0bmFtZSI6Ind3dy5wdWJsaWMuYXN1LmVkdSIsInJlZGlyZWN0X3VybCI6Ii9-anRhbmcyMC9kYXRhc2V0Y29kZS90cnVzdHN0dWR5Lmh0bSIsInNlcnZpY2VfdG9rZW5fc3RhdHVzIjpmYWxzZSwiaXNfd2FycCI6ZmFsc2UsImlzX2dhdGV3YXkiOmZhbHNlLCJleHAiOjE3OTMwMDQwNzMsIm5iZiI6MTc5MzAwMzc3MywiaWF0IjoxNzkzMDAzNzczLCJhdXRoX3N0YXR1cyI6Ik5PTkUiLCJtdGxzX2F1dGgiOnsiY2VydF9pc3N1ZXJfZG4iOiIiLCJjZXJ0X3NlcmlhbCI6IiIsImNlcnRfaXNzdWVyX3NraSI6IiIsImNlcnRfcHJlc2VudGVkIjpmYWxzZSwiY29tbW9uX25hbWUiOiIiLCJhdXRoX3N0YXR1cyI6Ik5PTkUifSwicmVhbF9jb3VudHJ5IjoiVVMiLCJhcHBfc2Vzc2lvbl9oYXNoIjoiNTYyYTk3OGNhODVlZDAwNTlmZTlmMDQ2NDEzZGRkYzdkMzEyZTlhNDRiOTFmODg2MGY2YTk3NjMyOWNkYTc0NSJ9.hMxQq9OLPaHWiclvaYeh1FHHV5zIg_1BQQ5eT-2bSTrt1nYsJJLCDYfOsa6m6JgzpomP0gAnEZjpYypF29LzzoNERQKHcxp1XNFayHzpZLStpq0OyQPZir8OGfz1Y0yIDsOdCBph3TbyOyYm3pOlPqYOMrBUBBADBrlCuZIOZp68Whx1CRJBY0sWeQKJLHmZVyWSnthi8-S8_5eKhrY8yKe2f7CUQUcO3aqfIJdOPQ-CLoW9XT3MkJ5Vz1Un4dO6ziMczqQ_bq3kouEkDZUMw8tbCQfYVMdMQB39bbhWvK0tk-IcW_pdyOjdBBRNP3f-iXIAhohJyugvz9eV1eUQ0w&redirect_url=%2F%7Ejtang20%2Fdatasetcode%2Ftruststudy.htm",
+    "status": 200,
+    "bytes": 51243,
+    "file": "dataset_check\\ciao_asu.html"
+  },
+  {
+    "name": "ciao_msu_http",
+    "url": "http://www.cse.msu.edu/~tangjili/datasetcode/truststudy.htm",
+    "error": "HTTP Error 502: Bad Gateway"
+  },
+  {
+    "name": "epinions_trustlet_http",
+    "url": "http://www.trustlet.org/downloaded_epinions.html",
+    "error": "HTTP Error 502: Bad Gateway"
+  }
+]

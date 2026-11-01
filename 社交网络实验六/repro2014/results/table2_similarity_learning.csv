@@ -1,0 +1,11 @@
+signal_combination,features_used,n_features,svm_accuracy,svm_std,note
+time,"time_millis,time_hours,time_days",3,0.5537,0.0036,
+metadata,"author,urls",2,0.5057,0.005,"缺 {'namedusers', 'hashtags'}"
+terms_jaccard,,0,,,所有特征都不可用
+semantics,,0,,,所有特征都不可用
+terms,,0,,,所有特征都不可用
+terms+time,"time_millis,time_hours,time_days",3,0.5537,0.0036,"缺 {'terms_lin_tfidf', 'terms_lin_cf', 'terms_jaccard'}"
+terms+semantics,,0,,,所有特征都不可用
+terms+semantics+metadata,"author,urls",2,0.5057,0.005,"缺 {'namedusers', 'hashtags', 'terms_lin_tfidf', 'semantic_lin_cf', 'semantic_jaccard', 'terms_jaccard', 'terms_lin_cf', 'semantic_lin_tfidf'}"
+terms+semantics+time,"time_millis,time_hours,time_days",3,0.5537,0.0036,"缺 {'terms_lin_tfidf', 'semantic_lin_cf', 'semantic_jaccard', 'terms_jaccard', 'terms_lin_cf', 'semantic_lin_tfidf'}"
+all,"author,urls,time_millis,time_hours,time_days",5,0.5578,0.0034,"缺 {'namedusers', 'hashtags', 'terms_lin_tfidf', 'semantic_lin_cf', 'semantic_jaccard', 'terms_jaccard', 'terms_lin_cf', 'semantic_lin_tfidf'}"

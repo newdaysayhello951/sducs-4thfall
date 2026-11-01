@@ -1,0 +1,13 @@
+[
+  {
+    "name": "ciao_wayback_zip",
+    "status": 200,
+    "bytes": 1275594,
+    "url": "https://web.archive.org/web/20220714012422id_/https://www.cse.msu.edu/~tangjili/datasetcode/ciao.zip",
+    "preview": null
+  },
+  {
+    "name": "ciao_tls12",
+    "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)>"
+  }
+]

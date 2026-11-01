@@ -1,0 +1,42 @@
+[
+  {
+    "name": "epinions_ratings",
+    "status": 200,
+    "bytes": 4161550,
+    "final_url": "https://static.preferred.ai/cornac/datasets/epinions/ratings_data.zip",
+    "files": [
+      {
+        "name": "epinions/ratings_data.txt",
+        "rows": 664824
+      },
+      {
+        "name": "epinions/trust_data.txt",
+        "rows": 487183
+      }
+    ]
+  },
+  {
+    "name": "epinions_trust",
+    "status": 200,
+    "bytes": 1692514,
+    "final_url": "https://static.preferred.ai/cornac/datasets/epinions/trust_data.zip",
+    "files": [
+      {
+        "name": "epinions/trust_data.txt",
+        "rows": 487183
+      }
+    ]
+  },
+  {
+    "name": "ciao_msu_nowww",
+    "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)>"
+  },
+  {
+    "name": "ciao_msu_new",
+    "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)>"
+  },
+  {
+    "name": "graphrec_tree",
+    "error": "HTTP Error 403: rate limit exceeded"
+  }
+]

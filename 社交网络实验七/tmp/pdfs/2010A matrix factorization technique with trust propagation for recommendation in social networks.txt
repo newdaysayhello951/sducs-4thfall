@@ -1,0 +1,678 @@
+    A Matrix Factorization Technique with Trust Propagation
+            for Recommendation in Social Networks
+
+                                 Mohsen Jamali                                                                Martin Ester
+                        School of Computing Science                                                  School of Computing Science
+                          Simon Fraser University                                                      Simon Fraser University
+                           Burnaby, BC, Canada                                                          Burnaby, BC, Canada
+                       mohsen_jamali@cs.sfu.ca                                                             ester@cs.sfu.ca
+
+ABSTRACT                                                                                   1.    INTRODUCTION
+Recommender systems are becoming tools of choice to select the                                With the rapidly growing amount of information available on the
+online information relevant to a given user. Collaborative filtering                       WWW, it becomes necessary to have tools to help users to select
+is the most popular approach to building recommender systems and                           the relevant part of online information. To satisfy this need, rec-
+has been successfully employed in many applications. With the ad-                          ommender systems have emerged, e.g. there are popular recom-
+vent of online social networks, the social network based approach                          menders for movies1 , books2 , music3 , etc.
+to recommendation has emerged. This approach assumes a social                                 Typically in a recommender system, we have a set of users and
+network among users and makes recommendations for a user based                             a set of items. Each user u rates a set of items by some values. The
+on the ratings of the users that have direct or indirect social relations                  recommender has the task to predict the rating for user u on a non-
+with the given user. As one of their major benefits, social network                        rated item i or to generally recommend some items for the given
+based approaches have been shown to reduce the problems with                               user u based on the ratings that already exist.
+cold start users. In this paper, we explore a model-based approach                            Generally two type of recommender systems have been investi-
+for recommendation in social networks, employing matrix factor-                            gated: Memory-based and Model-based recommenders. Memory
+ization techniques. Advancing previous work, we incorporate the                            based algorithms (collaborative filtering) [4] explore the user-item
+mechanism of trust propagation into the model. Trust propagation                           rating matrix and make recommendations based on the ratings of
+has been shown to be a crucial phenomenon in the social sciences,                          item i by a set of users whose rating profiles are most similar to
+in social network analysis and in trust-based recommendation. We                           that of user u. Model-based approaches learn the parameters of a
+have conducted experiments on two real life data sets, the public                          model and store only those parameters. Hence they do not need
+domain Epinions.com dataset and a much larger dataset that we                              to explore the rating matrix and only store the model parameters.
+have recently crawled from Flixster.com. Our experiments demon-                            Model-based approaches are very fast after the parameters of the
+strate that modeling trust propagation leads to a substantial increase                     model are learnt. The bottleneck for model-based approaches is
+in recommendation accuracy, in particular for cold start users.                            the training phase, while in memory-based approaches there is no
+                                                                                           training, but the prediction (test) phase is slower.
+                                                                                              With the advent of online social networks, the social network
+                                                                                           based approach to recommendation has emerged. This approach
+Categories and Subject Descriptors                                                         assumes a social network among users and makes recommenda-
+H.2.8.d [Information Technology and Systems]: Database Appli-                              tions for a user based on the ratings of the users that have direct or
+cations - Data Mining                                                                      indirect social relations with the given user.
+                                                                                              Collaborative filtering is most effective when users have expressed
+                                                                                           enough ratings to have common ratings with other users, but it
+General Terms                                                                              performs poorly for so-called cold start user. Cold start users are
+                                                                                           new users who have expressed only a few ratings. Using similarity
+Algorithms, Design, Measurement, Experimentation                                           based approaches, it is unlikely to find similar users since the cold
+                                                                                           start users only have a few ratings. Social network based recom-
+                                                                                           menders, however, can make recommendations as long as a new
+Keywords                                                                                   user is connected to a large enough component of the social net-
+                                                                                           work.
+Recommendation, Social Network, Trust, Graphical Model, Matrix                                Exploiting social networks in recommendation works because of
+Factorization                                                                              the effects of selection and social influence that have been postu-
+                                                                                           lated by sociologists for a long time. Selection means that people
+                                                                                           tend to relate to people with similar attributes, and due to social
+                                                                                           influence related people in a social network influence each other
+Permission to make digital or hard copies of all or part of this work for                  to become more similar[15]. The increasing availability of online
+personal or classroom use is granted without fee provided that copies are                  social network data has finally allowed a verification of these soci-
+not made or distributed for profit or commercial advantage and that copies
+                                                                                           ological models. The results of experiments in [1] and of similar
+bear this notice and the full citation on the first page. To copy otherwise, to
+republish, to post on servers or to redistribute to lists, requires prior specific         1
+                                                                                             http://www.netflix.com
+permission and/or a fee.                                                                   2
+RecSys2010, September 26–30, 2010, Barcelona, Spain.                                         http://www.amazon.com
+                                                                                           3
+Copyright 2010 ACM 978-1-60558-906-0/10/09 ...$10.00.                                        http://www.last.fm
+
+
+
+                                                                                     135
+work confirm that a social network provides an independent source               large scale dataset that we crawled from Flixster.com. Flixster is a
+of information which can be exploited to improve the quality of                 social networking service in which users can rate movies and create
+recommendations.                                                                a social network. All experiments were performed on this dataset
+   A social rating network is a social network in which each user               as well as on the existing Epinions dataset.
+expresses ratings on some items besides creating social relations to               The list of contributions of this paper are as follows:
+other users. A sample social rating network is illustrated in figure 1.
+Note that the terms "trust network" and "social network" are used                    • We introduce the novel SocialMF model which incorporates
+as synonyms throughout this paper.                                                     trust propagation in the matrix factorization approach.
+   Some memory based approaches have been proposed for recom-
+                                                                                     • SocialMF achieves significantly reduced recommendation er-
+mendation in social rating networks [11][3][5][16]. These meth-
+                                                                                       ror (RMSE) in particular for cold start users.
+ods typically explore the social network and find a neighborhood
+of users trusted (directly or indirectly) by a user and perform the                  • We performed experiments on two real life data sets from
+recommendation by aggregating their ratings. These methods use                         Epinons.com and Flixster.com, the latter of which we crawled
+the transitivity of trust and propagate trust to indirect neighbors in                 and prepared for research purposes.
+the social network. Since they have to explore the social network,
+memory based methods are slower in the test phase compared to                      The rest of this paper is organized as follows: The problem def-
+model based approaches.                                                         inition is presented in section 2. Some related work is discussed
+                                                                                in section 3. We introduce our proposed model in section 4. We
+                                                                                describe the real life data sets used in our experiments in section 5.
+                                                                                Our experiments are reported in section 6. Finally, we conclude the
+                                                                                paper and present some directions for future work.
+
+                                                                                2.     PROBLEM DEFINITION AND PRELIM-
+                                                                                       INARIES
+                                                                                   In recommender systems we have a set of users U = {u1 , ... uN }
+                                                                                and a set of items I = {i1 , ... iM }. The ratings expressed by users
+                                                                                on items are given in a rating matrix R = [Ru,i ]N ×M . In this ma-
+                                                                                trix Ru,i denotes the rating of user u on item i. Ru,i can be any
+                                                                                real number, but often ratings are integers in the range [1, 5]. In this
+                                                                                paper, without loss of generality, we map the ratings 1, ..., 5 to the
+                                                                                interval [0,1] by normalizing the ratings. In a social rating network,
+                                                                                each user u has a set Nu of direct neighbors and tu,v denotes the
+           Figure 1: A sample social rating network.                            value of social trust u has on v as a real number in [0, 1]. Zero
+                                                                                means no trust and one means full trust. Binary trust networks are
+                                                                                the most common trust networks (Amazon4 , eBay5 , ...). The trust
+   Recently, the model based approach for recommendation in so-
+                                                                                values are given in a matrix T = [Tu,v ]N ×N . Non-zero cells Tu,v
+cial rating networks has been investigated [9][10]. These methods
+                                                                                in T denote the existence of a social relation from u to v. Note that
+exploit the matrix factorization technique to learn latent features
+                                                                                T is asymmetric in general.
+for users and items from the observed ratings. Experimental re-
+                                                                                   The social rating network can also be defined as a graph in which
+sults show better performance compared to state of the art memory-
+                                                                                there is a node corresponding to each user, an edge corresponding
+based approaches. However, these methods do not consider the
+                                                                                to each social trust relation, and item ratings associated with nodes.
+propagation of trust. In this paper, we also propose a matrix factor-
+                                                                                An example of a graph representation of social rating network is
+ization based model for recommendation in social rating networks,
+                                                                                demonstrated in figure 1.
+called SocialMF. We incorporate the propagation of trust in our
+                                                                                   The task of a recommender is as follows: Given a user u ∈ U
+model to improve the quality of recommendation. To inject social
+                                                                                and an item i ∈ I for which Ru,i is unknown, predict the rating for
+influence in our model, we make the features of every user depen-
+                                                                                u on item i using R and T .
+dent on the feature vectors of the his direct neighbors in the social
+                                                                                   In this paper, we employ matrix factorization techniques to learn
+network. Using this idea, latent features of users indirectly con-
+                                                                                the latent characteristics of users and items and predict the un-
+nected in the social network will be dependent and hence the trust
+                                                                                known ratings using these latent characteristics. Let U ∈ RK×N
+gets propagated.
+                                                                                and V ∈ RK×M be latent user and item feature matrices, with col-
+   Cold start users are one of the most important challenges in rec-
+                                                                                umn vectors Uu and Vi representing K-dimensional user-specific
+ommender systems. Since cold start users are more dependent on
+                                                                                and item-specific latent feature vectors of users u and item i, re-
+the social network compared to users with more ratings, the effect
+                                                                                spectively. The goal of matrix factorization is to learn these latent
+of using trust propagation gets more important for cold start users.
+                                                                                variables and exploit them for recommendation.
+Moreover, in many real life social rating networks a very large por-
+                                                                                   Traditional recommender systems, like collaborative filtering ap-
+tion of users do not express any ratings, and they only participate
+                                                                                proaches [14][7][4], only utilize the information of the user-item
+in the social network. Hence, using only the observed ratings does
+                                                                                rating matrix for recommendations but ignore the social relations
+not allow to learn the user features. The SocialMF model forces
+                                                                                among users. With the exponential growth of online social net-
+the user feature vectors to be close to those of their neighbors to be
+                                                                                works, incorporating social networks into recommender systems is
+able to learn the latent user features for users with no or very few
+                                                                                becoming more and more important. In this section, we first review
+ratings.
+                                                                                4
+   Due to the sensitive nature of social network data, there are only               www.amazon.com
+                                                                                5
+very few public social rating network datasets. We present a new                    www.ebay.com
+
+
+
+                                                                          136
+the basic matrix factorization (MF) approach for recommendation                       widely investigated in the memory based approaches. Hence, we
+using only user-item rating matrix . In section 4, we introduce our                   first review some of the memory based methods for recommenda-
+proposed model to employ matrix factorization (MF) for recom-                         tion in social networks. Matrix factorization has been widely used
+mendation in social rating networks.                                                  in the model based recommendation [6][7][14]. However these
+   In order to learn the latent features of users and items, [14] em-                 models do not take into account the social network among users.
+ploys matrix factorization to factorize the user-item matrix. The                     Recently, some model-based approaches have been proposed which
+conditional probability of the observed ratings is defined as:                        use matrix factorization for recommendation in social networks
+                                                                                      [9][10], however, these works do not consider the propagation of
+                            M h ³
+                          N Y                          ´iIu,i                         trust. In this section, after reviewing memory based approaches
+                          Y                               R
+                2
+     p(R|U, V, σR )=           N Ru,i |g(UuT Vi ), σr2                   (1)          we discuss some model based approaches for recommendation in
+                          u=1 i=1                                                     social networks.
+                                                                                         TidalTrust[3] performs a modified breadth first search in the trust
+   where N (x|µ, σ 2 ) is the normal distribution with mean µ and                     network to compute a prediction. Basically, it finds all raters with
+                    R
+variance σ 2 , and Iu,i is the indicator function that is equal to 1 if               the shortest path distance from the source user and aggregates their
+u has rated i and equal to 0 otherwise. The function g(x) is the                      ratings weighted by the trust between the source user and these
+logistic function g(x) = 1/(1 + e−x ), which bounds the range of                      raters. To compute the trust value between user u and v who are not
+UuT Vi within [0,1]. Also, zero mean Gaussian priors are assumed                      directly connected, TidalTrust aggregates the trust value between
+for user and item feature vectors:                                                    u’s direct neighbors and v weighted by the direct trust values of u
+                                                                                      and its direct neighbors.
+                N
+                Y                                   M
+                                                    Y                                    [11] introduces MoleTrust. The ideas used in MoleTrust and
+        2                        2           2                       2
+  p(U |σU )=          N (Uu |0, σU I), p(V |σV )=         N (Vi |0, σV I) (2)         TidalTrust are similar. But MoleTrust considers all raters up to a
+                u=1                                 i=1                               maximum-depth given as an input. maximum-depth is independent
+                                                                                      of any specific user and item. Also, to compute the trust value be-
+   Now, through a Bayesian inference, the posterior probability of                    tween u and v in MoleTrust, we perform a backward exploration. It
+the latent variables U and V can be obtained as follows:                              means that the trust value from u to v is the aggregation of trust val-
+                                                                                      ues between u and users directly trusting v weighted by the direct
+                    2    2                                                            trust values.
+     p(U, V |R, T, σR , σU                      2
+                           , σV2 ) ∝ p(R|U, V, σR        2
+                                                  )p(U |σU )p(V |σV2 )                   The Advogato[8] maximum flow trust metric has been proposed
+                     M h ³
+                   N Y
+                   Y                            ´iIu,i
+                                                   R                                  in order to discover which users are trusted by members of an on-
+               =        N Ru,i |g(UuT Vi ), σr2                                       line community. The input for Advogato is given by an integer
+                   u=1 i=1                                                            number n, the number of members to trust. To assign capacities to
+                       N
+                       Y      ³           ´ YM  ³             ´                       the edges of the network, they need to transform the network, so it
+                                       2
+                   ×         N Uu |0, σU I ×   N Vi |0, σV2 I            (3)          needs to know the whole structure of the network. Moreover, it only
+                       u=1                    i=1                                     computes the nodes to trust and does not compute different degrees
+   The corresponding graphical model is presented in figure 2. Us-                    of trust. Since the number of users to trust is independent of users
+ing equation 3, we can learn the latent feature vectors of users and                  and items and there is no distinction between the trusted users, this
+items purely based on the user-item rating matrix.                                    approach is not appropriate for trust-based recommendation.
+                                                                                         In order to consider enough ratings without suffering from noisy
+                                                                                      data, [5] proposes a random walk method (TrustWalker) which
+                                                                                      combines trust-based and item-based recommendation. TrustWalker
+                                                                                      considers not only ratings of the target item, but also those of sim-
+                                                                                      ilar items. The probability of using the rating of a similar item
+                                                                                      instead of a rating for the target item increases with increasing
+                                                                                      length of the walk. Their framework contains both trust-based
+                                                                                      and item-based collaborative filtering recommendations as special
+                                                                                      cases. Their experiments show that their method outperforms other
+                                                                                      existing memory based approaches. The random walk model al-
+                                                                                      lows them to compute the confidence in the predictions.
+                                                                                         The authors of [9] proposed a matrix factorization approach for
+                                                                                      social network based recommendation, called STE. Their method
+                                                                                      is a linear combination of basic matrix factorization approach [14]
+                                                                                      and a social network based approach. The graphical model for their
+                                                                                      proposed model is illustrated in figure 36 . The predicted rating of
+                                                                                      user u on item i is as follows:
+
+Figure 2: Graphical Model of the baseline factorization of user-                                                                 X
+item rating matrix.                                                                            R̂u,i = g(αUuT Vi + (1 − α)             Tu,v UvT Vi )     (4)
+                                                                                                                                v∈Nu
+
+                                                                                        where parameter α controls the effects of neighbors on the esti-
+                                                                                      mated rating.
+3.      RELATED WORK                                                                  6
+                                                                                        It should be noted that model in figure 3 is different from the
+   In this section we review some related work on recommendation                      graphical model presented in [9], but it correctly represents the joint
+in social networks. Trust propagation in recommendation has been                      probability distribution actually computed for the STE model.
+
+
+
+                                                                                137
+                                                                                4.      THE SOCIALMF MODEL
+                                                                                   In this section, we present our approach to incorporate trust prop-
+                                                                                agation into a matrix factorization model for recommendation in
+                                                                                social networks.
+                                                                                   Due to social influence [2], the behavior of a user u is affected
+                                                                                by his direct neighbors Nu . In other words, the latent feature vec-
+                                                                                tor of u is dependent on the latent feature vectors of all his direct
+                                                                                neighbors v ∈ Nu . We formulate this influence as follows:
+                                                                                                     P                P
+                                                                                              bu =     v∈Nu Tu,v Uv    v∈Nu Tu,v Uv
+                                                                                              U       P             =                             (5)
+                                                                                                        v∈Nu Tu,v        |Nu |
+
+                                                                                   where Ubu is the estimated latent feature vector of u given the
+                                                                                feature vectors of his direct neighbors. Since the social networks
+                                                                                we are working with are all binary social networks, all none-zero
+                  Figure 3: The STE model [9].                                  values of Tu,v are 1. We normalize each row of the trust matrix so
+                                                                                     P
+                                                                                that N v=1 Tu,v = 1. Now, we have:
+
+                                                                                                                  X
+                                                                                                          bu =
+                                                                                                          U              Tu,v Uv                  (6)
+   Experiments show that their model outperforms the basic ma-                                                    v∈Nu
+trix factorization based approach and existing trust based based ap-
+proaches. However, in their model, the feature vectors of direct                   The above equation indicates that the estimate of the latent fea-
+neighbors of u affect the ratings of u instead of affecting the feature         ture vector of a user is the weighted average of the latent feature
+vector of u. This model does not handle trust propagation. We use               vectors of his direct neighbors. The estimated feature vector of
+this method as our main comparison partners in our experiments                  user u can be inferred as:
+and call it as STE model.
+   The same authors have also proposed another approach for trust
+                                                                                                                                       
+based recommendation in their previous work [10]. In this paper,                         bu,1
+                                                                                         U          U1,1          U2,1    ... UN,1     Tu,1
+they developed a factor analysis method based on the probabilis-                         b  
+                                                                                        U                                ... UN,2        
+                                                                                         u,2  =  U1,2          U2,2               Tu,2      (7)
+tic matrix factorization. In this model, they consider three sets of                     ...   ...              ..     ...  ...   ... 
+latent features: U for users, V for items, and F for factors. They                       bu,K      U1,K           U2,K    ... UN,K     Tu,N
+                                                                                         U
+factorize the rating matrix R using latent item features V and latent
+user features U . On the other hand, they factorize the trust matrix
+T using latent user features U and latent factor features F . They                 Note that taking the social network into account does not change
+assume a factor latent vector for each user. The graphical model for            the equation for the conditional distribution of the observed ratings.
+this model is presented in figure 4.                                            It only affects the user latent feature vectors. So the conditional
+   As stated in [9], although the users’ social network is integrated           probability of observed rating is the same as the conditional proba-
+into the recommender systems by factorizing the social trust graph,             bility in equation 1:
+the real world recommendation processes are not reflected in the
+model. Two sets of different feature vectors are assumed for users
+which makes the interpretability of the model very hard. Moreover,                                       Y M h ³
+                                                                                                         N Y                          ´iIu,i
+                                                                                                                                         R
+                                                                                                2
+experiments in [9] show that the more recent STE model outper-                       p(R|U, V, σR )=          N Ru,i |g(UuT Vi ), σr2             (8)
+forms this model in terms of the RMSE values.                                                           u=1 i=1
+
+
+                                                                                   For the user latent features, we have two factors: The zero-mean
+                                                                                Gaussian prior to avoid over-fitting, and the conditional distribu-
+                                                                                tion of user latent features given the latent features of his direct
+                                                                                neighbors. Therefore,
+
+
+                                                                                              2
+                                                                                     p(U |T, σU                 2
+                                                                                                , σT2 ) ∝ p(U |σU ) × p(U |T, σT2 )
+                                                                                       N
+                                                                                       Y      ³           ´ YN  ³     X                 ´
+                                                                                                       2
+                                                                                  =          N Uu |0, σU I ×   N Uu |   Tu,v Uv , σT2 I           (9)
+                                                                                       u=1                     u=1           v∈Nu
+
+
+
+                                                                                   The above distribution is a normal distribution which is a product
+                                                                                of two different normal distributions to keep the user feature vectors
+                                                                                both small and close to the features of their direct neighbors.
+Figure 4: The graphical model of the model presented in [10].
+                                                                                   Similar to equation 3, through a Bayesian inference, we have the
+                                                                                following equation for the posterior probability of latent feature
+                                                                                vectors given the rating and social trust matrices:
+
+
+
+                                                                          138
+                                                                                                          N   M
+                                                                                                       1 XX R
+                 2
+  p(U, V |R, T, σR          2
+                   , σT2 , σU , σV2 ) ∝
+                                                                                    L(R, T, U, V ) =             Iu,i (Ru,i − g(UuT Vi ))2
+                        2
+             p(R|U, V, σR           2
+                          )p(U |T, σU , σT2 )p(V |σV2 )                                                2 u=1 i=1
+                   M h ³                      ´iIu,i                                                     N              M
+                 N Y
+                 Y                               R
+                                                                                                     λU X T         λV X T
+             =        N Ru,i |g(UuT Vi ), σr2                                                    +          Uu Uu +        Vi Vi
+                                                                                                      2 u=1          2 i=1
+                 u=1 i=1
+                            ³                       ´                               λT X ³                                          ´
+                     N                                                                  N         X                    X
+                     Y            X
+                 ×         N Uu |   Tu,v Uv , σT2 I                            +           (Uu −     Tu,v Uv )T (Uu −     Tu,v Uv )               (12)
+                                                                                     2 u=1       v∈N                  v∈N
+                     u=1             v∈Nu                                                                 u                       u
+
+                   N
+                   Y      ³           ´ YM  ³            ´                                                       2
+                                                                                    In the above equation, λU = σR   2
+                                                                                                                   /σU         2
+                                                                                                                       , λV = σR /σV2 , and λT =
+                                   2
+               ×         N Uu |0, σU I ×   N Vi |0, σV2 I        (10)           2
+                                                                               σR /σT2 .
+                   u=1                       i=1                                  We can find a local minimum of the objective function in equa-
+   The graphical model corresponding to equation 9 is shown in                 tion 4 by performing gradient descent on Uu and Vi for all users u
+figure 5. Note that the trust matrix in the above equation is not              and all items i.
+explicitly shown in the figure. However, the edges among the la-
+tent feature vectors of users are representatives of the trust network                    M
+                                                                                 ∂L      X
+among users and the degree of trust of user u on user v is Tu,v .                     =       R
+                                                                                             Iu,i Vi g 0 (UuT Vi )(g(UuT Vi ) − Ru,i ) + λU Uu
+                                                                                 ∂Uu     i=1
+                                                                                          X                          X           ³       X           ´
+                                                                               +λT (Uu −      Tu,v Uv ))−λT                  Tv,u Uv −       Tv,w Uw
+                                                                                            v∈Nu                  {v|u∈Nv }             w∈Nv
+                                                                                                                                                         (13)
+
+                                                                                          XN
+                                                                                    ∂L         R
+                                                                                        =     Iu,i Uv g 0 (UuT Vi )(g(UuT Vi ) − Ru,i ) + λV Vi   (14)
+                                                                                    ∂Vi   u=1
+
+                                                                                  where g 0 (x) is the derivative of logistic function and is equal to
+                                                                                0
+                                                                               g (x) = e−x /(1 + e−x )2 . To reduce the model complexity, we set
+                                                                               λU = λV in all our experiments. The initial values of U and V are
+                                                                               samples from normal noises with zero mean. In each iteration, U
+                                                                               and V are updated based on the latent variables from the previous
+                                                                               iteration.
+Figure 5: Proposed Graphical Model to consider the social net-                 4.1      Desirable properties of the proposed model
+work in the factorization of user-item rating matrix.
+                                                                                  In this section, we discuss some desirable properties of SocialMF
+                                                                               and compare it against the closely related STE model [9].
+  The log of the posterior probability can be computed as follows:                The SocialMF model addresses the transitivity of trust in social
+                                                                               networks. In other words, our model takes the trust propagation
+                                                                               into account. According to the graphical model, the feature vec-
+                   2
+  lnp(U, V |R, T, σR          2
+                     , σT2 , σU , σV2 ) =                                      tor of any user is dependent on the feature vectors of his direct
+                      N M                                                      neighbors. Recursively, the feature vector of each direct neighbor
+                  1 XX R                                                       is dependent on the feature vector of his direct neighbors. This
+             −     2         Iu,i (Ru,i − g(UuT Vi ))2
+                 2σR u=1 i=1
+                                                                               effect is shown in the conditional distributions by considering the
+                        N              M
+                                                                               feature vector of a user being a normal distribution around the av-
+                    1 X T          1 X T                                       erage of the feature vectors of his neighbors. On the other hand,
+               −     2
+                           Uu Uu − 2      Vi Vi
+                   2σU u=1        2σV i=1                                      the STE model [9] does not support trust propagation and they list
+                                                                               trust propagation as future work.
+        1 X³                                           ´
+            N         X                    X
+   −           (Uu −     Tu,v Uv )T (Uu −     Tu,v Uv )                           In the baseline MF approach [14] and the STE model [9], the fea-
+         2
+       2σT u=1       v∈N                  v∈N
+                                                                               tures are being learnt based only on the observed ratings. However,
+                                 u                      u
+                                                                               in real life social rating networks, a huge portion of users have ex-
+                               N X
+                               X M
+                             1          R         2                            pressed no ratings and they participate only in the social network.
+                         −     (       Iu,i ) ln σR
+                             2 u=1 i=1                                         So their features can not be learnt based on their observed ratings.
+                                                                               However, our model can handle these users very well. The So-
+ 1             2
+− ((N × K) ln σU + (M × K) ln σV2 + (N × K) ln σT2 ) + C                       cialMF model learns to tune the latent features of these users close
+ 2                                                                             to their neighbors. So, despite not having any expressed ratings,
+                                                       (11)
+                                                                               the feature vectors of these users will be learnt to be close to their
+   Keeping the parameters(observation noise variance and prior vari-           neighbors. Basically, the social trust relations among users is an
+ance) fixed, maximizing the log-posterior over latent features of              observed dependency among the feature vectors of users. It should
+users and items is equivalent to minimizing the following objective            be noted that since evaluating the learnt features is typically based
+function, which is a sum of squared errors with quadratic regular-             on the withheld observed ratings, we are currently not able to eval-
+ization terms:                                                                 uate the features learnt for users with no expressed ratings.
+
+
+
+                                                                         139
+4.2 Complexity analysis of parameter learn-                                         General statistics of the Flixster dataset are shown in table 1.
+    ing                                                                          According to this table, on average each user has 27 friends and
+   The main cost in learning the parameters is computing L and its               each user has rated 8.2 movies. However, if we ignore the many
+gradients against feature vectors of users and items. Assuming the               users who have not rated any movies and only consider users with
+average number of ratings per user is r, and the average number of               at least one rating, each user has rated 55 movies on average.
+direct neighbors per user is t, the complexity of evaluation of L is
+                                                                                                      Statistics      Flixster   Epinions
+O(N rK + N tK). Since both the rating matrix R and trust matrix
+                                                                                                        Users           1M         71K
+T are very sparse, t and r are relatively small. So the computa-
+                                                                                                  Social Relations     26.7M      508K
+tion of the objective function L is very fast and linear with respect                                  Ratings         8.2M       575K
+to the number of users in the social rating network. The computa-                                       Items           49K       104K
+                                                                 2
+tional complexity of computing the gradients is O(N rK + N t K)                                   Users with Rating    150K        47K
+which is linear with respect to the number of users in the social rat-                            Users with Friend    980K        60K
+ing network. Note that the cost of computing the gradient in STE
+              2
+[9] is O(N rt K). So SocialMF is r+t   rt2                                               Table 1: General statistics of the Flixster and Epinions
+                                          2 times faster than STE in
+
+computing the gradient in each iteration of parameter learning pro-
+cess.                                                                               The Flixster dataset contains ratings expressed by users during
+   For each rating estimation, the model proposed in [9] needs to                the period from November 2005 to November 2009. The data set
+take the average of estimated ratings for direct neighbors which                 is now publicly available at www.sfu.ca/∼sja25/datasets/ .
+makes it slower in prediction compared to SocialMF proposed in
+this paper.                                                                      5.2        Epinions dataset
+                                                                                    To the best of our knowledge, the Epinions10 dataset is the only
+5.    DATASETS                                                                   social rating network dataset publicly available.
+   One of the bottlenecks to research in social network analysis in                 We used the version of the Epinions dataset11 published by the
+general, and in social rating networks in particular, has been the               authors of [13]. Table 1 also shows the statistics of the Epinions
+lack of publicly available datasets. To the best of our knowledge,               dataset. Each user has on average 8.1 expressed ratings and 7.2
+so far the Epinions.com dataset is the only publicly available social            direct neighbors. Unlike Flixster, the social relations in Epinions
+rating network dataset. In this section we briefly introduce the data            are directed. The distribution of the number of ratings per user
+sets we use in our experiments: the Flixster dataset, we crawled and             follows a power law. It should also be noted that unlike Flixster,
+prepared for this research, and the public domain Epinions dataset.              the items in Epinions are from different categories such as cameras,
+                                                                                 dvd players, music, etc, while all the items in the Flixster dataset
+5.1 Flixster dataset                                                             are movies.
+                                                                                    Based on the statistics presented in table 1, the crawled Flixster
+   For this research, we crawled a large scale social rating network
+                                                                                 dataset is denser than the Epinions dataset. The number of ratings
+dataset from the Flixster website7 . Flixster is a social networking
+                                                                                 and friends per user is larger in Flixster dataset. A large portion
+service in which users can rate movies. Users can also add some
+                                                                                 of users in Flixster dataset have no expressed ratings, but most of
+users to their friend list and create a social network. Note that social
+                                                                                 them have social relations. Users without any ratings are also im-
+relations in Flixster are undirected.
+                                                                                 portant. They may not be useful to compute the prediction for other
+   Flixster has many ways to gather ratings from users. First, users
+                                                                                 users based on their own ratings, but they may allow us to connect
+can go online, log into Flixster.com and rate some movies or make
+                                                                                 indirectly to other users who have rated items.
+friendship connections to other users. In addition, Flixster uses
+some applications to gather ratings from users. There are two Flixster
+applications which are very famous in Facebook8 and Myspace9 .                   6.       EXPERIMENTS
+When users of facebook or myspace install these applications on                     We performed experiments on the Epinions and the Flixster data
+their profile, they will be asked to rate different movies. Initially,           sets described in section 5. In this section, we report our experi-
+they are presented with a fixed set of 50 movies to rate. Many users             mental results and compare the results with existing methods. Also
+of Flixster rate only these movies. As a results the rating counts for           we present the results for different settings of model parameters.
+these 50 movies are extraordinarily high. Hence, we remove the
+ratings for these movies to reduce the bias of the dataset. Although             6.1        Experimental Setup
+this information could be useful in a real recommender system, we                   We perform 5-fold cross validation in our experiments. In each
+ignore it to have a less biased dataset in our research.                         fold we have 80% of data as the training set and the remaining 20%
+   Possible rating values in Flixster are 10 discrete numbers in the             as the test data.
+range [0.5,5] with step size 0.5. Users are also allowed to rate the                The evaluation metric we use in our experiments is RMSE which
+items with two other nominal values: "Want To See" and "Not In-                  is defined as follows:
+terested". These two types of rating also include some information
+                                                                                                            sP
+and may be useful for some research purposes. However, nominal                                                                        bu,i )2
+                                                                                                                  (u,i)|Rtest (ru,i − r
+ratings are not considered in the rest of this paper since we can not                           RM SE =                                             (15)
+easily convert them to numerical rating values. Almost half of the                                                        |Rtest |
+ratings are numerical values. The following statistics are only for                where Rtest is the set of all pairs (u, i) in the test data.
+the numerical ratings.                                                             To evaluate the performance of our method we consider three
+7                                                                                comparison partners:
+  www.flixster.com
+8                                                                                10
+  http://apps.facebook.com/flixster/                                                  www.epinions.com
+9                                                                                11
+  http://www.myspace.com/flixstermovies                                               http://alchemy.cs.washington.edu/data/epinions/
+
+
+
+                                                                           140
+       • BaseMF: This method is the baseline matrix factorization ap-               Intuitively, increasing K should add more flexibility to the model
+         proach proposed in [14], which does not take the social net-            and hence should improve the results. However, comparing results
+         work into account.                                                      of tables 2 and 3 for different values of K shows that increasing
+                                                                                 K in Epinions did not improve the results, while increasing K
+       • STE: This is the model proposed in [9], which takes into                in Flixster improved the results. We believe that these counter-
+         account the social network in a way different from SocialMF.            intuitive results for Epinions are due to the fact that the Epinions
+         We set α = 0.4 for STE in our experiments which is the                  data set is smaller than Flixster and increasing K leads to more pa-
+         optimum value according to the results of experiments in [9].           rameters in the model which leads to overfitting. Flixster, on the
+                                                                                 other hand, is a huge data set, and increasing K to 10 does not lead
+       • CF: This is the well-known user based collaborative filtering           to overfitting.
+         method which is a memory based approach.
+                                                                                 6.3     Impact of λT on the results
+   In our experiments, we refer to our proposed model as SocialMF.                  Parameter λT controls the influence of the social network on the
+In all our experiments, we set λU = λV = 0.1.                                    behavior of users. Larger values of λT in the objective function of
+                                                                                 equation 12 indicate more impact of the social network on the be-
+6.2 Experimental Results                                                         havior of users. Very small values of λT makes our model close to
+   Table 2 reports the RMSE values of all comparison partners on                 the baseline MF approach. However, very large values of λT lead
+the Epinions data set. The parameter λT is set to 5 for experiments              to a model in which having feature vectors close to those of direct
+on Epinions. Table 2 shows that SocialMF outperforms existing                    neighbors dominating having lower squared error in the training
+methods. Note that since collaborative filtering has no latent fea-              phase.
+tures, there is no dimensionality K associated with it and hence the                Figures 6 and 7 compare the RMSE of our model for different
+result for different values of K are the same.                                   ranges of values for λT in both data sets. As shown in these figures,
+   SocialMF improves the RMSE of the state-of-the-art method STE                 SocialMF has its best results on Epinions for λT = 5, and λT = 1
+by 6.2%. for K=5 and by 5.7% for K=10. To show how significant                   for Flixster.
+our gain is, note that the gain of STE over the baseline MF method
+is 2.5% and the gain of SocialMF over STE is more than 2 times
+that gain. As another evidence for the significance of these RMSE
+reductions, note that in the Netflix prize competition12 , there was a
+$1 Million reward for a reduction of the RMSE by 10%.
+
+                       Method      K=5      K=10
+                         CF        1.180    1.180
+                      BaseMF       1.175    1.195
+                        STE        1.145    1.150
+                      SocialMF     1.075    1.085
+                                                                                 Figure 6: Impact of different values of λT on the performance
+Table 2: RMSE values for comparison partners on Epinions                         of prediction in Epinions.
+with different settings of dimensionality K.
+
+
+   RMSE values for Flixster are presented in table 3. Again, So-
+cialMF clearly outperforms existing methods. In Flixster, the im-
+provement of the RMSE for SocialMF over STE is 5% which more
+than 3 times of the gain of STE over baseline MF (1.5%).
+   It should be noted that the results for Flixster are generally better
+than the results for Epinions for all methods, possibly because of
+the fact that the items in Epinions are from multiple categories such
+as DVD players, cameras, printers, laptops, ...., while the items in
+Flixster are all movies, which makes the recommendation easier in
+general. Another explanation for the better results on Flixster could            Figure 7: Impact of different values of λT on the performance
+be that it Flixster is a richer dataset since there are more social              of prediction in Flixster.
+relations and ratings per user in Flixster compared to Epinions.                 6.4    Performance on cold start users
+                                                                                    Some users in a social rating network express a lot of ratings,
+                       Method      K=5      K=10
+                                                                                 but most users express a few ratings. We consider users who have
+                         CF        0.911    0.911                                expressed less than 5 ratings as cold start users [12][5]. In both
+                      BaseMF       0.878    0.863                                Flixster and Epinions more than 50% of users are cold start users13 .
+                        STE        0.864    0.852                                Hence efficiency of any recommendation algorithm for cold start
+                      SocialMF     0.821    0.815                                users becomes very important.
+                                                                                    Table 4 shows that for cold start user, proposed SocialMF out-
+Table 3: RMSE values for comparison partners on Flixster                         performs other methods. The improvement of the RMSE for cold
+with different settings of dimensionality K.                                     13
+                                                                                  In Flixster, we do not take into account the users with no ratings
+12
+     http://www.netflixprize.com                                                 in this statistics.
+
+
+
+                                                                           141
+                  Method       Epinions     Flixster                            sciences, in social network analysis and in trust-based recommen-
+                    CF          1.361        1.228                              dation. Also if a user has not expressed any ratings, his feature
+                  BaseMF        1.352        1.213                              vectors can be learnt as long as he is connected to the social net-
+                   STE          1.295        1.152                              work via a social relation. Thus SocialMF deals better with cold
+                 SocialMF       1.159        1.057                              start users than existing methods. Note that if a cold start user is
+                                                                                not connected to the social network, then social network based ap-
+       Table 4: RMSE values on cold start users (K=5).                          proaches have no additional information to improve the quality of
+                                                                                recommendation for that user.
+start users compared to STE is 11.5% for Epinions and 8.5% for
+                                                                                   Experiments on two real life data sets from Epinions and Flixster
+Flixster. The gain for cold start users is more than the gain for
+                                                                                demonstrate that SocialMF outperforms existing methods for social
+all users which we discussed in previous subsection. This implies
+                                                                                network based recommendation. This work suggests several inter-
+that SocialMF handles cold start users better than STE. We believe
+                                                                                esting directions for future work. We want to extend the model to
+this is mainly due to the consideration of trust propagation in our
+                                                                                handle negative trust relations, since some social networks allow
+model.
+                                                                                users to express distrust towards other users. In this paper, we per-
+6.5 Analysis of learning runtime                                                formed experiments on different ranges of λT . As future work, we
+                                                                                investigate the possibility of tuning λT automatically. Finally, cold
+   In section 4, we analyzed the runtime complexity and compared
+                                                                                start items have not been addressed in this paper, and it should be
+the complexity of computing the gradients of the objective function
+                                                                                explored how the model can be extended so that the feature vectors
+L in SocialMF and STE. In this section we compare the actual run-
+                                                                                of cold start items are also learnt efficiently.
+times, conducting experiments on a Core2 Duo 2.16 GHz machine
+with Windows XP and 2 GB of memory.
+   Table 5 compares the actual runtime of a single iteration of the             8.    REFERENCES
+                                                                                 [1] D. Crandall, D. Cosley, D. Huttenlocher, J. Kleinberg, and
+training phase for both models.
+                                                                                     S. Suri. Feedback effects between similarity and social
+   Note that according to our discussion in section 3.2, SocialMF
+                         rt2
+                                                                                     influence in online communities. In KDD 2008.
+should theoretically be r+t 2 times faster than STE. Since the Flixster
+                                                                                 [2] N. E. Friedkin. A Structural Theory of Social Influence.
+data set is denser than the Epinions data set, the improvement of                    Cambridge University Press, 1998.
+runtime efficiency for Flixster is stronger than for Epinions.                   [3] J. Golbeck. Computing and Applying Trust in Web-based
+                                                                                     Social Networks. PhD thesis, University of Maryland
+                    Model      Epinions    Flixster
+                                                                                     College Park, 2005.
+                   SocialMF     2.8 sec    29 sec
+                     STE        37 sec     27 min                                [4] D. Goldberg, D. Nichols, B. M. Oki, and D. Terry. Using
+                                                                                     collaborative filtering to weave an information tapestry.
+ Table 5: Runtime comparison of a single iteration in training.                      Communications of the ACM, 35(12), 1992.
+   It should also be noted that the average number of iterations for             [5] M. Jamali and M. Ester. Trustwalker: A random walk model
+SocialMF to converge is around 700, while the number of iterations                   for combining trust-based and item-based recommendation.
+for STE is around 550. Table 6 shows the total time required to                      In KDD 2009.
+learn the parameters for each model. As shown in this table, the                 [6] Y. Koren. Factorization meets the neighborhood a
+STE model is much slower than SocialMF. The training phase of                        multifaceted collaborative filtering model. In KDD 2008, Las
+SocialMF is 40 times faster than that of the STE model for Flixster                  Vegas, USA.
+and more than 7 times faster for Epinions.                                       [7] Y. Koren, R. Bell, and C. Volinsky. Matrix factorization
+                                                                                     techniques for recommender systems. IEEE Computer,
+                    Model      Epinions    Flixster                                  42:30–37, 2009.
+                   SocialMF     40 min      5.5 hr                               [8] Levien and Aiken. Advogato’s trust metric. online at
+                     STE         5 hr      9 days                                    http://advogato.org/trust-metric.html, 2002.
+                                                                                 [9] H. Ma, I. King, and M. R. Lyu. Learning to recommend with
+Table 6: Total time required to learn the parameters of models.                      social trust ensemble. In SIGIR 2009, pages 203–210.
+7.    CONCLUSIONS AND FUTURE WORK                                               [10] H. Ma, H. Yang, M. R. Lyu, and I. King. Sorec: social
+                                                                                     recommendation using probabilistic matrix factorization. In
+   Recommender systems are emerging as tools of choice to select
+                                                                                     CIKM 2008, pages 931–940. ACM, 2008.
+the online information relevant to a given user. Collaborative filter-
+                                                                                [11] P. Massa and P. Avesani. Trust-aware recommender systems.
+ing is the most popular approach to building recommender systems
+                                                                                     In RecSys 2007, USA.
+and has been successfully employed in many applications. With the
+advent of online social networks, exploiting the information hidden             [12] P. Massa and P. Avesani. Trust metrics on controversial
+in the social network to predict the behavior of users has become                    users: balancing between tyranny of the majority and echo
+very important.                                                                      chambers. International Journal on Semantic Web and
+   In this paper we proposed a novel model based approach for rec-                   Information Systems (IJSWIS), 3(1), 2007.
+ommendation in social networks. Our model is a matrix factoriza-                [13] M. Richardson and P. Domingos. Mining knowledge-sharing
+tion based approach. Similar to the STE model presented in [9],                      sites for viral marketing. In KDD 2002.
+SocialMF learns the latent feature vectors of users and items. Dif-             [14] R. Salakhutdinov and A. Mnih. Probabilistic matrix
+ferent from STE, the feature vector of each user is dependent on the                 factorization. In NIPS 2008, volume 20.
+feature vectors of his direct neighbors in the social network.                  [15] S. Wasserman and K. Faust. Social Network Analysis.
+   This allows SocialMF to handle the transitivity of trust and trust                Cambridge Univ. Press, 1994.
+propagation, which is not captured by the STE model. Trust prop-                [16] C. N. Ziegler. Towards Decentralized Recommender Systems.
+agation has been shown to be a crucial phenomenon in the social                      PhD thesis, University of Freiburg, 2005.
+
+
+
+                                                                          142
+

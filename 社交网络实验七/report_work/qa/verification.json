@@ -1,0 +1,38 @@
+{
+  "pages": 14,
+  "tables": 16,
+  "images": 13,
+  "heading_numbering": false,
+  "headings": [
+    "摘要",
+    "研究问题与模型思路",
+    "论文公式与计算实现",
+    "使用稀疏聚合计算梯度",
+    "数据来源与预处理",
+    "Ciao 数据版本说明",
+    "重复观察与划分边界",
+    "复现代码结构与正确性验证",
+    "从代码理解隐式影响",
+    "实验设置与评估方法",
+    "对比方法与实现约定",
+    "所有模型的评分预测结果",
+    "五维隐向量",
+    "十维隐向量",
+    "整体性能与论文结果对照",
+    "冷启动用户的预测表现",
+    "信任信息与评分偏好的关系",
+    "不同信任度用户的分组结果",
+    "训练过程与结果复核",
+    "差异分析与实验结论",
+    "与 SVD++ 的配对比较",
+    "结论与可继续开展的工作",
+    "复跑入口与资料来源",
+    "论文与方法资料",
+    "数据与结果依据"
+  ],
+  "changed_pages_since_last_visual_review": [
+    9
+  ],
+  "renderer": "WPS COM ExportAsFixedFormat followed by bundled Poppler; packaged render_docx.py failed due Windows temporary directory permissions and unavailable LibreOffice",
+  "docx_sha256": "b66ff7c74d1f35409e3c73b72dd26de0ac0f19aa70713989dcfa9d1c3868e20f"
+}

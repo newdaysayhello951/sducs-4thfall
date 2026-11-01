@@ -1,0 +1,792 @@
+                                             Topic-Aware Neural Keyphrase Generation for Social Media Language
+
+                                              Yue Wang1∗ Jing Li2† Hou Pong Chan1 Irwin King1 Michael R. Lyu1 Shuming Shi2
+                                                              1
+                                                                Department of Computer Science and Engineering
+                                                            The Chinese University of Hong Kong, HKSAR, China
+                                                                      2
+                                                                        Tencent AI Lab, Shenzhen, China
+                                                       1
+                                                         {yuewang, hpchan, king,lyu}@cse.cuhk.edu.hk
+                                                              2
+                                                                {ameliajli,shumingshi}@tencent.com
+
+
+
+                                                                Abstract                               Source post with keyphrase “super bowl”:
+                                                                                                       [S]: Somewhere, a wife that is not paying attention
+                                              A huge volume of user-generated content is               to the game, says ”I want the team in yellow pants
+                                              daily produced on social media. To facil-                to win.”
+arXiv:1906.03889v1 [cs.CL] 10 Jun 2019
+
+
+
+
+                                              itate automatic language understanding, we               Relevant tweets:
+                                              study keyphrase prediction, distilling salient           [T1 ]: I been a steelers fan way before black & yel-
+                                              information from massive posts. While most
+                                                                                                       low and this super bowl!
+                                              existing methods extract words from source
+                                                                                                       [T2 ]: I will bet you the team with yellow pants wins.
+                                              posts to form keyphrases, we propose a
+                                                                                                       [T3 ]: Wiz Khalifa song ’black and yellow” to spur
+                                              sequence-to-sequence (seq2seq) based neural
+                                                                                                       the pittsburgh steelers and Lil Wayne is to sing
+                                              keyphrase generation framework, enabling ab-
+                                              sent keyphrases to be created. Moreover, our             ”green and yellow’ for the packers.
+                                              model, being topic-aware, allows joint mod-            Table 1: Sample tweets tagged with “super bowl” as
+                                              eling of corpus-level latent topic representa-         their keyphrases. Blue and italic words can indicate
+                                              tions, which helps alleviate the data sparsity         the topic of super bowl.
+                                              that widely exhibited in social media language.
+                                              Experiments on three datasets collected from
+                                              English and Chinese social media platforms                In this work, we study the prediction of
+                                              show that our model significantly outperforms          keyphrases, generally formed with words or
+                                              both extraction and generation models that do          phrases reflecting main topics conveyed in input
+                                              not exploit latent topics.1 Further discussions        texts (Zhang et al., 2018). Particularly, we fo-
+                                              show that our model learns meaningful topics,
+                                                                                                     cus on producing keyphrases for social media lan-
+                                              which interprets its superiority in social media
+                                              keyphrase generation.                                  guage, proven to be beneficial to a broad range of
+                                                                                                     applications, such as instant detection of trending
+                                         1    Introduction                                           events (Weng and Lee, 2011), summarizing pub-
+                                                                                                     lic opinions (Meng et al., 2012), analyzing social
+                                         As social media continues its worldwide expan-              behavior (Ruths and Pfeffer, 2014), and so forth.
+                                         sion, the last decade has witnessed the revolution             In spite of the substantial efforts made in social
+                                         of interpersonal communication. While empow-                media keyphrase identification, most progress to
+                                         ering individuals with richer and fresher informa-          date has focused on extracting words or phrases
+                                         tion, the flourish of social media also results in          from source posts, thus failing to yield keyphrases
+                                         millions of posts generated on a daily basis. Fac-          containing absent words (i.e., words do not ap-
+                                         ing a sheer quantity of texts, language understand-         pear in the post). Such cases are indeed prominent
+                                         ing has become a daunting task for human beings.            on social media, mostly attributed to the informal
+                                         Under this circumstance, there exists a pressing            writing styles of users therein. For example, Ta-
+                                         need for developing automatic systems capable of            ble 1 shows a tweet S tagged with keyphrase “su-
+                                         absorbing massive social media texts and figuring           per bowl” by its author, though neither “super”
+                                         out what is important.                                      nor “bowl” appears in it.2 In our work, distin-
+                                             *
+                                               This work was partially done when Yue Wang was an     guishing from previous studies, we approach so-
+                                         intern at Tencent AI Lab.                                   cial media keyphrase prediction with a sequence
+                                             †
+                                               Jing Li is the corresponding author.
+                                             1                                                          2
+                                               Our data and code are publicly released in https://        Following common practice (Zhang et al., 2016, 2018),
+                                         github.com/yuewang-cuhk/TAKG                                we consider author-annotated hashtags as tweets’ keyphrases.
+generation framework, which is able to create ab-       our outputs and find that meaningful latent top-
+sent keyphrases beyond source posts.                    ics can be learned, which can usefully indicate
+   Our work is built on the success of deep             keyphrases. At last, a preliminary study on sci-
+keyphrase generation models based on neu-               entific articles shows that latent topics work better
+ral sequence-to-sequence (seq2seq) frame-               on text genres with informal language style.
+work (Meng et al., 2017). However, existing
+models, though effective on well-edited docu-
+                                                        2   Related Work
+ments (e.g., scientific articles), will inevitably      Our work is mainly in the line of two areas:
+encounter the data sparsity issue when adapted to       keyphrase prediction and topic modeling. We in-
+social media. It is essentially due to the informal     troduce them in turn below.
+and colloquial nature of social media language,
+which results in limited features available in the      Keyphrase Prediction. Most previous efforts
+noisy data. For instance, only given the words in       on this task adopt supervised or unsupervised
+S (Table 1), it is difficult to figure out why “super   approaches based on extraction — words or
+bowl” is its keyphrase. However, by looking at          phrases selected from source documents to form
+tweets T1 to T3 , we can see “yellow pants” is          keyphrases. Supervised methods are mostly based
+relevant to “steelers”, a super bowl team. As           on sequence tagging (Zhang et al., 2016; Golla-
+“yellow” and “pants” widely appear in tweets            palli et al., 2017) or binary classification using
+tagged with “super bowl’, it becomes possible to        various features (Witten et al., 1999; Medelyan
+identify “super bowl” as S’s keyphrase.                 et al., 2009). For unsupervised methods, they
+                                                        are built on diverse algorithms, including graph
+   Here we propose a novel topic-aware neural
+                                                        ranking (Mihalcea and Tarau, 2004; Wan and
+keyphrase generation model that leverages latent
+                                                        Xiao, 2008), document clustering (Liu et al., 2009,
+topics to enrich useful features. Our model is
+                                                        2010), and statistical models like TF-IDF (Salton
+able to identify topic words, naturally indicative
+                                                        and McGill, 1986).
+of keyphrases, via exploring post-level word co-
+occurrence patterns, such as “yellow” and “pants”          Our work is especially in the line of social
+in S. Previous work have shown that corpus-level        media keyphrase prediction, where extractive ap-
+latent topics can effectively alleviate data spar-      proaches are widely employed (Zhang et al., 2016,
+sity in other tasks (Zeng et al., 2018; Li et al.,      2018). On the contrary, we predict keyphrases
+2018). The effects of latent topics, nevertheless,      in a sequence generation manner, allowing the
+have never been explored in existing keyphrase          creation of absent keyphrases. Our work is
+generation research, particularly in the social me-     inspired by seq2seq-based keyphrase generation
+dia domain. To the best of our knowledge, our           models (Meng et al., 2017; Chen et al., 2018,
+work is the first to study the benefit of leverag-      2019a,b), which are originally designed for sci-
+ing latent topics on social media keyphrase gen-        entific articles. However, their performance will
+eration. Also, our model, taking advantage of the       be inevitably compromised when directly applied
+recent advance of neural topic models (Miao et al.,     to social media language owing to the data spar-
+2017), enables end-to-end training of latent topic      sity problem. Recently, Wang et al. (2019) pro-
+modeling and keyphrase generation.                      pose a microblog hashtag generation framework,
+                                                        which explicitly enriches context with user re-
+   We experiment on three newly constructed so-         sponses. Different from them, we propose to
+cial media datasets. Two are from English plat-         leverage corpus-level latent topic representations,
+form Twitter and StackExchange, and the other           which can be learned without requiring external
+from Chinese microblog Weibo. The compari-              data. Its potential usefulness on keyphrase gen-
+son results over both extraction and generation         eration has been ignored in previous research and
+methods show that our model can better pro-             will be extensively studied here.
+duce keyphrases, significantly outperforming all
+the comparison models without exploiting latent         Topic Modeling. Our work is closely related
+topics. For example, on Weibo dataset, our model        with topic models that discover latent topics from
+achieves 34.99% F1@1 compared with 32.01%               word co-occurrence in document level. They are
+yielded by a state-of-the-art keyphrase generation      commonly in the fashion of latent Dirichlet allo-
+model (Meng et al., 2017). We also probe into           cation (LDA) based on Bayesian graphical models
+           Sequence Encoder                               $%              Below we first introduce our two modules and
+                                                1%
+     &'      &(               &)                                        then describe how they are jointly trained (§3.3).
+                                                …         GRU    …
+                         …                      2
+                                                                        3.1   Neural Topic Model
+     GRU      GRU             GRU
+                                                                        Our neural topic model (NTM) module is inspired
+                                               Topic-aware Decoder
+                  *./0                                                  by Miao et al. (2017) based on variational auto-
+                  4/                                 48                 encoder (Kingma and Welling, 2013), which con-
+                                          45
+                         46                                             sists of an encoder and a decoder to resemble the
+                              !                                         data reconstruction process.
+    *+,-                              "                         *3+,-
+                         47   σ                                            Specifically, the input xbow is first encoded into
+                         Neural Topic Model                             a continuous latent variable z (representing x’s
+                                                                        topic) by a BoW encoder. Then the BoW decoder,
+Figure 1: Our topic-aware neural keyphrase generation                   conditioned on z, attempts to reconstruct x and
+framework (§3).                                                         outputs a BoW vector x0 bow . Particularly, the de-
+                                                                        coder simulates topic model’s generation process.
+                                                                        We then describe their division of labor.
+(Blei et al., 2003). These models, however, rely
+on the expertise involvement to customize model                         BoW Encoder. The BoW encoder is responsi-
+inference algorithms. Our framework exploits the                        ble for estimating prior variables µ and σ, which
+recently proposed neural topic models (Miao et al.,                     will be used to induce intermediate topic represen-
+2017; Srivastava and Sutton, 2017) to infer latent                      tation z. We adopt the following formula:
+topics, which facilitate end-to-end training with
+other neural models and do not require model-                             µ = fµ (fe (xbow )), log σ = fσ (fe (xbow )), (1)
+specific derivation. It has proven useful for cita-
+tion recommendation (Bai et al., 2018) and con-                         where f∗ (·) is a neural perceptron with an ReLU-
+versation understanding (Zeng et al., 2019). In                         activated function following Zeng et al. (2018).
+particular, Zeng et al. (2018) propose to jointly                       BoW Decoder. Analogous to LDA-style topic
+train topic models and short text classification,                       models, it is assumed that there are K topics un-
+which cannot fit our scenario due to the large di-                      derlying the given corpus C. Each topic k is repre-
+versity of the keyphrases (Wang et al., 2019). Dif-                     sented with a topic-word distribution φk over the
+ferent from them, our latent topics are learned                         vocabulary, and each post x ∈ C has a topic mix-
+together with language generation, whose effects                        ture denoted by θ, a K-dim distributional vector.
+on keyphrase generation have never been explored                        Specifically in neural topic model, θ is constructed
+before in existing work.                                                by Gaussian softmax (Miao et al., 2017). The de-
+                                                                        coder hence takes the following steps to simulate
+3     Topic-Aware Neural Keyphrase
+                                                                        how each post x is generated:
+      Generation Model
+                                                                           • Draw latent topic variable z ∼ N (µ, σ 2 )
+In this section, we describe our framework that                            • Topic mixture θ = sof tmax(fθ (z))
+leverages latent topics in neural keyphrase genera-                        • For each word w ∈ x
+tion. Figure 1 shows our overall architecture con-                              – Draw w ∼ sof tmax(fφ (θ))
+sisting of two modules — a neural topic model for                       Here f∗ (·) is also a ReLU-activated neural per-
+exploring latent topics (§3.1) and a seq2seq-based                      ceptron for inputs. In particular, we employ the
+model for keyphrase generation (§3.2).                                  weight matrix of fφ (·) as the topic-word distribu-
+   Formally, given a collection C with |C| social                       tions (φ1 , φ2 , ..., φK ). In the following, we adopt
+media posts {x1 , x2 , ..., x|C| } as input, we process                 the topic mixture θ as the topic representations to
+each post x into bag-of-words (BoW) term vector                         guide keyphrase generation.
+xbow and word index sequence vector xseq . xbow
+is a V -dim vector over the vocabulary (V being                         3.2   Neural Keyphrase Generation Model
+the vocabulary size). It is fed into the neural topic                   Here we describe how we generate keyphrases
+model following the BoW assumption (Miao et al.,                        with a topic-aware seq2seq model, which incor-
+2017). xseq serves as the input for the seq2seq-                        porates latent topics (learned by NTM) in its gen-
+based keyphrase generation model.                                       eration process. Below comes more details.
+Overview. The keyphrase generation module                    where uj is the j-th embedded decoder input3 and
+(KG model) is fed with source post x in its word             sj−1 is the previous hidden state. Here [; ] denotes
+sequence form xseq = hw1 , w2 , ..., w|x| i (|x| is          the concatenation operation.
+the number of words in x). Its target is to out-                The decoder also looks at M (learned by se-
+put a word sequence y as x’s keyphrase. Particu-             quence encoder) and puts an attention on it to cap-
+larly, for a source post with multiple gold-standard         ture important information. When predicting the
+keyphrases, we follow the practice in Meng et al.            j-th word in keyphrase, the attention weights on
+(2017) to pair its copies with each of the gold stan-        wi ∈ xseq is defined as:
+dards to form a training instance.
+                                                                               exp(fα (hi , sj , θ))
+   To generate keyphrases for source posts, the                       αij = P|x|                         ,            (6)
+KG model employs a seq2seq model. The se-                                    i0 =1 exp(fα (hi , sj , θ))
+                                                                                              0
+
+quence encoder distills indicative features from
+                                                             where
+an input source post. The decoder then generates
+its keyphrase, conditioned on the encoded features             fα (hi , sj , θ) = vαT tanh(Wα [hi ; sj ; θ] + bα ).
+and the latent topics yielded by NTM (henceforth                                                                 (7)
+topic-aware sequence decoder).                               Here vα , Wα , and bα are trainable parameters.
+                                                             fα (·) measures the semantic relations between the
+Sequence Encoder. We employ a bidirectional
+                                                             i-th word in the source and the j-th target word
+gated recurrent unit (Bi-GRU) (Cho et al., 2014)
+                                                             to be predicted. Such relations are also calibrated
+to encode the input source sequence. Each word
+                                                             with the input’s latent topic θ in order to explore
+wi ∈ xseq (i = 1, 2, ..., |x|) is first embedded into
+                                                             and highlight topic words. We hence obtain the
+an embedding vector νi , and then mapped into for-
+                                                   →
+                                                   −         topic sensitive context vector cj with:
+ward and backward hidden states (denoted as hi
+    ←−
+and hi ) with the following defined operations:                                         |x|
+                                                                                        X
+               →
+               −                                                                 cj =         αij hi .                (8)
+               hi = fGRU (νi , hi−1 ),                (2)                               i=1
+
+                  −
+                  ←                                          Further, conditioned on cj , we generate the j-th
+                  hi = fGRU (νi , hi+1 ).              (3)
+                                                             word over the global vocabulary according to:
+                             −
+                             →      ←− →  − ← −
+The concatenation of hi and hi , [hi ; hi ], serves
+as wi ’s hidden state in encoder, denoted as hi .               pgen = sof tmax(Wgen [sj ; cj ] + bgen ).             (9)
+Finally, we construct a memory bank: M =                        In addition, we adopt copy mechanism (See
+hh1 , h2 , ..., h|x| i, for decoder’s attentive retrieval.   et al., 2017) following Meng et al. (2017), which
+Topic-Aware Sequence Decoder. In general,                    allows keywords to be directly extracted from the
+conditioned on the memory bank M and latent                  source input. Specifically, we adopt a soft switcher
+topic θ from NTM, we define the process to gener-            λj ∈ [0, 1] to determine whether to copy a word
+ate its keyphrase y with the following probability:          from source as the j-th target word:
+
+                      |y|                                       λj = sigmoid(Wλ [uj ; sj ; cj ; θ] + bλ ),           (10)
+                      Y
+       P r(y | x) =         P r(yj | y<j , M, θ),     (4)    with Wλ and bλ being learnable parameters.
+                      j=1
+                                                             Topic information θ is also injected here to guide
+where y<j        =     hy1 , y2 , ..., yj−1 i.  And          the switch decision.
+P r(yj |y<j , M, θ), denoted as pj , is a word                 Finally, we obtain distribution pj for predicting
+distribution over vocabulary, reflecting how likely          the j-th target word with the formula below:
+a word to fill in the j-th slot in target keyphrase.                                                   |x|
+                                                                                                       X
+Below we describe the procedure to obtain pj .                    pj = λj · pgen + (1 − λj ) ·               αij ,   (11)
+   Our sequence decoder employs a unidirectional                                                       i=1
+GRU layer. Apart from the general state update,                                                  |x|
+the j-th hidden state sj is further designed to take         where attention scores {αij }i=1 serve as the ex-
+input x’s topic mixture θ into consideration:                tractive distribution over the source input.
+                                                                 3
+                                                                   We take the previous word from gold standards in train-
+             sj = fGRU ([uj ; θ], sj−1 ),             (5)    ing by teacher forcing and from the predicted word in test.
+3.3      Jointly Learning Topics and Keyphrases                                 # of   Avg len    # of KP    Source
+                                                           Source posts
+                                                                              posts    per post   per post    vocab
+Our neural framework allows end-to-end learning            Twitter           44,113      19.52        1.13   34,010
+of latent topic modeling and keyphrase genera-             Weibo             46,296      33.07        1.06   98,310
+tion. We first define objective functions for the          StackExchange     49,447      87.94        2.43   99,775
+two modules respectively.                                                              Avg len       % of    Target
+                                                           Target KP           |KP|
+   For NTM, the objective function is defined                                           per KP     abs KP     vocab
+based on negative variational lower bound (Blei            Twitter            4,347        1.92     71.35     4,171
+                                                           Weibo              2,136        2.55     75.74     2,833
+et al., 2016). Here due to space limitation, we omit
+                                                           StackExchange     12,114        1.41     54.32    10,852
+the derivation details already described in Miao
+et al. (2017), and directly give its loss function:
+                                                          Table 2: Data statistics of source posts (on the top) and
+                                                          target keyphrases (on the bottom). Avg len: the average
+LN T M = DKL (p(z) || q(z | x))−Eq(z | x) [p(x | z)],
+                                                          number of tokens. KP: keyphrases. Abs KP: absent
+                                                (12)      keyphrases. |KP|: the number of distinct keyphrases.
+where the first term is the Kullback-Leibler di-
+vergence loss and the second term reflects the re-
+construction loss. p(z) denotes a standard normal         tracked the real-time trending hashtags in Jan-Aug
+prior. q(z | x) and p(x | z) represent the process of     2014,5 and then used them as keywords to search
+BoW encoder and BoW decoder respectively.                 posts with hashtag-search API.6 And the StackEx-
+   For KG model, we minimize the cross entropy            change dataset is randomly sampled from a pub-
+loss over all training instances:                         licly available raw corpus.7
+                  N
+                  X                                          For the target keyphrases, we employ user-
+        LKG = −         log(P r(yn | xn , θn )),   (13)   annotated hashtags for Twitter and Weibo follow-
+                  n=1                                     ing Zhang et al. (2016), and author-assigned tags
+                                                          (e.g., “artificial-intelligence”) for StackExchange.
+where N denotes the number of training instances
+                                                          Posts without such keyphrase tags are hence re-
+and θn is xn ’s latent topics induced from NTM.
+                                                          moved from the datasets. Particularly, for Stack-
+  Finally, we define the entire framework’s train-
+                                                          Exchange, we concatenate the question title to-
+ing objective with the linear combination of
+                                                          gether with its description as the source input. For
+LN T M and LKG :
+                                                          Twitter and Weibo source posts, we retain tokens
+               L = LN T M + γ · LKG ,              (14)   in hashtags (without # symbols) for those appear-
+                                                          ing in the middle of posts, since they generally
+where the hyper-parameter γ balances the ef-              act as semantic elements and thus considered as
+fects of NTM and KG model. Our two mod-                   present keyphrases (Zhang et al., 2016). For those
+ules can be jointly trained with their parameters         appearing before or after a post, we remove the en-
+updated simultaneously. For inference, we adopt           tire hashtags and regard them as absent keyphrases
+beam search and generate a ranking list of output         as is done in Wang et al. (2019).
+keyphrases following Meng et al. (2017).                     For model training and evaluation, we split the
+                                                          data into three subsets with 80%, 10%, and 10%,
+4       Experiment Setup
+                                                          corresponding to training, development, and test
+Datasets. We conduct experiments on three so-             set. The statistics of the three datasets are shown
+cial media datasets collected from two English on-        in Table 2. As can be seen, over 50% of the
+line platforms, Twitter and StackExchange, and            keyphrases do not appear in their source posts,
+a Chinese microblog website, Weibo. Twitter and           thus extractive approaches will fail in dealing with
+Weibo are microblogs encouraging users to freely          these posts. We also observe that StackExchange
+post with a wide range of topics, while Stack-            exhibits different keyphrase statistics compared to
+Exchange, an online Q&A forum, are mainly for             either Twitter or Weibo, with more keyphrases ap-
+question asking (with a title and a description) and      pearing in one post and more diverse keyphrases.
+seeking answers from others.
+   The Twitter dataset contains tweets from TREC             5
+                                                              http://open.weibo.com/wiki/Trends/
+                                                             6
+2011 microblog track.4 For Weibo dataset, we first          7
+                                                              http://www.open.weibo.com/wiki/2/
+                                                              https://archive.org/details/
+    4
+        http://trec.nist.gov/data/tweets/                 stackexchange
+Preprocessing. For Twitter dataset, we em-               as the keyphrases for all test instances. We also
+ployed Twitter preprocessing toolkit in Bazio-           compare with the following extractive baselines,
+tis et al. (2017) for source post and hashtag            where n-grams (n = 1, 2, 3) in source posts are
+(keyphrase) tokenization. Chinese Weibo data was         ranked by TF-IDF scores (henceforth TF-IDF),
+preprocessed with Jieba toolkit8 for word segmen-        TextRank algorighm (Mihalcea and Tarau, 2004)
+tation, and English StackExchange data with nat-         (henceforth T EXT R ANK), and KEA system (Wit-
+ural language toolkit (NLTK) for tokenization.9          ten et al., 1999) (henceforth KEA). We also com-
+   We further take the following preprocessing           pare with a neural state-of-the-art keyphrase ex-
+steps for each of the three datasets: First,             traction model based on sequence tagging (Zhang
+posts with meaningless keyphrases (e.g., single-         et al., 2016) (henceforth S EQ -TAG). In addition,
+character ones) were filtered out; also re-              we take the following state-of-the-art keyphrase
+moved were non-alphabetic (for English data) and         generation models into consideration: seq2seq
+retweet-only (e.g., “RT”) posts. Second, links,          model with copy mechanism (Meng et al., 2017)
+mentions (@username), and digits were replaced           (henceforth S EQ 2S EQ -C OPY) and its variation
+with generic tags “URL”, “MENT”, and “DIGIT”             S EQ 2S EQ without copy mechanism, S EQ 2S EQ -
+following Wang et al. (2019). Third, a vocabulary        C ORR (Chen et al., 2018) exploiting keyphrase
+was maintained, with 30K most frequent words for         correlations, and TG-N ET (Chen et al., 2019b)
+Twitter, and 50K for Weibo and StackExchange             jointly modeling of titles and descriptions (thereby
+each. For BoW vocabulary of the input xbow for           only tested on StackExchange).
+NTM, stop words and punctuation were removed.
+                                                         5     Experimental Results
+Parameter Settings. We implement our model
+                                                         In the experiment, we first evaluate our perfor-
+based on the pytorch framework in Paszke et al.
+                                                         mance on keyphrase prediction (§5.1). Then, we
+(2017). For NTM, we implement it following the
+                                                         study whether jointly learning keyphrase gener-
+design10 in Zeng et al. (2018) and set topic num-
+                                                         ation can in turn help produce coherent topics
+ber K to 50. The KG model is set up mostly
+                                                         (§5.2). At last, further discussions (§5.3) are pre-
+based on Meng et al. (2017). For its sequence en-
+                                                         sented with an ablation study, a case study, and an
+coder, we adopt two layers of bidirectional GRU
+                                                         analysis for varying text genres.
+and one layer of unidirectional GRU for its de-
+coder. The hidden size of the GRU is 300 (for bi-        5.1    Keyphrase Prediction Results
+GRU, 150 for each direction). For the embedding,
+                                                         In this section, we examine our performance in
+its size is set to 150 and values are randomly ini-
+                                                         predicting keyphrases for social media. We first
+tialized. We apply Adam (Kingma and Ba, 2014)
+                                                         discuss the main comparison results, followed by
+with initial learning rate as 1e − 3. In training pro-
+                                                         a discussion for present and absent keyphrases.
+cess, gradient clipping = 1.0 is conducted to sta-
+                                                            Popular information retrieval metrics macro-
+bilize the training. Early-stopping strategy (Caru-
+                                                         average F1@K and mean average precision
+ana et al., 2001) is adopted based on the validation
+                                                         (MAP) are adopted for evaluation. Here for Twit-
+loss. Before joint training, we pretrain NTM for
+                                                         ter and Weibo, most posts are tagged with one
+100 epochs and KG model for 1 epoch as the con-
+                                                         keyphrase on average (Table 2), thus F1@1 and
+vergence speed of NTM is much slower than the
+                                                         F1@3 are reported. For StackExchange, we report
+KG model. We empirically set the γ = 1.0 for
+                                                         F1@3 and F1@5, because on average, posts have
+balancing NTM and KG loss (Eq. 14) and itera-
+                                                         2.4 keyphrases. MAP is measured over the top 5
+tively update the parameters in each module and
+                                                         predictions for all three datasets. For keyphrase
+then their combination in turn.
+                                                         matching, we consider keyphases after stemmed
+Comparisons. In comparison, we first consider            by Porter Stemmer following Meng et al. (2017).
+a simple baseline selecting majority keyphrases          Main Comparison Discussion. Table 3 shows
+(henceforth M AJORITY) — the top K keyphrases            the main comparison results on our three datasets,
+ranked by their frequency in training data are used      where higher scores indicate better performance.
+   8
+     https://github.com/fxsjy/jieba
+                                                         From all three datasets, we observe:
+   9
+     https://www.nltk.org/                                 • Social media keyphrase prediction is chal-
+  10
+     https://github.com/zengjichuan/TMN                  lenging. As can be seen, all simple baselines give
+                                  Twitter                                                     Weibo                                   StackExchange
+  Model
+                       F1@1        F1@3        MAP         F1@1                               F1@3                 MAP      F1@3          F1@5      MAP
+  Baselines
+  M AJORITY             9.36       11.85       15.22        4.16                                  3.31              5.47    1.79          1.89            1.59
+  TF-IDF                1.16        1.14        1.89        1.90                                  1.51              2.46    13.50         12.74           12.61
+  T EXT R ANK           1.73        1.94        1.89        0.18                                  0.49              0.57    6.03          8.28            4.76
+  KEA                   0.50        0.56        0.50        0.20                                  0.20              0.20    15.80         15.23           14.25
+  State of the arts
+  S EQ -TAG           22.79±0.3   12.27±0.2   22.44±0.3   16.34±0.2                          8.99±0.1         16.53±0.3    17.58±1.6    12.82±1.2       19.03±1.3
+  S EQ 2S EQ          34.10±0.5   26.01±0.3   41.11±0.3   28.17±1.7                          20.59±0.9        34.19±1.7    22.99±0.3    20.65±0.2       23.95±0.3
+  S EQ 2S EQ -C OPY   36.60±1.1   26.79±0.5   43.12±1.2   32.01±0.3                          22.69±0.2        38.01±0.1    31.53±0.1    27.41±0.2       33.45±0.1
+  S EQ 2S EQ -C ORR   34.97±0.8   26.13±0.4   41.64±0.5   31.64±0.7                          22.24±0.5        37.47±0.8    30.89±0.3    26.97±0.2       32.87±0.6
+  TG-N ET                 -           -           -           -                                  -                -        32.02±0.3    27.84±0.3       34.05±0.4
+  Our model           38.49±0.3   27.84±0.0   45.12±0.2   34.99±0.3                          24.42±0.2        41.29±0.4    33.41±0.2    29.16±0.1       35.52±0.1
+
+Table 3: Main comparison results displayed with average scores (in %) and their standard deviations over the
+results with 5 sets of random initialization seeds. Boldface scores in each column indicate the best results. Our
+model significantly outperforms all comparisons on all three datasets (p < 0.05, paired t-test).
+
+
+poor performance. This indicates that predicting                      • Twitter and Weibo data is noisier. We no-
+keyphrases for social media language is a chal-                    tice that TF-IDF, T EXT R ANK, and KEA per-
+lenging task. It is impossible to rely on simple                   form much worse than M AJORITY, while the op-
+statistics or rules to yield good results.                         posite is observed on StackExchange. It is because
+   • Seq2seq-based keyphrase generation models                     Twitter and Weibo, as microblogs, contain shorter
+are effective. Compared to the extractive base-                    posts (Table 2) and exhibit more informal lan-
+lines and S EQ -TAG, seq2seq-based models per-                     guage styles. In general, models relying on simple
+form much better. It is because social media’s                     word statistics would suffer from such noisy data.
+informal language style results in a large amount
+                                                                                             90
+of absent keyphrases (Table 2), which is impossi-                                                                                                           Seq-Tag
+                                                                                                                                                            Seq2Seq
+                                                                      (a) Present F1@1 (%)
+
+
+
+
+                                                                                             80                                                             Seq2Seq-Copy
+ble for extractive methods to make correct predic-                                           70
+                                                                                                                                                            Seq2Seq-Corr
+                                                                                                                                                            TG-Net
+                                                                                                                                                            Our model
+
+tions. We also find S EQ 2 SEQ - COPY better than                                            60
+
+S EQ 2 SEQ, suggesting the effectiveness to com-                                             50
+
+
+bine source word extraction with word generation                                             40
+
+                                                                                                          Twitter             Weibo           StackExchange
+when predicting keyphrases.                                                                  45
+                                                                                                                                                            Seq2Seq
+
+   • Latent topics are consistently helpful for in-                                                                                                         Seq2Seq-Copy
+                                                                      (b) Absent R@5 (%)
+
+
+
+
+                                                                                             40                                                             Seq2Seq-Corr
+                                                                                                                                                            TG-Net
+
+dicating keyphrases. It is observed that our model                                           35
+                                                                                                                                                            Our model
+
+
+
+
+achieves the best results, significantly outperform-                                         30
+
+
+ing all comparisons by a large margin. This                                                  25
+
+                                                                                             20
+shows the usefulness of leveraging latent topics                                                         Twitter              Weibo               StackExchange
+
+
+in keyphrase prediction. Interestingly, compared
+with StackExchange, we achieve larger improve-                     Figure 2: The prediction results for present (on the
+ments for Twitter and Weibo, both exhibiting more                  top) and absent keyphrases (on the bottom, R@5: re-
+                                                                   call@5). For present cases, from left to right shows
+informal nature and prominent word order misuse.
+                                                                   the results of S EQ -TAG, S EQ 2S EQ, S EQ 2S EQ -C OPY,
+For such text genres, latent topics, learned under                 S EQ 2S EQ -C ORR, TG-N ET (only for StackExchange),
+BoW assumption, are more helpful.                                  and our model. For absent cases, models (except S EQ -
+   Also, the following interesting points can be ob-               TAG) are shown in the same order.
+served by comparing results across datasets:
+   • Keyphrase generation is more challeng-                        Present and Absent Keyphrase Prediction.
+ing for StackExchange. When MAP scores of                          We further discuss how our model performs in
+seq2seq-based methods are compared over the                        producing present and absent keyphrases. The
+three datasets, we find that the scores on Stack-                  comparison results with all neural-based models
+Exchange are generally lower. It is probably at-                   are shown in Figure 2. Here F1@1 is adopted
+tributed to the data characteristics of more diverse               for evaluating the prediction of present keyphrases
+keyphrases and larger target vocabulary (Table 2).                 and recall@5 for absent keyphrases.
+        Datasets     Twitter   StackExchange              Sample Topics. To further evaluate whether our
+        LDA           41.12         35.13                 model can produce coherent topics qualitatively,
+        BTM           43.12         43.52                 we probe into some sample words (Table 5) re-
+        NTM           43.82         43.04
+                                                          flecting the topic “super bowl” discovered by var-
+        Our model     46.28         45.12
+                                                          ious models from Twitter. As can be seen, there
+Table 4: CV topic coherence score comparison on our       are mixed non-topic words 14 in LDA’s, BTM’s,
+two English datasets. Higher scores indicate better co-   and NTM’s sample topic. Compared with them,
+herence. Our model produces the best scores.              our inferred topic looks more coherent. For exam-
+                                                          ple, “steeler” and “packer”, names of super bowl
+                                                          teams, are correctly included into the cluster.
+   The results indicate that our model consistently
+outperforms comparison models in predicting ei-                         bowl super quote steeler jan watching
+ther absent or present keyphrases. Also, interest-          LDA
+                                                                        egypt playing glee girl
+ingly, copy mechanism seems to somehow sac-                             bowl super anthem national christina
+                                                            BTM
+rifice the performance on absent keyphrase gen-                         aguilera fail word brand playing
+eration for correctly extracting the present ones.                      super bowl eye protester winning
+                                                            NTM
+Such side effects, however, are not observed on                         watch halftime ship sport mena
+our model. It is probably attributed to our ability         Our         bowl super yellow green packer steeler
+to associate posts with corpus-level topics, hence          model       nom commercial win winner
+enabling absent keywords from other posts to be
+                                                          Table 5: Top 10 terms for latent topics “super bowl”.
+“copied”. This observation also demonstrates the          Red and underlined words indicate non-topic words.
+latent topics can help our model to better decide
+whether to copy (Eq. 10).
+                                                          5.3    Further Discussions
+5.2    Latent Topic Analysis                              Ablation Study. We compare the results of our
+                                                          full model and its four ablated variants to ana-
+We have shown latent topics useful for social me-         lyze the relative contributions of topics on dif-
+dia keyphrase generation in §5.1. Here we analyze         ferent components. The results in Table 6 indi-
+whether our model can learn meaningful topics.            cate the competitive effect of topics on decoder
+                                                          attention and that on hidden states, but combin-
+Coherence Score Comparison. We first evalu-               ing them both help our full model achieve the best
+ate topic coherence with an automatic CV mea-             performance. We also observe that pre-trained
+sure. Here we employ Palmetto toolkit11 (Röder           topics only bring a small boost, indicated by the
+et al., 2015) on the top 10 words from each la-           close scores yielded by our model (separate train)
+tent topic following Zeng et al. (2018). The re-          and S EQ 2S EQ -C OPY. This suggests that the joint
+sults are only reported on English Twitter and            training is crucial to better absorb latent topics.
+StackExchange because Palmetto does not sup-
+port Chinese. For comparisons, we consider LDA              Model                          Twitter    Weibo       SE
+(implemented with a gensim LdaMulticore pack-               S EQ 2S EQ -C OPY               36.60     32.01     31.53
+age12 ), BTM13 (Yan et al., 2013) (a state-of-the-          Our model (separate train)      36.75     32.75     31.78
+                                                            Our model (w/o topic-attn)      37.24     32.42     32.34
+art topic model specifically for short texts), and
+                                                            Our model (w/o topic-state)     37.44     33.48     31.98
+NTM (Miao et al., 2017). For LDA and BTM, we                Our full model                  38.49     34.99     33.41
+run Gibbs sampling with 1, 000 iterations to en-
+sure convergence. From the results in Table 4, we         Table 6: Comparison results of our ablation models on
+observe that our model outperforms all the com-           three datasets (SE: StackExchange) — separate train:
+parison topic models by large margins, which im-          our model with pre-trained latent topics; w/o topic-attn:
+                                                          decoder attention without topics (Eq. 7); w/o topic-
+plies that jointly exploring keyphrase generation
+                                                          state: decoder hidden states without topics (Eq. 5). We
+can in turn help produce coherent topics.                 report F1@1 for Twitter and Weibo, F1@3 for Stack-
+                                                          Exchange. Best results are in bold.
+  11
+     https://github.com/dice-group/
+Palmetto/                                                   14
+                                                               Non-topic words refer to words that cannot clearly indi-
+  12
+     https://pypi.org/project/gensim/                     cate the corresponding topic, including off-topic words more
+  13
+     https://github.com/xiaohuiyan/BTM                    likely to reflect other topics.
+Case Study. We feed the tweet S in Table 1                                                           90
+
+
+
+
+                                                                Proprotion of Absent Keyphrase (%)
+                                                                                                     80
+into both S EQ 2S EQ - COPY and our model. Even-                                                     70
+tually our model correctly predicts the keyphrase                                                    60
+as “super bowl” while S EQ 2S EQ - COPY gives a                                                      50
+                                                                                                     40
+wrong prediction “team follow back” (posted to                                                       30
+ask other to follow back). To analyze the rea-                                                       20
+son behind, we visualize the attention weights of                                                    10
+                                                                                                          1             2                3                   >3
+two models in Figure 3. It can be seen that both                                                              Twitter   StackExchange   Inspec     SemEval
+                                                                                                              Weibo     KP20k           Krapivin   NUS
+models highlight the common word “team”, which
+frequently appears in “team follow back”-tagged                 Figure 4: Proportion of absent n-gram keyphrases (n:
+tweets. By joint modeling of latent topics, our                 1, 2, 3, > 3). The dashed lines with ‘*’ marks: the five
+model additionally emphasizes topic words “yel-                 scientific article datasets used in Meng et al. (2017).
+low” and “pants”, which are signals indicating a
+super bowl team steeler (also reflected in the 1st              6                                         Conclusion and Future Work
+topic) and thus helpful to correctly generate “super
+bowl” as its keyphrase. Without such topic guid-                We have presented a novel social media keyphrase
+ance, S EQ 2 SEQ - COPY wrongly predicts a com-                 generation model that allows the joint learning of
+mon but unrelated term “team follow back”.                      latent topic representations. Experimental results
+                                                                on three newly constructed social media datasets
+                                                                show that our model significantly outperforms
+                                  n
+                              tio
+                       att g
+
+
+
+
+                              w
+                          me
+
+
+
+
+                          nts
+                          yin
+                           en
+
+
+
+
+                           m
+                           nt
+
+
+                          llo
+                   e
+
+
+
+
+                                                                state-of-the-art methods in keyphrase prediction,
+                                                  win
+                       tea
+               wif
+
+
+
+
+                       wa
+                   pa
+
+
+                       ga
+
+
+
+
+                       pa
+                       ye
+
+
+
+
+                                                                meanwhile produces more coherent topics. Fur-
+(a) Seq2Seq-Copy
+
+
+
+
+                                                        super   ther analysis interprets our superiority to discover
+                                                        bowl    key information from noisy social media data.
+                                                                   In the future, we will explore how to explic-
+                                                                itly leverage the topic-word distribution to further
+(b) Our Model
+
+
+
+
+                                                        super   improve the performance. Also, our topic-aware
+                                                                neural keyphrase generation model can be investi-
+                                                        bowl
+                                                                gated in a broader range of text generation tasks.
+
+               1st Topic   steeler national team packer win     Acknowledgements
+Figure 3: Attention visualization for the sample post in        This work is supported by the Research Grants
+Table 1. Only non-stopwords are selected. The table             Council of the Hong Kong Special Administrative
+below shows the top five words for the 1st topic.               Region, China (No. CUHK 14208815 and No.
+                                                                CUHK 14210717 of the General Research Fund).
+Topic-Aware KG for Other Text Genres. We                        We thank ACL reviewers for their insightful sug-
+have shown the effectiveness of latent topics on                gestions on various aspects of this work.
+social media keyphrase generation. To examine
+how they affect in identifying keyphrases for well-
+edited language, we also experiment on the tra-                 References
+ditional scientific article datasets (Meng et al.,              Haoli Bai, Zhuangbin Chen, Michael R. Lyu, Irwin
+2017), but limited improvements are observed.                     King, and Zenglin Xu. 2018. Neural relational topic
+Latent topics can better help keyphrase genera-                   models for scientific article analysis. In Proceed-
+tion on social media, probably because there are                  ings of ACM International Conference on Informa-
+                                                                  tion and Knowledge Management.
+larger proportion of keyphrases with absent words
+(Figure 4), where latent topics can cluster relevant            Christos Baziotis, Nikos Pelekis, and Christos Doulk-
+posts and enrich the source contexts. Another pos-                eridis. 2017. Datastories at semeval-2017 task 4:
+sible reason lies in that social media language ex-               Deep LSTM with attention for message-level and
+                                                                  topic-based sentiment analysis. In Proceedings of
+hibits prominent arbitrary word orders. Thus la-                  the North American Chapter of the Association for
+tent topics, learned under BoW assumption, can                    Computational Linguistics: Human Language Tech-
+better provide useful auxiliary features.                         nologies.
+David M. Blei, Alp Kucukelbir, and Jon D. McAuliffe.     Olena Medelyan, Eibe Frank, and Ian H. Witten.
+  2016. Variational inference: A review for statisti-      2009. Human-competitive tagging using automatic
+  cians. CoRR, abs/1601.00670.                             keyphrase extraction. In Proceedings of Empirical
+                                                           Methods in Natural Language Processing.
+David M. Blei, Andrew Y. Ng, and Michael I. Jordan.
+  2003. Latent dirichlet allocation. Journal of Ma-      Rui Meng, Sanqiang Zhao, Shuguang Han, Daqing
+  chine Learning Research.                                 He, Peter Brusilovsky, and Yu Chi. 2017. Deep
+                                                           keyphrase generation. In Proceedings of Associa-
+Rich Caruana, Steve Lawrence, and C Lee Giles. 2001.       tion for Computational Linguistics.
+  Overfitting in neural nets: Backpropagation, conju-
+  gate gradient, and early stopping. In Proceedings of   Xinfan Meng, Furu Wei, Xiaohua Liu, Ming Zhou, Su-
+  Neural Information Processing Systems.                   jian Li, and Houfeng Wang. 2012. Entity-centric
+                                                           topic-oriented opinion summarization in twitter. In
+Jun Chen, Xiaoming Zhang, Yu Wu, Zhao Yan, and             Proceedings of ACM International Conference on
+  Zhoujun Li. 2018. Keyphrase generation with cor-         Knowledge Discovery and Data Mining.
+  relation constraints. In Proceedings of Empirical
+  Methods in Natural Language Processing.                Yishu Miao, Edward Grefenstette, and Phil Blunsom.
+                                                           2017. Discovering discrete latent topics with neu-
+Wang Chen, Hou Pong Chan, Piji Li, Lidong Bing,            ral variational inference. In Proceedings of Interna-
+  and Irwin King. 2019a. An integrated approach for        tional Conference on Machine Learning.
+  keyphrase generation via exploring the power of re-
+  trieval and extraction. In Proceedings of the North    Rada Mihalcea and Paul Tarau. 2004. Textrank: Bring-
+  American Chapter of the Association for Computa-         ing order into text. In Proceedings of Empirical
+  tional Linguistics: Human Language Technologies.         Methods in Natural Language Processing.
+
+Wang Chen, Yifan Gao, Jiani Zhang, Irwin King, and       Adam Paszke, Sam Gross, Soumith Chintala, Gre-
+  Michael R. Lyu. 2019b. Title-guided encoding for         gory Chanan, Edward Yang, Zachary DeVito, Zem-
+  keyphrase generation. In Proceedings of AAAI Con-        ing Lin, Alban Desmaison, Luca Antiga, and Adam
+  ference on Artificial Intelligence.                      Lerer. 2017. Automatic differentiation in pytorch.
+                                                           In Proceedings of Neural Information Processing
+Kyunghyun Cho, Bart van Merrienboer, Çaglar               Systems.
+  Gülçehre, Dzmitry Bahdanau, Fethi Bougares, Hol-
+  ger Schwenk, and Yoshua Bengio. 2014. Learning         Michael Röder, Andreas Both, and Alexander Hinneb-
+  phrase representations using RNN encoder-decoder         urg. 2015. Exploring the space of topic coherence
+  for statistical machine translation. In Proceedings      measures. In Proceedings of ACM International
+  of Empirical Methods in Natural Language Process-        Conference on Web Search and Data Mining.
+  ing.                                                   Derek Ruths and Jürgen Pfeffer. 2014. Social media
+Sujatha Das Gollapalli, Xiaoli Li, and Peng Yang.          for large studies of behavior. Journal of Science.
+  2017.      Incorporating expert knowledge into         Gerard Salton and Michael J McGill. 1986. Introduc-
+  keyphrase extraction. In Proceedings of AAAI Con-        tion to modern information retrieval.
+  ference on Artificial Intelligence.
+                                                         Abigail See, Peter J. Liu, and Christopher D. Manning.
+Diederik P. Kingma and Jimmy Ba. 2014. Adam: A             2017. Get to the point: Summarization with pointer-
+  method for stochastic optimization. In Proceedings       generator networks. In Proceedings of Association
+  of International Conference on Learning Represen-        for Computational Linguistics.
+  tations.
+                                                         Akash Srivastava and Charles Sutton. 2017. Autoen-
+Diederik P Kingma and Max Welling. 2013. Auto-             coding variational inference for topic models. arXiv
+  encoding variational bayes.    arXiv preprint            preprint arXiv:1703.01488.
+  arXiv:1312.6114.
+                                                         Xiaojun Wan and Jianguo Xiao. 2008. Single doc-
+Jing Li, Yan Song, Zhongyu Wei, and Kam-Fai Wong.          ument keyphrase extraction using neighborhood
+   2018. A joint model of conversational discourse and     knowledge. In Proceedings of AAAI Conference on
+   latent topics on microblogs. Journal of Computa-        Artificial Intelligence.
+   tional Linguistics.
+                                                         Yue Wang, Jing Li, Irwin King, Michael R. Lyu, and
+Zhiyuan Liu, Wenyi Huang, Yabin Zheng, and                 Shuming Shi. 2019. Microblog hashtag generation
+  Maosong Sun. 2010. Automatic keyphrase extrac-           via encoding conversation contexts. In Proceedings
+  tion via topic decomposition. In Proceedings of Em-      of the North American Chapter of the Association
+  pirical Methods in Natural Language Processing.          for Computational Linguistics: Human Language
+                                                           Technologies.
+Zhiyuan Liu, Peng Li, Yabin Zheng, and Maosong
+  Sun. 2009. Clustering to find exemplar terms for       Jianshu Weng and Bu-Sung Lee. 2011. Event detection
+  keyphrase extraction. In Proceedings of Empirical         in twitter. In Proceedings of AAAI conference on
+  Methods in Natural Language Processing.                   weblogs and social media.
+Ian H. Witten, Gordon W. Paynter, Eibe Frank, Carl
+   Gutwin, and Craig G. Nevill-Manning. 1999. KEA:
+   practical automatic keyphrase extraction. In Pro-
+   ceedings of ACM conference on Digital Libraries.
+Xiaohui Yan, Jiafeng Guo, Yanyan Lan, and Xueqi
+  Cheng. 2013. A biterm topic model for short texts.
+  In Proceedings of international conference on World
+  Wide Web.
+Jichuan Zeng, Jing Li, Yulan He, Cuiyun Gao,
+   Michael R. Lyu, and Irwin King. 2019. What you
+   say and how you say it: Joint modeling of topics and
+   discourse in microblog conversations. Transactions
+   of Association for Computational Linguistics.
+Jichuan Zeng, Jing Li, Yan Song, Cuiyun Gao,
+   Michael R. Lyu, and Irwin King. 2018. Topic mem-
+   ory networks for short text classification. In Pro-
+   ceedings of Empirical Methods in Natural Language
+   Processing.
+Qi Zhang, Yang Wang, Yeyun Gong, and Xuanjing
+  Huang. 2016. Keyphrase extraction using deep re-
+  current neural networks on twitter. In Proceedings
+  of Empirical Methods in Natural Language Process-
+  ing.
+Yingyi Zhang, Jing Li, Yan Song, and Chengzhi Zhang.
+  2018. Encoding conversation context for neural
+  keyphrase extraction from microblog posts. In Pro-
+  ceedings of the North American Chapter of the Asso-
+  ciation for Computational Linguistics: Human Lan-
+  guage Technologies.
+

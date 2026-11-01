@@ -1,0 +1,991 @@
+                             Proceedings of the Seventh International AAAI Conference on Weblogs and Social Media
+
+
+
+
+                     Automatic Summarization of Events From Social Media
+
+                      Freddy Chong Tat Chua∗                                                Sitaram Asur
+                    Living Analytics Research Centre                                   Social Computing Lab
+                    Singapore Management University                                 Hewlett Packard Research Labs
+                       80 Stamford Road, Singapore                                   Palo Alto, California, USA
+                      freddy.chua.2009@smu.edu.sg                                      sitaram.asur@hp.com
+
+
+
+                           Abstract                                       the actual information content in the tweet stream is fairly
+                                                                          limited (Chakrabarti and Punera 2011; Sharifi, Hutton, and
+  Social media services such as Twitter generate phenomenal               Kalita 2010). This is due to the fact that several of the tweets
+  volume of content for most real-world events on a daily basis.
+  Digging through the noise and redundancy to understand the
+                                                                          contain redundant information. Also, many of the tweets that
+  important aspects of the content is a very challenging task.            are returned by a search query are not relevant to the event.
+  We propose a search and summarization framework to ex-                  This is due to ambiguity in the search keywords and the
+  tract relevant representative tweets from a time-ordered sam-           noise prevalent in social media. In this paper, we address this
+  ple of tweets to generate a coherent and concise summary of             problem of summarizing a targeted event of interest for a
+  an event. We introduce two topic models that take advantage             human reader by extracting the most representative tweets
+  of temporal correlation in the data to extract relevant tweets          from the time-ordered sample of tweets for the event.
+  for summarization. The summarization framework has been                    Problem definition. Formally, we define our problem as
+  evaluated using Twitter data on four real-world events. Evalu-
+  ations are performed using Wikipedia articles on the events as
+                                                                          follows. Given a time-ordered sample of tweets D represent-
+  well as using Amazon Mechanical Turk (MTurk) with human                 ing an event of interest e, the task is to extract K number
+  readers (MTurkers). Both experiments show that the proposed             of tweets from D to form a summary Se , such that each of
+  models outperform traditional LDA and lead to informative               these tweets d ∈ Se adequately covers different aspects of
+  summaries.                                                              the event e, where K is a choice of parameter that the human
+                                                                          reader may choose, with larger values of K yielding longer
+                                                                          summaries. Note that, the event of interest can refer also to
+                       Introduction                                       search terms used to query for tweets. It is common, in in-
+When a news-worthy event occurs in the real world, Twit-                  dustry and politics, for people to query what is being said in
+ter users instantaneously post numerous tweets detailing all              social media about a particular brand, a political candidate
+aspects of the event. Due to these real-time updates, there               or a campaign. In these situations, it becomes paramount
+is a flood of information propagated through these net-                   to gain an understanding of the key aspects of discussion
+works. By closely monitoring these streams of information,                quickly, particularly to detect changes in opinions and senti-
+prior research have shown that it is possible to detect real              ment over time.
+world events from Twitter (Popescu and Pennacchiotti 2010;                   Challenges. The above problem definition leads to the
+Sakaki, Okazaki, and Matsuo 2010; Sayyadi, Hurst, and                     question of how we can measure different aspects of the
+Maykov 2009; Watanabe et al. 2011; Weng and Lee 2011).                    event e from D. By aspects, we mean the features of the
+An event refers to any concept of interest that gains the                 event that serve as the main discussion points on social me-
+attention of the populace. Examples of real-world events                  dia. For example, in the case of a product launch, aspects
+range from global catastrophes such as earthquakes (Sakaki,               might include the date of the launch, the features of the prod-
+Okazaki, and Matsuo 2010), political protests or unrest                   uct, the price and initial reviews of its performance. Sev-
+(Weng and Lee 2011), to launches of new consumer prod-                    eral challenges arise when we attempt to perform basic text
+ucts.                                                                     analysis on tweets. 1) Words are often misspelled in tweets
+   The easiest way to extract tweets related to an event is               which means that we cannot use a dictionary or knowledge-
+through a search query. However, for popular events, this                 base (Freebase, Wikipedia, etc.) to find words that are rele-
+typically results in a significantly large stream of tweets,              vant for e. 2) Many tweets in D are the result of noise and are
+which makes the task of understanding the aspects of the                  irrelevant to e, causing unnecessary computation on majority
+event and the opinion of people, a difficult and mostly futile            of the tweets. 3) Tweets, by their very nature, are short and
+task. It has been observed that, despite the high frequency,              that causes poor performance when we apply unsupervised
+   ∗                                                                      learning techniques that have been developed for traditional
+     The work was completed when the author visited HPLabs in
+the summer of 2012.                                                       text analysis.
+Copyright c 2013, Association for the Advancement of Artificial              A naive solution for the problem of extracting relevant
+Intelligence (www.aaai.org). All rights reserved.                         tweets would be to apply a standard topic model on the sam-
+
+
+
+                                                                     81
+ple of tweets D to obtain a set of topics Z that can be in-                                                       the decay parameters δz using the variance of the Gaus-
+spected by the human reader. The event of interest e may                                                          sian distributions. Thus, if a topic z has a large time vari-
+emerge as one of the topics ze ∈ Z found after topic model-                                                       ance, it implies that the topic “sticks” around longer and
+ing. Then using the words ranked highly in the topic ze , we                                                      should have a smaller decay, while topics with a smaller
+can obtain a set of words related to the event which addresses                                                    time variance lose their novelty quickly and should have a
+the first challenge. The tweets which are found to have low                                                       larger decay. By adding Gaussian components to the topic
+probability in the discovered topic can be discarded as irrele-                                                   distribution, we obtain the Gaussian Decay Topic Model
+vant to e which will address the second challenge. However,                                                       (GDTM).
+the problem of such an approach is that there is no guaran-                                                    4. Based on these two models, we propose a framework
+tee we can find topic ze for event e regardless of how many                                                       for solving the extraction and summarization problem for
+topics we use.                                                                                                    events from a social media stream.
+   To overcome the problems of this naive approach and ad-
+dress the aforementioned challenges efficiently, we propose                                                    5. We perform a qualitative and quantitative evaluation of
+a framework that performs search and summarization in a                                                           these models on the summarization of four real-world
+bootstrapping manner.                                                                                             events and demonstrate that the use of temporal correla-
+                                                                                                                  tion facilitates the generation of concise and relevant sum-
+         Unﬁltered Tweet                         1. keywords                             Tweets for
+                                                                                                                  maries. Both our methods were found to outperform tra-
+           Stream, D                                search                              an event, De              ditional LDA for this purpose with GDTM providing the
+                        3. check whether tweet                 2 or 6. learn unsupervised
+                                                                                                                  best overall performance.
+                             ﬁt these topics                           topic model
+
+
+            objective                             Topics, Z                            5. merge with
+                                                                                                                                     Related Work
+                                                                                        previous set
+                                                                                                               Text Summarization : (Nenkova and McKeown 2012) have
+                              7. select most
+                              probable tweet
+                                                                  4. extract tweets
+                                                                    using topics
+                                                                                                               reviewed an extensive survey of text summarization tech-
+                                                                                                               niques. According to them, summarization systems perform
+          Summaries, Se
+                                                                                      Additional Tweets
+                                                                                       for an event, De
+                                                                                                               three successive independent steps to summarize a given tar-
+                                                                                                               get text: 1) Using an intermediate representation for the tar-
+                                                                                                               get text which captures its key features, 2) Using the inter-
+      Figure 1: Framework for Search and Summarize                                                             mediate representation to assign scores for individual sen-
+                                                                                                               tences within the text and 3) Selecting a set of sentences
+    Our Search and Summarize framework (shown in Figure                                                        which maximizes the total score as the summary for the tar-
+ 1) proceeds by first applying a simple keyword-based query                                                    geted text.
+ Q on the time-ordered sample of tweets D to obtain an ini-                                                       (Ganesan, Zhai, and Viegas 2012) have proposed the
+ tial subset of relevant tweets De1 for the event e. We propose                                                generation of abstract short text summaries from text. They
+ two topic models that can then be applied on De1 to obtain                                                    first obtain lists of n-grams (minimum of n is 2) from the
+ topics that are highly relevant to the event. Using the discov-                                               raw text and generate a score for each n-gram based on its
+ ered topics, we subsequently uncover other tweets De2 from                                                    representativeness and readability. Subsequently, optimal
+ D that are relevant to the event e but may not contain the                                                    n-grams are chosen for summarization. In our event sum-
+ keywords given by the query Q. The combined set of tweets                                                     marization, we follow the traditional approach of finding
+ De := De1 ∪ De2 is then used to refine the model and find                                                     an intermediate representation using topics and modeling
+ more aspects of the event e.                                                                                  n-grams using noun phrases in tweets. The distinctive
+    The main contributions of this paper are as follows:                                                       feature in our work is the use of the temporal correlation
+1. Our analysis of Twitter data revealed that the content of                                                   between tweets which has not been considered in traditional
+    tweets for an event e is typically strongly related to other                                               text summarization.
+    tweets about the same event written around the same time.
+    That is, given three tweets d1 , d2 , d3 ∈ De , that are writ-                                             Micro-Blog Event Summarization: (Lu, Zhai, and Sun-
+    ten respectively at t1 , t2 , t3 , suppose t1 << t2 << t3 ,                                                daresan 2009) have proposed a variant of Hidden Markov
+    then the similarity between d1 and d2 will be higher than                                                  Models to obtain an intermediate representation for a
+    the similarity between d1 and d3 .                                                                         sequence of tweets relevant for an event. Their approach
+                                                                                                               does not use the continuous time stamps present in tweets
+2. Based on this observation, we proposed a Decay Topic                                                        and does not address the problem of obtaining the minimal
+    Model (DTM) which learns improved posterior knowl-                                                         set of tweets relevant to an event.(Meng et al. 2012) have
+    edge about tweets d ∈ De written at a later time, given                                                    summarized opinions for entities in Twitter by mining
+    the prior knowledge of earlier tweets. The importance of                                                   hash-tags to infer the presence of entities and inferring
+    this prior knowledge with respect to each topic z decays                                                   sentiments from tweets. However, not all tweets contain
+    as an exponential decay function with two parameters -                                                     hash-tags which makes it difficult to gain sufficient coverage
+    the actual difference in time between the tweets and a δz                                                  for an event this way. (Sharifi, Hutton, and Kalita 2010)
+    parameter for each topic z ∈ Z.                                                                            have proposed the Phrase Reinforcement Algorithm to find
+3. By assuming that the time associated with each topic z                                                      the best tweet that matches a given phrase, such as trending
+    is distributed with a Gaussian distribution Gz , we infer                                                  keywords. They produce one tweet as a summary for one
+
+
+
+                                                                                                          82
+phrase while we propose to provide a set of tweets to                  facebook, initial, public, offer }, { fb, initial, public, offer
+summarize an event. (Yang et al. 2012) have also proposed a            }, { facebook, initial, public, offering }, { fb, initial, public,
+framework for summarizing a stream of tweets. Their main               offering } }.
+focus is on creating a scalable approach by compressing                1. From D, we extract all tweets that match at least one of
+the tweet stream to fit in limited memory, followed by the                the queries q ∈ Q. A tweet matches a query q if it contains
+use of Nonnegative Matrix Factorization (NNMF) to find                    all of the keywords in q. The set of tweets obtained is
+topics in the tweet stream. Since they do not filter the tweets           denoted by De1 .
+for a specific event of interest, the topics discovered using
+their framework will only contain globally major events.               2. Next, we apply a topic model on De1 , to find keywords
+Our proposed framework finds a summary for a targeted                     that describe the main aspects of the event that are being
+event of interest. (Metzler, Cai, and Hovy 2012) proposed                 discussed. We have developed two topic models DTM and
+a structured retrieval approach for obtaining a set of tweets             GDTM that are designed to extract relevant tweets.
+that are most relevant for an event. It uses a query expansion         3. Once we have obtained the set of topics Z from the topic
+technique and also exploits the temporal correlation of                   models, the top ranked words in each topic z ∈ Z are
+related event words. The added benefit of our topic model                 the keywords that describe various aspects of the event e.
+approach is that using the time-variance of each topic for                We may obtain the additional set of tweets De2 by finding
+each event, we can gauge how fast each facet of the event                 tweets d ∈ D that are not present in De1 by selecting those
+decays.                                                                   with high perplexity score with respect to the topics.
+                                                                       4. De1 and De2 can be merged to refine the model and im-
+Dynamic Topic Models for Social Media: (Ahmed et al.
+                                                                          prove upon the topics for the event e.
+2011) have used an exponential decay function to model
+the dynamic user behavior in search logs. But they have as-            5. Using the final set of topics z ∈ Z, we can summarize the
+sumed that the parameters of the decay function remain con-               event e by selecting the tweets d from each topic z that
+stant for all topics. We have taken a different approach by as-           give the best (lowest) perplexity.
+suming that there is a decay parameter for each topic and we           The whole process can be performed for several iterations to
+infer the parameters of the decay function using the variance          improve the quality of the summary.
+of Gaussian distribution on the time of the written words.
+(Saha and Sindhwani 2012) have improved upon existing                  NP+LDA
+non-negative matrix factorization to provide an online ver-            Due to the noisy nature of tweets, it is typical to find that
+sion for finding emerging topics in social media. But unlike           many of the words in a tweet contribute little or no informa-
+our work, they do not address the problem of short sentences           tion to the aspects of the target event. In order to avoid pro-
+in social media. (Wang and McCallum 2006) have proposed                cessing the unnecessary words in tweets, we remove stop-
+a non-markovian approach to model the trend of topics evo-             words and only consider noun phrases by applying a Part-of-
+lution in text. Their approach assumes that the time stamp             Speech Tagger to extract noun phrases using the following
+on each word is generated by a Beta distribution because of            regular expressions
+the different shapes a Beta distribution can take. We have
+used a Gaussian distribution instead because the symmetric                Base N P := determiner? adjectives ∗ nouns+
+shape of the Gaussian curve allows us to use the variance for             Conj N P := Base N P (of Base N P )∗
+inferring the decay parameters of our Gaussian Decay Topic
+Model (GDTM). (Wang, Agichtein, and Benzi 2012) have                   We then model the noun phrases in tweets using the
+proposed a temporal topic model called (TM-LDA) that ex-               NP+LDA model as described in Chua et al. (Chua et al.
+ploits the temporal correlation between the posts for each             2012). Instead of generating a topic for every word, we only
+specific author. They assume that a tweet topic distribution is        generate a topic for each noun phrase which may consist
+related to the next tweet via a square matrix with dimensions          of several words (Chua et al. 2012). The subsequent topic
+equal to number of topics. But the algorithm solves for the            models we propose in the rest of the paper extends from
+matrix by minimizing the transition error in Euclidean space.          NP+LDA.
+Our approach describes the model as a generative process
+to preserve the probabilistic foundations of LDA. We have              The Problem of Short Documents
+also explicitly used the time for each tweet to describe the           As we mentioned earlier, one of the inherent difficulties of
+amount of temporal correlation between consecutive tweets.             modeling tweets is the short length of the tweets, most of
+                                                                       which consist of typically 20 to 30 words. In order to under-
+       Search and Summarize Framework                                  stand why this is difficult, let us examine how topic model-
+Figure 1 provides an overview of the framework we pro-                 ing works on traditional documents using Figure 2.
+pose in this paper. To summarize for the event of interest e,              Figure 2(a) shows three documents, d1 , d2 and d3 contain-
+we first begin by assuming that we have access to a time-              ing certain words w1:8 . The document d contains the word w
+ordered sample of tweets. This can be obtained via a set of            if there is an edge connecting d and w. Topic models exploit
+search queries Q, where each query q ∈ Q is defined by a               the co-occurrences of words between documents to find re-
+set of keywords. For example, the set of queries for the event         lations between words. Given that d1 and d2 share the com-
+“Facebook IPO” can be { { facebook, ipo }, { fb, ipo }, {              mon words {w1 , w2 , w3 , w4 }, we can infer that this densely
+
+
+
+                                                                  83
+                                                                                                                                                          140                                                                90
+
+                                       Cluster (Topic) 1                                                   Cluster (Topic) 1                                                     May 1st May 18th                            80
+                                                                                                                                                                                                                                                     May 1st May 18th
+                           w5           w6          w7       w8                                 w5          w6          w7        w8                      120
+
+
+
+                                                                                                                                                                                                                                   Apr 1st                          Jun 1st
+                                                                                                                                                                                                                             70
+
+                                                                                                                                                          100   Apr 1st                               Jun 1st
+                                                                                                                                                                                                                             60
+
+
+
+
+                                                                                                                                                                                                                      Freq
+                                                                                                                                                   Freq
+                                                                                                                                                           80                                                                50
+
+              Doc d1                Doc d2                 Doc d3           Tweet d1                   Tweet d2                Tweet d3
+                                                                                                                                                                                                                             40
+                                                                                                                                                           60
+
+
+                                                                                                                                                                                                                             30
+                                                                                                                                                           40
+
+                                                                                                                                                                                                                             20
+              w1          w2          w3         w4                                  w1       w2           w3         w4                                   20
+                                                                                                                                                                                                                             10
+                         Cluster (Topic) 2                                                    Cluster (Topic) 2
+                                                                                                                                                            0                                                                 0
+
+                                                                                                                                                                           Time (ms)                                                              Time (ms)
+ (a) Topic Modeling in Tradi- (b) Topic Modeling in Tweets
+ tional Documents                                                                                                                                              (a) Frequency of “price”                                            (b) Frequency of “$28”
+                                                                                                                                                          90                                                                 200
+                                                                                                                                                                                          st          th
+                                                                                                                                                          80
+                                                                                                                                                                                 May 1         May 18                        180
+                                                                                                                                                                                                                                                      May 1st May 18th
+              Figure 2: Topic Modeling on Documents vs Tweets                                                                                             70
+                                                                                                                                                                     st                                     st               160
+
+                                                                                                                                                                Apr 1                                 Jun 1                  140
+                                                                                                                                                                                                                                   Apr 1st                          Jun 1st
+                                                                                                                                                          60
+
+                                                                                                                                                                                                                             120
+
+
+
+
+                                                                                                                                                   Freq
+
+
+
+
+                                                                                                                                                                                                                      Freq
+                                                                                                                                                          50
+
+                                                                                                                                                                                                                             100
+                                                                                                                                                          40
+                                                                                                                                                                                                                              80
+
+connected set of words forms a topic and has semantically                                                                                                 30
+                                                                                                                                                                                                                              60
+
+
+
+similar meanings. Similarly for the set of common words                                                                                                   20
+
+
+                                                                                                                                                          10
+                                                                                                                                                                                                                              40
+
+
+                                                                                                                                                                                                                              20
+
+
+between d2 and d3 , we can infer that {w5 , w6 , w7 , w8 } are                                                                                             0                                                                   0
+
+                                                                                                                                                                          Time (ms)                                                               Time (ms)
+semantically related and belong to the same topic.
+   However, in the case of tweets as shown in Figure 2(b),                                                                                                      (c) Frequency of “$35”                                             (d) Frequency of “$38”
+due to the smaller number of words, there is less likelihood
+for words to co-occur with one another across different doc-                                                                                                              Figure 4: Facebook IPO Launch Price
+uments. The words which could be inferred as belonging to
+the same topics as before now have a weaker co-occurrence
+relationship with other words.                                                                                                                    for “date” and 3(c) for “may” show two spikes around
+                                                                                                                                                  the same period of time. Figure 3(b) shows that “17” has
+Temporal Correlation of Twitter Content                                                                                                           temporal co-occurrence with “date” and “may” in the first
+                                                                                                                                                  spike while Figure 3(d) shows that “18” has temporal co-
+        120                                                                     100
+                                                                                                                                                  occurrence with the second spike. Based on such temporal
+                                      May 1st May 18th                           90
+                                                                                                             May 1st May 18th                     co-occurrence relationships, it leads us to infer that these
+        100
+
+
+                                                                                                                                                  words { “date”, “17”, “may”, “18” } possibly belong to the
+                                                                                 80
+                    st                                              st                     st
+               Apr 1                                         Jun 1               70
+                                                                                      Apr 1                                        Jun 1st
+         80
+
+                                                                                 60
+                                                                                                                                                  same topic.
+ Freq
+
+
+
+
+                                                                         Freq
+
+
+
+
+         60                                                                      50
+
+
+                                                                                 40                                                                  In Figure 4, the words represent the topic of Twitter users
+         40
+                                                                                 30
+
+
+                                                                                 20
+                                                                                                                                                  discussing the launch price of “Facebook IPO”. Similar to
+                                                                                                                                                  the previous analysis of the launch date, the first spike in
+         20
+
+                                                                                 10
+
+
+          0
+
+                               Time (ms)
+                                                                                  0
+
+                                                                                                     Time (ms)                                    Figure 4(a) shows that the word “price” co-occurs with “28”
+              (a) Frequency of “date”                                                 (b) Frequency of “17”                                       in Figure 4(b) and “35” in Figure 4(c). Figure 4(d) shows
+        200                                                                     90
+                                                                                                                                                  that the word “38” co-occurs with the word “price” in the
+                                      May 1st May 18th                                                       May 1st May 18th
+        180                                                                     80
+                                                                                                                                                  second spike. Using such temporal co-occurrences, we can
+                                                                                                                                                  infer that these words { “price”, “28”, “35”, “38” } are likely
+        160
+
+                                                                                      Apr 1st                                      Jun 1st
+                                                                                70
+
+
+        140
+               Apr 1st                                       Jun 1st
+                                                                                60
+
+        120
+                                                                                                                                                  to belong to the same topic.
+                                                                         Freq
+ Freq
+
+
+
+
+                                                                                50
+
+        100
+                                                                                40
+         80
+
+                                                                                30
+         60
+
+                                                                                20
+         40
+                                                                                                                                                                                                                 Cluster (Topic) 1
+         20                                                                     10
+
+
+          0                                                                      0
+                                                                                                                                                                                                w5                 w6                        w7           w8
+                               Time (ms)                                                             Time (ms)
+
+              (c) Frequency of “may”                                                  (d) Frequency of “18”
+
+                             Figure 3: Facebook IPO Launch Date                                                                                                                Tweet d1                          Tweet d2                               Tweet d3
+
+
+
+   Given this problem, the question is whether we can ex-
+ploit other form of features to make up for the weakness
+and sparsity of Twitter. An additional feature that Twitter                                                                                                               w1                   w2                w3                    w4
+
+provides is the timestamp on each of the tweets, showing                                                                                                                                       Cluster (Topic) 2
+when the tweet was published. Figures 3 and 4 shows the
+trend of words written by Twitter users for the event “Face-
+book IPO”. In these figures, the x-axis represents the times-                                                                                      Figure 5: Topic Modeling in Temporal Correlated Tweets
+tamps with each vertical bin representing a day while the
+y-axis represents the frequency of the words written for                                                                                             By assuming that tweets written around the same time for
+the respective day (bin). In Figure 3, the words { “date”,                                                                                        the same event are similar in content, we could arrange the
+“17”, “may”, “18” } represent the topic of Twitter users                                                                                          set of tweets in a sorted order such that tweets written around
+discussing the launch date of “Facebook IPO”. Figure 3(a)                                                                                         the same time can “share” words from other tweets to com-
+
+
+
+                                                                                                                                             84
+pensate for their short length. Figure 5 shows an illustrated              where pi,z is the number of words in tweet di that belong
+example of this idea. Assuming that tweet d2 is written af-                to topic z and δz is the decay factor associated with topic
+ter tweet d1 , we could imagine d2 as inheriting some of the               z. The larger the value of δz , the faster the topic z loses
+words in d1 as shown by the blue - - lines. Similarly, d3 could            its novelty. ti is the time that tweet di was written. The
+also inherit some of the words written by d2 as shown by                   summation is over all the tweets [1, n − 1] that were writ-
+the red -.. lines. The inheritance need not be strictly binary,            ten before tweet dn . Each pi,z is decayed according to the
+instead it can be weighted according to the time difference                time difference between tweet dn and tweet di . Although
+between the two consecutive tweets. The next section will                  the summation seems to involve an O(n) operation, the
+explain how we model the inheritance using an exponen-                     task can be made O(1) via memoization, a programming
+tial decay function. As a result of this inheritance between               technique.
+tweets, the sparse Twitter data becomes denser and will im-             4. For each noun phrase np in tweet d, sample a topic vari-
+prove the inference of topics from tweets.                                 able zd,np from a multinomial distribution using θd as pa-
+                                                                           rameters.
+Decay Topic Model (DTM)                                                                         zd,np ∼ M ult(θd )
+Given that we want to allow tweets to inherit the content
+of previous ones, we need to define a model such that each              5. For each noun phrase np, sample words wnp,v for the
+tweet inherits not only the words of the immediately pre-                  tweet d using topic variable zd,np and the topic word dis-
+ceding tweet but also earlier tweets, subjected to an increas-             tribution φz .
+ing decay as we increase the time difference between tweets.                                          Y
+                                                                           P (wd,np |zd,np = k, φ) =       P (wd,np,v |zd,np = k, φk )
+However there are several computational issues that we have
+                                                                                                                      v∈np
+to cope with. 1) Suppose we duplicate the existence of these                                                            Y
+words in later tweets for their inheritance, the size of the                                                      =          φk,v
+corpus will be inflated due to the duplication. The inflated                                                          v∈np
+corpus causes unnecessary repeated computation for infer-
+ence of the duplicated words. 2) Suppose the duplication                The inference algorithm for DTM is given by,
+proceeds for every subsequent tweet, this accumulation of                                                               
+                                                                                                                          Y Γ(β + qk,v + |v ∈ np|)
+                                                                                                                                                   
+
+words will result in a snowball effect that eventually causes              P (zd,np = k|wd,np , α, β, δk ) ∝ 
+                                                                                                                                 Γ(β + qk,v )
+                                                                                                                                                   
+tweets with newer timestamps to inherit the content of all                                                               v∈np
+
+previous tweets. The snowballed tweets of later timestamps                                                        n−1
+                                                                                                            "                                         #
+                                                                                Γ(V β + qk )                      X
+                                                                                                             α+         pi,k · exp (−δk (tn − ti ))
+will have less diverse variations in their topic because of the              Γ(V β + |np| + qk )                  i=1
+baggage incurred from the inheritance.
+   We need to define our model such that 1) it avoids repet-             where V is the total size of vocabulary, |np| is the number
+itive computation and 2) It decays the inheritance of the               of words in the noun phrase, |v ∈ np| is the number of times
+words such that the content in newer tweets do not get over-            v appear in np, qk,v is the number of times v is inferred as
+whelmed by the content of previous tweets. We address the               topic k and qk is the number of words that are in topic k.
+first issue by the use of the topic distribution for each tweet.           After performing inference on the set of tweets
+Since topic models summarize the content of tweets in la-               Df acebook ipo for the “Facebook IPO” event, we observe the
+tent space using a K (number of topics) dimensional proba-              trend of the topics by plotting how important the topics are
+bility distribution, we can allow the newer tweets to inherit           at different time points. Figure 6 shows the intensity (y-axis)
+this probability distribution instead of raw words. We ad-
+dress the second issue by the use of an exponential decay                                      300
+function for each dimension of the probability distribution.                                                            18 May 2012           Topic 1
+Here, we show the generative process of the Decay Topic                                                                                       Topic 2
+                                                                                               250
+Model (DTM).                                                                                                                                  Topic 3
+                                                                                                                                              Topic 4
+1. For each topic z, sample the prior word distribution from                                   200                                            Topic 5
+                                                                              Expected Value
+
+
+
+
+   a symmetric Dirichlet distribution,                                                                                                        Topic 6
+                                                                                                                                              Topic 7
+                          φz ∼ Dir(β)                                                          150
+                                                                                                                                              Topic 8
+
+2. For the first tweet d1 ∈ De , sample the prior topic distri-                                100
+
+   bution from a symmetric Dirichlet distribution,
+                         θd1 ∼ Dir(α)                                                           50
+
+
+
+
+3. For all other tweets dn ∈ De , sample the prior topic dis-                                    0
+                                                                                                                      Tiime (ms)
+   tribution from an asymmetric Dirichlet distribution,
+                  (     n−1
+                                                       )  !
+                        X                                                                      Figure 6: Chronological Intensity of Topics
+   θdn ∼ Dir       α+       pi,z · exp [−δz (tn − ti )]
+                        i=1                              z∈Z            of every topic differentiated by different colors with respect
+
+
+
+                                                                   85
+to time (x-axis). Each vertical bar for a topic (color) repre-
+                                                                                                        0.14
+sents the expected number of tweets in the day (bin). The                                                                          2p
+expected value Eday (z) of topic z for a day (bin) is given by                                          0.12
+                                 X
+                   Eday (z) =          θd,z                                                              0.1
+
+                                           d∈Dday
+                                                                                                        0.08
+                                                                                                                                                     p
+where Dday represent the set of tweets in a given day.
+
+
+
+
+                                                                                                 P(t)
+   However, we are not able to observe a smooth transition                                              0.06
+
+of topics between different times. Based on the original def-
+inition of the model, we assumed that tweets written around                                             0.04
+
+
+the same time should share high similarity in their content
+                                                                                                                                            ∆t
+and hence topic distributions as well. But Figure 6 does not                                            0.02
+
+
+show that the resulting topics are well differentiated by time.                                           0
+This motivates us to address a deficiency in the Decay Topic                                              −10    −8   −6     −4   −2    0
+                                                                                                                                        t
+                                                                                                                                                 2   4   6   8   10
+
+
+Model. Since we have already modeled the temporal cor-
+relation of tweets by adding the exponential decay func-                                                                   Figure 7: Find ∆t
+tion between the tweets’ topic distributions, we could also
+add additional parameters to the topic word distributions to
+model the assumption that words specific to certain topics                               v appear in np, qk,v is the number of times v is inferred as
+has higher chance of appearing at specific times. This leads                             topic k and qk is the number of words that are in topic k.
+us to introduce the Gaussian Decay Topic Model.                                             We use the concept of half-life to estimate the value of δz .
+                                                                                         Given that we want to find the δz value that causes a tweet
+Gaussian Decay Topic Model (GDTM)                                                        to discard half of the topic from previous tweet,
+ The generative process for the Gaussian Decay Topic Model
+ (GDTM) follows that of DTM with the addition of the time                                                       exp(−δ · (tn − tn−1 )) = 0.5
+ stamp generation for each noun phrase,                                                                                        δ · ∆T = log 2
+1. In addition to topic word distribution φz , each topic z has                                                                          log 2
+    an additional topic time distribution Gz approximated by                                                                         δ=
+                                                                                                                                          ∆T
+    the Gaussian distribution with mean µz and variance σz2 .
+                                                                                            Figure 7 shows a Gaussian distribution with an arbitrary
+                              Gz ∼ N (µz , σz2 )                                         mean and variance. The value of ∆T is affected by the
+                                                                                         variance (width) of the distribution. To estimate ∆T , let
+2. Then the time t for a noun phrase np is given by the fol-
+                                                                                         ∆T = τ ∆t where τ is a parameter and ∆t is estimated
+   lowing,
+                                                                                         as follows,
+                                        (tnp − µz )2
+                                                    
+                            1
+        P (tnp |z, Gz ) = p      exp −                                                                                  P (0)     2p
+                           2πσz2             2σz2                                                                               =
+                                                                                                                       P (∆t)      p
+   Since every topic z is now associated with a Gaussian dis-                                                       exp(0)
+tribution Gz , we can use the shape of the distribution curve                                                                2  =2
+to determine the decay factors δz , ∀z ∈ Z. The δz which                                                          exp(− (∆t)
+                                                                                                                         2σ 2 )
+was previously used for transferring the topic distribution                                                                 (∆t)2
+from previous tweets to the subsequent tweets can depend                                                                          = log 2
+                                                                                                                             2σ 2
+on the variances of the Gaussian distributions. Topics hav-                                                                         p
+                                                                                                                               ∆t = 2σ 2 log 2
+ing small values of variance σz2 indicate aspects that have
+short lifespans and should decay quickly (larger δz ), while                             Finally, δ is given by,
+topics with large variance represent aspects that should de-
+cay slowly giving it a smaller δz . The inference algorithm                                                                     log 2
+                                                                                                                           δ= p                                       (1)
+for GDTM is as follows,                                                                                                      τ 2σ 2 log 2
+
+                                       2          Γ(V β + qk )                           As shown in Equation 1, the larger the variance σ 2 is, the
+P (zd,np = k|wd,np , α, β, δk , µk , Σk ) ∝
+                                               Γ(V β + |np| + qk )                       smaller the δ (decay) and vice versa.
+                                                                     !
+                                                                            |np|           Figure 8(a) shows the intensity (y-axis) of all the top-
+   Y Γ(β + qk,v + |v ∈ np|)    1                        (tnp − µk )2                    ics each differentiated with different colors with respect to
+                                     exp               −
+                          q                                              
+          Γ(β + qk,v )                                         2
+                                                             2σk
+                                                                            
+  v∈np                         2πσ 2           k                                         time (x-axis) found by the Gaussian Decay Topic Model
+ "     n−1
+       X
+                                           #                                             (GDTM). Figure 8(b) shows the corresponding Gaussian
+  α+         pi,k · exp (−δk (tn − ti ))                                                 components for each topic.
+       i=1
+                                                                                            While some other probability distributions can also be
+ where V is the total size of vocabulary, |np| is the number                             used to describe the time distribution of words in an event,
+of words in the noun phrase, |v ∈ np| is the number of times                             we choose the Gaussian distribution because of the ease
+
+
+
+                                                                                    86
+                                                                                                           tweets d ∈ De and choose the tweet that has lowest perplex-
+                                                                             −9
+                                                                          x 10
+                                                                    1.8
+                   1200
+
+                          Topic 1      18 May 2012                  1.6
+                                                                                            Topic 1
+                   1000   Topic 2                                                           Topic 2        ity with respect to z.
+  Expected Value
+
+
+
+
+                                                     Gaussian PDF
+                                                                    1.4
+
+                          Topic 3                                                           Topic 3
+                                                                    1.2
+                                                                                            Topic 4
+                                                                                                                                                                   
+                          Topic 4
+                                                                                                                                         − log P (d, z|θ, φz , Gz )
+                   800
+
+
+
+                          Topic 5                                                           Topic 5
+                   600
+                          Topic 6
+                                                                     1
+
+
+                                                                                            Topic 6
+                                                                                                               perplexity(d, z) = exp
+                          Topic 7
+                                                                    0.8
+
+
+                                                                    0.6
+                                                                                            Topic 7
+                                                                                                                                                   Nd
+                   400
+
+                          Topic 8                                                           Topic 8
+                   200
+                                                                    0.4
+
+
+                                                                    0.2
+                                                                                                           The list of representative tweets for each topic forms the
+                     0                                               0
+                                                                                                           summary of the event e. Note that, depending on the size of
+                                    Tiime (ms)                                    Time, t
+                                                                                                           the summary required, we could extract additional represen-
+ (a) Chronological Intensity of                               (b) Gaussian Components                      tative tweets for each topic, based on the perplexity scores.
+ Gaussian Decay Topics                                                                                     Since we choose one tweet from each topic, then the number
+                                                                                                           of topics K determines the number of selected tweets for the
+                      Figure 8: Intensity and the Gaussian Components                                      summarized event.
+
+                                                                                                                                       Experiments
+of computing sufficient statistics for inference using Gibbs                                               To validate our choice of using the temporal correlation be-
+Sampling. We also exploit the symmetry of Gaussian distri-                                                 tween tweets to extract topics, we evaluate the two models
+bution in estimating δ. This symmetric property cannot be                                                  DTM and GDTM with respect to the LDA baseline1 . Un-
+observed in most continuous distributions.                                                                 like our DTM and GDTM models, the LDA baseline does
+                                                                                                           not consider the use of noun phrases and assumes that every
+Additional Tweets from the Tweet Sample                                                                    tweet has no temporal relation to other tweets. One possi-
+After finding the topics from the initial set of relevant tweets                                           ble way to evaluate the temporal correlation is to compare
+De1 , the next step is to find additional tweets De2 from the                                              the convergence log-likelihoods of these models and assume
+tweet stream D using the trained model. A related method                                                   that the model with the highest log-likelihood during conver-
+of achieving this is to perform query expansion by using the                                               gence is a better model. Alternatively, we can also compute
+top words in a topic for keyword search. Instead of apply-                                                 the perplexity score of a held-out test set.
+ing a threshold on selecting the top-k keywords for query                                                     However these approaches have the following problems,
+expansion, we compute a perplexity score for each tweet                                                    1) The models make different assumptions on the generative
+d ∈ D, d ∈   / De1 . Tweets relevant to the event e are then                                               process of the data, especially LDA which considers tweets
+ranked in ascending order with lower perplexity being more                                                 as a bag-of-words while DTM and GDTM consider noun
+relevant to event e. Using the perplexity score instead of key-                                            phrases. 2) Tweets contain a great deal of noise in them.
+word search from each topic allows us to differentiate be-                                                 Many of the tweets containing keywords such as “Face-
+tween the importance of different words using the inferred                                                 book” and “IPO” are found to be spam instead. These tweets
+probabilities. The perplexity of tweet d is given by the ex-                                               try to gain attention and visibility by riding on the popularity
+ponential of the log likelihood normalized by the number of                                                of these trending keywords during the occurrence of these
+words in a tweet.                                                                                          events. A model that optimizes for the log-likelihood or per-
+                                
+                                  − log P (d|θ, φ, G)
+                                                                                                          plexity score risks over-fitting the parameters to these noisy
+         perplexity(d) = exp                                 (2)                                           tweets.
+                                          Nd                                                                  We therefore evaluate the temporal correlation and the
+where Nd is the number of words in tweet d. Since tweets                                                   two derivative models by comparing 1) the quality of the
+with fewer words tend to have higher probabilities and there-                                              summaries generated from these models and 2) their utility
+fore lower perplexity, we normalized by Nd in order to                                                     towards finding additional tweets from the tweet sample that
+favour tweets with more words.                                                                             are related to the event and yet do not contain the keywords
+                                                                                                           from the original queries.
+Summarization
+                                                                                                           Events and Data Set
+Our goal is to use the extracted topics to summarize the event
+e. Summarizing the event is a multi-objective problem. On                                                   We perform our experiments for four real-world events,
+one hand we want to select tweets such that we maximize                                                     selected to cover natural disasters, politics and company
+the total perplexity using as few tweets as possible. But we                                                events. For each event, we apply a set of queries on the sam-
+also want the topic overlap between the selected tweets to be                                               ple of tweets D to obtain the relevent set of tweets, De1 . The
+as low as possible.                                                                                         events used in this study are:
+   The models described earlier are designed to provide us                                                 1. Facebook IPO: The Initial Public Offer (IPO) of Face-
+diverse topics representing the various different aspects of                                                   book Inc. (web c). We use { { (Facebook — FB), IPO },
+the event that are being discussed on Twitter. Using the top-                                                  { (Facebook — FB), Initial, Public, (Offer — Offering) }
+ics learned from the set of relevant tweets De , we can obtain                                                 } as queries to obtain a set of 9,570 tweets.
+the most representative tweet from each topic to summarize                                                 2. Obamacare: The Patient Protection and Affordable Care
+the target event e.                                                                                            Act (web d). We use { { Obamacare }, { PPACA }, {
+   To choose the most representative tweet for topic z, we
+                                                                                                               1
+compute the perplexity with respect only to topic z for all                                                        The constants for the prior distributions are set as 0.1
+
+
+
+
+                                                                                                      87
+   Obama, Health, Care }, { Obama (Healthcare — Health-                 number of counts between the true summary and the gen-
+   care) } } to obtain a set of 136,761 tweets.                         erated summary. Equation 4 calculates the final similarity
+3. Japan Earthquake: The earthquake that occurred near                  score between the summaries by aggregating the number of
+   Tokyo, Japan in 2011 (web a). We use { { Fukushima },                matched 1,2 and 3 grams. The weights allocated are meant to
+   { (Japan — Tokyo), (Earthquake — Quake — Tsunami }                   give a higher importance to 3-grams and lower importance
+   } to obtain a set of 251,802 tweets.                                 to 1-grams.
+4. BP Oil Spill: The oil spill resulted from British Petroleum
+                                                                                         20
+   (BP) drilling in the Gulf of Mexico (web b). We use { {                                        LDA
+   BP, Oil, Spill }, { Gulf, Mexico, Oil, Spill } } to obtain a                          18       Decayed Topic Model
+                                                                                                  Gaussian Decayed Topic Model
+   set of 79,676 tweets.                                                                 16
+ Note that the number of tweets for these events ranges from a                           14
+ small 9,570 tweets for Facebook IPO to a mammoth 251,802
+                                                                                         12
+
+
+
+
+                                                                           Sim(Str,Sm)
+ tweets for the Japan Earthquake.
+                                                                                         10
+Summarization Results                                                                     8
+Fair evaluations of our summaries require both a quantita-
+                                                                                          6
+tive comparison with simulated true summaries and qualita-
+tive assessment from human readers. Due to the difficulty of                              4
+obtaining human generated summaries from our data sets,                                   2
+we construct the true summaries by using the headlines of
+news articles found in the reference section of the events’                               0
+                                                                                              Facebook IPO   Obamacare Japan Earthquake BP Oil Spill
+Wikipedia articles. The human readers are crowdsourced                                                   (a) Results for 8 Topics
+from Amazon Mechanical Turk (MTurk).
+   Quantitative Comparison with Wikipedia: Wikipedia                                     20
+                                                                                                  LDA
+forms a comprehensive resource for all manner of real-world                              18       Decayed Topic Model
+content including the events that we consider in this paper.                                      Gaussian Decayed Topic Model
+                                                                                         16
+Each Wikipedia article for an event contains a section that
+references the relevant news articles which contributed to                               14
+the article. These news articles thus can be considered as                               12
+                                                                           Sim(Str,Sm)
+
+
+
+
+proxies for each of the important pieces of news about the
+                                                                                         10
+event. Since Wikipedia articles are edited and discussed by
+the general public, the news articles that are referenced rep-                            8
+resent the popular choices of the internet public. For each                               6
+of the Wikipedia references for our events, we extract the
+headline text which gives a one-line summary of the corre-                                4
+sponding news article. The headline also has an advantage                                 2
+of resembling the language style used in tweets. To con-
+                                                                                          0
+struct a true summary for each event from its correspond-                                     Facebook IPO   Obamacare Japan Earthquake BP Oil Spill
+ing Wikipedia article, we aggregate the one-line summaries                                              (b) Results for 10 Topics
+of all the news articles referenced in the Wikipedia article.
+We then compare the true summary with the summaries we
+                                                                                              Figure 9: Results of Sim(S tr , S m ) Score
+generated from each model using a similarity metric.
+   The similarity metric we use for the comparison of sum-
+maries is adapted from the ROUGE metric proposed by                        Figures 9(a) and 9(b) show two sets of results for dif-
+Lin and Hovy (Lin and Hovy 2003). The ROUGE metric                      ferent number of topics. The y-axis gives the similarity
+counts the total number of matching n-grams (excluding                  score between the model-generated summaries and the true
+stop-words) between the true summary S tr and the sum-                  summary, while the x-axis differentiates between the vari-
+mary S m generated from model m. We let N Gtr     n denote the
+                                                                        ous events. Figures 9(a) and 9(b) show that GDTM consis-
+set of n-grams from the true summary and N Gm    n denote the
+                                                                        tently gives better performance than LDA. DTM is shown
+n-grams from summaries generated by the model m.                        to be better than GDTM for “Obamacare” at K=8 in Figure
+             X                                                          9(a) and “Facebook IPO” at K=10 in Figure 9(b). Overall,
+    gn =           min(|ng ∈ N Gtr                  m
+                                    n |, |ng ∈ N Gn |)     (3)          GDTM shows better performance over DTM and LDA with
+          ng∈N Gm
+                n
+                                                                        DTM showing inconsistent performance. DTM is some-
+                                                                        times better than LDA and sometimes slightly worse-off
+       Sim(S tr , S m ) = 0.2 · g1 + 0.3 · g2 + 0.5 · g3    (4)
+                                                                        than LDA. This suggests that estimating the appropriate de-
+Equation 3 first calculates the number of n-grams common                cay parameters is important for using the temporal correla-
+to both S tr and S m . In order not to let a few frequent n-gram        tion features.
+dominate the counts, each n-gram is limited to the minimum                 Since we extract the most representative tweet for each
+
+
+
+                                                                   88
+topic, the use of K topics gives K tweets as the summary                             not fact.” 4) “If I wanted to find information, Summaries
+for each event. In our experiments, we use K = 8 and K =                             (DTM) and (GDTM) had the most.” 5) “There is too much
+10, to obtain 8-tweet summaries and 10-tweet summaries for                           garbage posts in the other summaries (non-GDTM), and not
+each event. We choose these values of K to avoid generating                          true news.” These comments show that readers appreciated
+long summaries for the events so that the human evaluation                           the GDTM summaries and felt that it was a good represen-
+task in Mechanical Turk will be easier for our mechanical                            tation of the event.
+turk workers.
+   Qualitative Evaluation on Mechanical Turk: We used                                Search Results
+Amazon’s Mechanical Turk to find human evaluators for                                Next we evaluate the models on their ability to retrieve ad-
+this task. To each mechanical turk worker (mturker), we pre-                         ditional tweets that are relevant to the event but do not con-
+sented the generated summaries of the four events from each                          tain the keywords in the queries. The relevance of a tweet is
+model. Since each event has three summaries from the three                           measured based on perplexity, as given by Equation 2. We
+models, mturkers were instructed to choose 1 or 2 out of                             calculate the perplexity score for each of the tweets with re-
+the 3 summaries as the best representations of the event. We                         spect to each of the models from the sample of tweets and
+also provided a feature for mturkers to leave comments. To                           then rank it accordingly. This way, we obtain three ranked
+avoid bias to any one model, we did not show which model                             lists from the three models.
+generated the summaries and we randomized the order of                                  Traditional Information Retrieval (IR) evaluation is done
+presented summaries. We required mturkers to fulfil three                            by going through each list from top to bottom to compute the
+criteria before they could participate in our experiment: 1)                         precision and recall curve at each k. In our evaluation here,
+have approval rating of ≥ 95%, 2) have completed more                                we do not make a binary decision as to whether each tweet
+than 1000 tasks, and 3) are located in United States (USA)                           is relevant to the event. Instead, we compute the number of
+because the events “Facebook IPO”, “Obamacare” and “BP                               n-grams that matched between the top-k tweets and the true
+Oil Spill” are more relevant to the population of USA. Al-                           summary. Because we vary n from 1 to 3, we obtain three
+though “Japan Earthquake” did not occur in USA, the event                            sets of precision P Rn and recall RCn values. The precision
+can be considered to be of interest to everyone worldwide.                           and recall are calculated as follows,
+We employed a total of 100 different mturkers. Each mturker                                       X
+spent an average of 7 minutes and 10 seconds to complete                               gn =               min(|ng ∈ N Gtr                 top−k
+                                                                                                                            n |, |ng ∈ N Gn     |)
+the task which translated to an hourly wage of approximately                                           np∈N Gtop−k
+                                                                                                             n
+USD$4.2.
+                                                                                                                                  gn
+                  70
+                           LDA                                                                                          P Rnk =
+                           Decayed Topic Model
+                                                                                                                               |Dtop−k |
+                  60       Gaussian Decayed Topic Model                                                                          gn
+                                                                                                                        RCnk =
+                                                                                                                               |N Gtr
+                                                                                                                                    n|
+                  50
+
+
+                                                                                                      P Rk = 0.2 · P R1k + 0.3 · P R2k + 0.5 · P R3k
+     # of votes
+
+
+
+
+                  40
+
+
+                  30
+                                                                                                      RC k = 0.2 · RC1k + 0.3 · RC2k + 0.5 · RC3k
+                                                                                     Varying k from 1 to the size of the tweet sample gives us the
+                  20
+                                                                                     Precision-Recall curve (PR-curve) as shown in Figure 11.
+                  10
+                                                                                     Figure 11 shows us that the results given by GDTM is sig-
+
+                                                                                                       0.02
+                   0
+                       Facebook IPO   Obamacare Japan Earthquake BP Oil Spill                                                        LDA
+                                                                                                      0.018                          Decayed Topic Model
+                                                                                                                                     Gaussian Decayed Topic Model
+                         Figure 10: Mechanical Turk Results                                           0.016
+
+
+                                                                                                      0.014
+
+
+   Figure 10 shows the results from Mechanical Turk with                                              0.012
+                                                                                          Precision
+
+
+
+
+the x-axis differentiating between the four events and the y-                                          0.01
+axis showing the number of votes for the respective models.
+Aggregating the total votes for all events, GDTM has the                                              0.008
+
+
+most number of votes with 207 votes followed by DTM with                                              0.006
+
+146 votes and finally LDA with 130 votes.                                                             0.004
+
+   Some comments given by our mturkers were : 1) “I think
+                                                                                                      0.002
+these (GDTM) best summarize Facebook IPO because it
+shows a broad range of information related to the event.”                                                0
+                                                                                                              0   0.1   0.2   0.3            0.4   0.5   0.6    0.7
+                                                                                                                                    Recall
+2) “Well I learned that their co-founder renounced his US
+citizenship just now!” 3) “I believe that other summaries
+(non-GDTM) had a large amount of personal opinion and                                                    Figure 11: Precision Recall Curves of De2
+
+
+
+                                                                                89
+nificantly better than DTM and DTM is in turn better than                  Becker, H.; Naaman, M.; and Gravano, L. 2011. Beyond trending
+LDA. The precision and recall does not give high values                    topics: Real-world event identification on twitter. In ICWSM.
+because the true summaries are keywords from Wikipedia                     Chakrabarti, D., and Punera, K. 2011. Event summarization using
+articles which are different corpus from the generate sum-                 tweets. ICWSM ’11. The AAAI Press.
+maries.                                                                    Chua, F. C. T.; Cohen, W. W.; Betteridge, J.; and Lim, E.-P. 2012.
+                                                                           Community-based classification of noun phrases in twitter. CIKM
+            Discussion and Future Work                                     ’12. ACM.
+We have presented our framework for summarizing events                     Ganesan, K.; Zhai, C.; and Viegas, E. 2012. Micropinion gener-
+                                                                           ation: an unsupervised approach to generating ultra-concise sum-
+from a sample of tweets. We have developed two topic mod-                  maries of opinions. WWW ’12.
+els, the Decay Topic Model (DTM) and Gaussian Decay
+                                                                           Lin, C.-Y., and Hovy, E. 2003. Automatic evaluation of summaries
+Topic Model (GDTM) that leverage the temporal correlation
+                                                                           using n-gram co-occurrence statistics. NAACL ’03.
+that exists among tweets written around the same time, to ex-
+tract meaningful topics that capture different aspects of the              Lu, Y.; Zhai, C.; and Sundaresan, N. 2009. Rated aspect summa-
+                                                                           rization of short comments. WWW ’09.
+underlying event. We have shown how representative tweets
+with low perplexity can be selected from the extracted top-                Meng, X.; Wei, F.; Liu, X.; Zhou, M.; Li, S.; and Wang, H.
+ics to generate a concise and information-rich summary of                  2012. Entity-centric topic-oriented opinion summarization in twit-
+                                                                           ter. KDD ’12.
+the events. Our experiments evaluating the summaries us-
+ing Wikipedia links as well as the qualitative evaluation us-              Metzler, D.; Cai, C.; and Hovy, E. 2012. Structured event retrieval
+                                                                           over microblog archives. In NAACL-HLT, 646–655. Montréal,
+ing Mechanical Turk have demonstrated that both our topic
+                                                                           Canada: Association for Computational Linguistics.
+models generated summaries that outperformed traditional
+LDA in almost all cases with GDTM having the highest per-                  Nenkova, A., and McKeown, K. 2012. A survey of text summa-
+                                                                           rization techniques. In Aggarwal, C. C., and Zhai, C., eds., Mining
+formance overall and also receiving the highest overall votes
+                                                                           Text Data. Springer US.
+from the Turk workers. The Search and Summarize frame-
+work also proceeds in an iterative loop, with newer search                 Popescu, A.-M., and Pennacchiotti, M. 2010. Detecting controver-
+                                                                           sial events from twitter. CIKM ’10.
+queries being generated from the extracted topic models and
+the resultant tweets used to refine the topic model and the                Saha, A., and Sindhwani, V. 2012. Learning evolving and emerg-
+summary.                                                                   ing topics in social media: a dynamic nmf approach with temporal
+                                                                           regularization. WSDM ’12.
+   Since our approach relies on computing topic models, the
+running time would depend on training the model as well                    Sakaki, T.; Okazaki, M.; and Matsuo, Y. 2010. Earthquake shakes
+                                                                           twitter users: real-time event detection by social sensors. WWW
+as rounds of iterations for improving them by adding more
+                                                                           ’10.
+tweets. In this paper, we have assumed that relevant key-
+words are easy to determine for the initial search. This is                Sayyadi, H.; Hurst, M.; and Maykov, A. 2009. Event detection and
+                                                                           tracking in social streams. ICWSM, ’09.
+generally true in most cases, where the search is for a par-
+ticular event or brand or product. Alternatively, one may use              Sharifi, B.; Hutton, M.-A.; and Kalita, J. 2010. Summarizing mi-
+an independent event detection system such as (Becker, Naa-                croblogs automatically. HLT ’10.
+man, and Gravano 2011) to find the relevant keywords. We                   Wang, Y.; Agichtein, E.; and Benzi, M. 2012. Tm-lda: efficient
+have used the Twitter search API to extract the tweets rele-               online modeling of latent topic transitions in social media. KDD
+                                                                           ’12.
+vant to our four events. This can also be done in an incre-
+mental manner to gain full coverage of an ongoing event.                   Wang, X., and McCallum, A. 2006. Topics over time: a non-
+   We believe that the area of social media summarization                  markov continuous-time model of topical trends. KDD ’06.
+has lots of scope for future work. To that end, we have re-                Watanabe, K.; Ochi, M.; Okabe, M.; and Onai, R. 2011. Jasmine:
+ceived insightful feedback from Mechanical Turk workers.                   a real-time local-event detection system based on geolocation in-
+                                                                           formation propagated to microblogs. CIKM ’11.
+Some workers preferred summaries that fit their own be-
+liefs and opinions. Thus personalized summaries could be                   2011 tōhoku earthquake and tsunami. http://en.wikipedia.org/wiki/
+extracted that are tailored to suit particular sentiments or               2011 Tōhoku earthquake and tsunami.
+beliefs. And conversely, factual tweets could be weighted                  Deepwater horizon oil spill.           http://en.wikipedia.org/wiki/
+higher to generate objective summaries. We wish to extend                  Deepwater Horizon oil spill.
+our work in these directions.                                              Facebook ipo. http://en.wikipedia.org/wiki/Facebook IPO.
+                                                                           Patient protection and affordable care act. http://en.wikipedia.org/
+                   Acknowledgements                                        wiki/Patient Protection and Affordable Care Act.
+                                                                           Weng, J., and Lee, B.-S. 2011. Event detection in twitter. ICWSM
+The authors will like to thank all members of the Social
+                                                                           ’11.
+Computing Research Group, Hewlett Packard Research Lab
+for their helpful comments and discussions.                                Yang, X.; Ghoting, A.; Ruan, Y.; and Parthasarathy, S. 2012. A
+                                                                           framework for summarizing and analyzing twitter feeds. KDD ’12.
+                         References
+Ahmed, A.; Low, Y.; Aly, M.; Josifovski, V.; and Smola, A. J. 2011.
+Scalable distributed inference of dynamic user interests for behav-
+ioral targeting. KDD ’11.
+
+
+
+
+                                                                      90
+

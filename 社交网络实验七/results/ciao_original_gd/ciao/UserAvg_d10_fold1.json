@@ -1,0 +1,59 @@
+{
+  "dataset": "ciao",
+  "model": "UserAvg",
+  "dim": 10,
+  "fold": 1,
+  "seed": 20262036,
+  "hyperparameters": {
+    "reg": 0.001,
+    "social": 1.0,
+    "alpha": 1.0
+  },
+  "n_train": 227223,
+  "n_test": 56829,
+  "status": "completed",
+  "data": {
+    "counts": [
+      7375,
+      105096,
+      284052,
+      111781
+    ],
+    "expected": [
+      7375,
+      99746,
+      280391,
+      111781
+    ],
+    "duplicate_pairs": 1433,
+    "matches_paper": false,
+    "user_union": 7375,
+    "ratings_sha256": "9c4cc9f27bb96cbbaa6ec9d8c64034d17a289cf1b8f67925e04a5302bb934c42",
+    "trust_sha256": "355fd5875658d519a59d3f7db9c46554c3b5c1c597550f200ab6477887fbcb89"
+  },
+  "optimizer": "gd",
+  "validation_fraction": 0.1,
+  "maxiter": 200,
+  "all": {
+    "n": 56829,
+    "mae": 0.784343848927754,
+    "rmse": 1.0359437456131133
+  },
+  "cold_train_lt5": {
+    "n": 713,
+    "mae": 0.8590462833099579,
+    "rmse": 1.166174009385043
+  },
+  "cold_total_lt5": {
+    "n": 3,
+    "mae": 0.6666666666666666,
+    "rmse": 0.7071067811865476
+  },
+  "all_unclipped": {
+    "n": 56829,
+    "mae": 0.784343848927754,
+    "rmse": 1.0359437456131133
+  },
+  "training": [],
+  "seconds": 0.6437722999980906
+}

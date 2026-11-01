@@ -1,0 +1,562 @@
+                           Context-Aware Event Recommendation in
+                                Event-based Social Networks
+
+               Augusto Q. Macedo                                           Leandro B. Marinho                               Rodrygo L. T. Santos
+         Dept. of Syst. and Computing                                Dept. of Syst. and Computing                         Dept. of Computer Science
+         Fed. Univ. of Campina Grande                                Fed. Univ. of Campina Grande                         Fed. Univ. of Minas Gerais
+            Campina Grande, Brazil                                      Campina Grande, Brazil                              Belo Horizonte, Brazil
+         augusto@copin.ufcg.edu.br lbmarinho@dsc.ufcg.edu.br                                                               rodrygo@dcc.ufmg.br
+
+ABSTRACT                                                                                            1.   INTRODUCTION
+The Web has grown into one of the most important channels                                             Event-based social networks (EBSNs) are online social
+to communicate social events nowadays. However, the sheer                                           networks where users can create, promote and share up-
+volume of events available in event-based social networks                                           coming events of any kind with other users. For instance,
+(EBSNs) often undermines the users’ ability to choose the                                           Meetup.com,1 one of the largest EBSNs available today,
+events that best fit their interests. Recommender systems                                           registered 3,000 new groups and 330,000 users participat-
+appear as a natural solution for this problem, but differ-                                          ing in events in the first week of January, 2015 alone.2 In
+ently from classic recommendation scenarios (e.g. movies,                                           Meetup.com, users can create and join groups of like-minded
+books), the event recommendation problem is intrinsically                                           people, promoting events (aka Meetups) that they are inter-
+cold-start. Indeed, events published in EBSNs are typically                                         ested in. However, the sheer volume of available events,
+short-lived and, by definition, are always in the future, hav-                                      especially in large and touristic cities, often undermines the
+ing little or no trace of historical attendance. To overcome                                        users’ ability to find the ones that best match their interests.
+this limitation, we propose to exploit several contextual sig-                                        Recommender systems appear as a natural solution to
+nals available from EBSNs. In particular, besides content-                                          overcome such an information overload, as they help users
+based signals based on the events’ description and collabo-                                         discover relevant information in large data sets. Nonetheless,
+rative signals derived from users’ RSVPs, we exploit social                                         the event recommendation problem is arguably more chal-
+signals based on group memberships, location signals based                                          lenging than classic recommendation scenarios (e.g. movies
+on the users’ geographical preferences, and temporal sig-                                           and books), since event recommenders need to deal with
+nals derived from the users’ time preferences. Moreover, we                                         the new item cold-start problem that arises naturally in this
+combine the proposed signals for learning to rank events for                                        setting [14]. Indeed, events published in EBSNs are typi-
+personalized recommendation. Thorough experiments using                                             cally short-lived and, by definition, are always in the future,
+a large crawl of Meetup.com demonstrate the effectiveness                                           having little or no trace of historical attendance. In this
+of our proposed contextual learning approach in contrast to                                         scenario, classic recommendation approaches may underper-
+state-of-the-art event recommenders from the literature.                                            form, leaving the EBSN users unsatisfied.
+                                                                                                      To overcome this limitation, we propose a context-aware
+Categories and Subject Descriptors                                                                  approach to event recommendation, by exploiting several
+                                                                                                    contextual signals generally available in EBSNs. Besides
+H.3.3 [Information Search and Retrieval]: Information                                               content-based signals based on the events’ description and
+filtering; H.2.8 [Database Applications]: Data mining                                               collaborative signals derived from users’ RSVPs,3 we exploit
+                                                                                                    social signals based on group memberships, location signals
+General Terms                                                                                       based on the users’ home distance to each event, and tem-
+                                                                                                    poral signals derived from the users’ time preferences. In
+Algorithms; Experimentation
+                                                                                                    particular, our assumption is that each of these signals has
+                                                                                                    a positive influence on the users’ decision about attending
+Keywords                                                                                            an event. For example, a user may decide to attend an event
+Event-based social networks; recommender systems                                                    not only because the event matches his or her interests and
+                                                                                                    other like-minded users have RSVP’ed to the event, but also
+                                                                                                    because the event is in the user’s neighborhood.
+                                                                                                      To exploit the aforementioned contextual signals, we de-
+                                                                                                    vise and meticulously analyse the behavior of a specialized
+Permission to make digital or hard copies of all or part of this work for personal or               recommendation model tailored to each signal. To combine
+classroom use is granted without fee provided that copies are not made or distributed               the strengths of the various devised models, we further pro-
+for profit or commercial advantage and that copies bear this notice and the full cita-              pose a hybrid contextual recommender for learning to rank
+tion on the first page. Copyrights for components of this work owned by others than                 upcoming events in an EBSN. Thorough experiments using
+ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or re-
+publish, to post on servers or to redistribute to lists, requires prior specific permission         1
+                                                                                                      http://www.meetup.com
+and/or a fee. Request permissions from Permissions@acm.org.                                         2
+RecSys’15, September 16–20, 2015, Vienna, Austria.
+                                                                                                      http://blog.meetup.com/chart
+                                                                                                    3
+ c 2015 ACM. ISBN 978-1-4503-3692-5/15/09 ...$15.00.                                                  RSVP stands for the French expression “répondez s’il vous
+DOI: http://dx.doi.org/10.1145/2792838.2800187.                                                     plaı̂t”, meaning “please respond”.
+
+
+
+
+                                                                                              123
+a large crawl of Meetup.com demonstrate the effectiveness                t ∈ T , g ∈ G, c ∈ C and d ∈ D, the top-n recommendations
+of our proposed contextual learning approach in contrast to              can be computed by:
+state-of-the-art event recommenders from the literature. To                                                     n
+the best of our knowledge, this is the first attempt to con-                     top-n(u, t, g, c, d) := arg max ŝ(u, e, t, g, c, d),   (2)
+                                                                                                          e∈E\Eu
+jointly exploit the aforementioned contextual evidence for
+the event recommendation problem. Our contributions can                  where n denotes the number of events to be recommended
+be summarized as follows:                                                and Eu the set of events that user u has attended in the
+                                                                         past. In top-n recommendation settings, such as this, the
+      • We compare and contrast several specialized event rec-           goal is to minimize a ranking loss function of the form:
+        ommendation models based on multiple contextual sig-
+        nals available from EBSNs;                                                             ` : P(E) × RE → R,
+      • We propose a hybrid recommendation approach that                 which quantifies the misfit between the recommended list
+        leverages multiple context-aware recommendation mod-             (generated by ŝ ∈ RE ) and the actual list (a subset of P(E))
+        els as features for learning to rank events;                     on test users whose actual events are unknown during train-
+                                                                         ing. In the sequel we will use ŝX (u, e) to denote a context-
+      • We thoroughly evaluate our proposed approach on a
+                                                                         aware recommender that computes the relevance score of
+        large crawl of Meetup.com and demonstrate its effec-
+                                                                         e ∈ E to user u ∈ U based on context X.
+        tiveness in contrast to state-of-the-art recommenders.
+   In the remainder of this paper, Section 2 formalizes our              3.    CONTEXTUAL MODELS
+problem setting and the nomenclature used throughout the                    Data sparsity can severely hamper the performance of tra-
+paper. Section 3 describes our proposed context-aware mod-               ditional event recommenders based on a single strategy. To
+els for event recommendation. Section 4 presents the setup               overcome this limitation, we propose a hybrid recommen-
+and the results of our experimental evaluation. Relevant                 dation approach that leverages multiple context-aware rec-
+related works are described in Section 5. Lastly, Section 6              ommenders as features for learning to rank events. In the
+provides our conclusions and directions for future work.                 following, we describe each of the proposed features as well
+                                                                         as our learning approach for event recommendation.
+2.      PROBLEM SETTING
+   Traditional recommender systems typically model an in-
+                                                                         3.1     Social-Aware
+teraction between two types of entity, namely, users and                   In some EBSNs, such as Meetup.com, users may join
+items. Context-aware recommenders, on the other hand,                    groups and interact with other users both online, through
+exploit additional signals that help further define such an              the communication tools available in the platform, and face-
+interaction, including the time, location, and social environ-           to-face, by means of the events promoted by the groups.
+ment in which the interaction takes place [1]. As pointed                Here we propose two models based on the social interactions
+out in Section 1, there is no interaction between users and              in these two modes of communication.
+candidate events in EBSNs, since the latter are always in
+the future.4 Indeed, even when using positive RSVP data
+                                                                         3.1.1    Group Frequency Model
+as a proxy for user-event attendance—as we do later in Sec-                 As we will see in Section 4, group membership has a strong
+tion 3—this information is still missing for the majority of             influence on the users’ decision on attending an event, spe-
+events (cf. Section 4). To overcome this problem, also known             cially when the user is a frequent attendant of the group
+as the new item cold-start problem, we propose to use the                events. The intuition here is that the likelihood of the target
+rich contextual evidence available in EBSNs.                             user u ∈ U attending event e ∈ E depends on the number
+   The problem that we address in this paper can be stated               of events this user attended in the group that e belongs to.
+as follows: given a target user and a set of contextual signals,         In other words, the more events a user attends in a group,
+which of the available events are more likely to be attended             the higher is the probability that this user will continue to
+(i.e. RSVP’ed “yes”) by this user? We simulate this scenario             attend events of this group. More formally, assuming that
+by splitting the available RSVP data into two partitions,                ge represents the group associated with the candidate event
+before and after a given time-stamp θ. The (user,events)                 e, the relevance score of this event for the target user u ∈ U
+pairs occurring before θ form the training partition, while              is calculated as follows:
+those that occur after θ form the test partition. Formally,                                                     |Eu,ge |
+in addition to the set of users U and the set of events E, we                                  ŝS1 (u, e) :=            ,               (3)
+                                                                                                                 |Eu |
+consider as contextual signals users’ temporal preferences
+T , the set of groups G that users can join, users’ geographic           where Eu denotes the set of all events that the user u ∈ U
+distance preferences D, and the textual content of events C.             attended, Eu,ge denotes the set of events attended by u that
+In this paper, we only consider implicit feedback data, i.e.,            were created by group ge ∈ G, and S1 is the social context
+the set S ⊆ U × E × T × G × D × C × D of relations between               represented by this recommender.
+users, time, events, groups, distances and content. The task             3.1.2    Multi-Relational Model
+is then to find a scoring function of the form:
+                                                                            Although simple and effective (cf. Section 4), the method
+               ŝ : U × E × T × G × C × D → R,              (1)          described above does not consider two important interac-
+                                                                         tions, namely, between users and all the groups they are
+that assigns a preference score for candidate events. Thus,
+                                                                         affiliated to and between the groups and the events created
+for a given target user u ∈ U and the contextual signals
+                                                                         by them. By using these two sources of interactions con-
+4
+    Except for the events that occur periodically.                       jointly one might discover, for example, that users affiliated
+
+
+
+
+                                                                   124
+to the same or similar groups are prone to attend the same              decay factor and τ (e) returns the number of days from the
+events created by these groups. The user-group relation is              RSVP to e until the moment of recommendation. In the
+especially important because it enables the recommendation              end, the candidate events are ranked based on their cosine
+of cold-start events, i.e., events with zero RSVP.                      similarity with respect to the target user, such that:
+   To model and leverage these sources of interactions con-
+                                                                                                                u, ~e).
+                                                                                               ŝC (u, e) = cos(~                       (7)
+jointly we propose to use Multi-Relational Factorization with
+Bayesian Personalized Ranking (MRBPR) [8], a state-of-art                  Other variations of this approach were also evaluated, such
+recommender that solves the top-n recommendation task by                as Latent Dirichlent Allocation (LDA) [3], however, none
+optimizing a personalized ranking function (aka BPR [16])               of these variations outperformed the bag-of-words approach
+considering multiple binary relations. In our case, the idea is         with time decay.
+to reconstruct the target relation RU E ⊆ U × E by consider-
+ing a joint factorization approach that includes the auxiliary          3.3    Location-aware
+relations RU G ⊆ U × G and RGE ⊆ G × E.                                    The mobility patterns of users within a city may vary from
+   The parameters of the model Θ := {U, E, G} are the                   user to user. While someone may prefer to attend events in
+latent matrices associated with each considered entity. For             his neighborhood, others might like to attend events far away
+example, the set of users U is associated with the matrix U ∈           from their homes. Figure 3.3 depicts the estimated densities
+R|U |×k , where k is the number of latent factors considered.           of two inhabitants of Phoenix, US, where the colored regions
+The objective function is then expressed as follows:                    represent the density of attended events around their homes
+         arg min αL(RU E , UET )                                        (depicted as map markers). Notice that while User 1 tends
+            Θ                                                           to concentrate his events in a single region with sporadic
+                  + βL(RU G , UGT )                                     events in other regions, User 2 concentrates his events in
+                  + γL(RGE , GET )                                      two main regions.
+
+                  + λU kUk2 + λE kEk2 + λG kGk2 ,          (4)
+where L is a loss function (in our case BPR [16]) measuring
+the reconstruction error of the relation under consideration,
+α, β, γ are application specific weights for the losses of the
+relations considered and λU , λG , λE are regularization pa-
+rameters. The intuition is that latent factors are shared
+between all relations that involve the same entities, i.e., in-
+formation is propagated between relations sharing the same
+entities. The parameter learning is performed via stochastic
+gradient descent as proposed by [8].
+   Once the model is learned, predicting the relevance score
+of an event e ∈ E for the target user u ∈ U is done as follows:                   (a) User 1                              (b) User 2
+                                    k
+                    ŝS2 (u, e) =
+                                    X
+                                           ~
+                                           uf ~ef ,        (5)             Figure 1: Geographical densities of two users.
+                                    f =1
+                                                                           Here we propose a kernel-based density estimation ap-
+where ~u and ~e are the latent vectors of user u and event              proach to model the mobility patterns of individual users as
+e respectively. The key difference from a standard matrix               distributions of geographic distances between the attended
+factorization (i.e. based on a single relation) is that now the         events. The relevance of a new event for a user is based on
+latent factors of u and e also bear group aspects that may              the aggregated likelihood of this event being located in any
+influence the users’ decision on attending a future event.              of the regions the user attended events in the past.
+                                                                           More formally, let Lu be the sample of lat-long coordinates
+3.2    Content-aware                                                    of the events the target user has attended in the past, i.e.,
+   Content-based filtering appears as a promising approach                                              [
+in EBSNs. In particular, besides its usual capacity of retriev-                                 Lu :=      le ,                    (8)
+ing events with similar descriptions, it also captures recur-                                             e∈Eu
+rent events since these events tend to have similar or near-            where le is the lat-long coordinate of event e ∈ Eu .
+identical content. Thus, as content-based filtering approach,              Assuming that Lu comes from an unknown distribution
+we use a classic bag-of-words model based on the textual                f , a kernel density function fˆ is defined over Lu as follows:
+description of events. Here, each user is represented as a
+TF-IDF vector of the words extracted from the past events                                          1 X               0
+                                                                                        fˆ(l) :=            KH (l − l ),            (9)
+the user attended. Additionally, each event is weighted by                                       |Lu | 0
+                                                                                                        l ∈Lu
+its time distance to the recommendation instant by means
+of a time value of money decay function [18]. More formally,            where l is a lat-long coordinate, KH (.) is the bivariate Gaus-
+the profile of the target user u ∈ U is defined as follows:             sian kernel,
+                        X         1                                                                        1     − xx
+                                                                                                                    √
+                                                                                                                      >
+                  ~
+                  u :=                    × ~e,             (6)                          KH (x) := p             2 H,                 (10)
+                       e∈E
+                             (1 + α)τ (e)                                                                 2π|H|
+                           u
+
+where ~e is the TF-IDF representation of event e considering            and H is a 2 × 2 symmetric and positive definite matrix that
+the terms that appear in the event’s description, α is a time           represents the bandwidth defined as H = (h1 , h2 ) × I.
+
+
+
+
+                                                                  125
+  The geographical preferences of a given user are then rep-            vector representations, such that:
+resented by the sum of all Gaussian distributions centered
+at le , for all e ∈ Eu . The candidate events are now scored                                                      u, ~e).
+                                                                                                ŝT (u, e) := cos(~                         (13)
+based on their distances to the events attended by the target
+user in the past as follows:                                            3.5     Learning to Rank Events with Contextual
+                                                                                Features
+                      ŝD (u, e) := fˆ(le ).              (11)            To further improve the effectiveness of event recommen-
+                                                                        dation, particularly for cold-start events, we use the afore-
+3.4    Time-aware                                                       mentioned recommenders as features for learning to rank
+  Another important factor that might affect users’ decision            events. In particular, let D := {(x1 , y1 ), . . . , (xn , yn )} be
+on attending an event is when the event occurs. Some users              the training set where xi := (ŝ1 (u, e), . . . , ŝm (u, e), |Ue |) is a
+might prefer to attend events during the morning on week-               feature vector containing the normalized (i.e. z-score) scores
+ends, while others prefer events occurring on Friday nights.            generated for a given (u ∈ U, e ∈ E) pair by each of the m
+We capture this intuition by assuming that users that at-               context-aware recommenders plus the number of RSVPs |Ue |
+tended events in the past at certain days of the week and               the event e has received in the past. Notice that this last fea-
+at certain hours of the day will likely attend events with a            ture refers to the sparsity of this event. Also let yi = {0, 1}
+similar temporal profile in the future. Figure 2 exposes two            denote whether user u attended event e (class 1) or not (class
+interesting cases. While User 1 tends to go to events every             0) respectively. In a learning to rank setting, the classes are
+day, but mainly at night, User 2 attends events during the              not nominal but ordinal (i.e. 0 < 1). The goal is to learn
+week and in the afternoon only.                                         a function h(x) such that for any pair of training instances
+                                                                        (xi , yi ) and (xj , yj ) the following implication holds:
+                                                                                             h(xi ) > h(xj ) ⇔ yi > yj .
+                                                                           For learning h(x), we have chosen Coordinate Ascent [12],
+                                                                        a state-of-the-art listwise learning to rank approach. Coor-
+                                                                        dinate Ascent directly optimizes a target ranking evaluation
+                                                                        metric in an iterative fashion until convergence. As detailed
+                                                                        in Section 4, in our experiments, we use NDCG@10 as the
+                                                                        target optimization function. Once learned, we use function
+                                                                        h(x) to generate the final recommendation list. We will re-
+                                                                        fer to this method as Multi-Contextual Learning to Rank
+                                                                        Events (MCLRE for short).
+
+                  (a) Distribution per day.                             4.     EVALUATION
+                                                                          In this section, we thoroughly assess the effectiveness of
+                                                                        our proposed context-aware learning approach for event rec-
+                                                                        ommendation. In Section 4.1, we describe the setup that
+                                                                        supports our evaluation, including the EBSN dataset, the
+                                                                        evaluation protocol and metrics, and the recommendation
+                                                                        baselines used in our experiments. In Section 4.2, we dis-
+                                                                        cuss and analyse our experimental results.
+
+                                                                        4.1     Experimental Setup
+                                                                        4.1.1     Event Dataset
+                                                                           Meetup.com is an EBSN that promotes offline and face-to-
+                                                                        face meetings, the so called Meetups. The network is formed
+                 (b) Distribution per hour.                             by a Web-based structure of groups where like-minded peo-
+                                                                        ple can plan, create, comment, share and advertise events.
+Figure 2: Temporal distribution of attended events.                     After the creation of a public event, any user can RSVP
+                                                                        to it with “yes” or “no”. We used the Meetup REST API5
+  To formalize this intuition, we represent each event e as a           to crawl all public activity in the platform from January,
+24×7-dimensional vector ~e in the space of all possible days of         2010 to April, 2014, which comprises the dataset we used to
+the week and hours of the day, with a vector component set              evaluate the recommenders proposed in this paper.
+to 1 whenever the event happened at that particular day and                Three cities located in the USA were selected for this in-
+hour. Accordingly, each user is represented as the centroid             vestigation, namely Phoenix, Chicago and San Jose. We se-
+~
+u of the events he attended in the past:                                lected these cities for two main reasons: (i) they are among
+                                                                        the most populous cities in the USA, which might indicate
+                              1 X
+                      ~
+                      u :=            ~e.                 (12)          large event activity and (ii) the cities are located in different
+                            |Eu | e∈E                                   states, thus representing some degree of cultural diversity.
+                                       u
+                                                                        The data collection procedure consisted of first collecting all
+  Similarly to Equation (6), the temporal score for user u
+                                                                        5
+and event e can now be expressed as the cosine between their                http://www.meetup.com/meetup_api/
+
+
+
+
+                                                                  126
+the groups of a given city. Next, for each group, its members            By having multiple such timestamps, we can assess the ef-
+and events were collected. Finally, from each group member,              fectiveness of each recommender through a sliding training
+we collected his or her event’s RSVPs. Table 4.1.1 summa-                window. In particular, each timestamp simulates a moment
+rizes salient statistics of this dataset, in terms of the number         in time when an event recommendation must be generated.
+of groups (|G|), users (|U |), events (|E|), and RSVPs. We               As illustrated in Figure 4, we consider as candidate events
+also report the sparsity of the dataset, as the percentage of            those created within the 6 months immediately before the
+missing links (i.e., RSVPs) between users and events.                    target timestamp and that are scheduled to take place any-
+                                                                         time after the timestamp. Accordingly, the RSVPs issued
+  City     |G|    |U |    |E|          RSVPs Sparsity                    for a candidate event during the 6 months window preced-
+ Chicago 2,321 207,649 190,927         1,375,154 99.996%                 ing the target timestamp are used for training, whereas those
+ Phoenix 1,661 117,458 222,632         1,209,324 99.995%                 issued after the timestamp form test instances to be recom-
+ San Jose 2,589 242,143 206,682        1,607,985 99.996%                 mended to the corresponding users. For each city, of the 12
+                                                                         train-test partitions induced by the chosen timestamps, the
+   Table 1: Statistics of the Meetup.com dataset.                        four initial partitions are used as validation sets for tuning
+                                                                         the possible (hyper)parameters of the recommender mod-
+   The statistics in Table 4.1.1 emphasize the extreme spar-             els. The selected models are then tested by averaging their
+sity of RSVPs in our dataset. In addition, Figure 4.1.1                  performance across the remaining eight partitions.
+depicts the user and event RSVP distribution per sparsity
+level. We show all the users (as well as events) in the test set
+that are associated with a specific number of “yes” RSVPs.
+In both cases, we see that the most frequent level of sparsity
+is zero, which means that most of the users and events in the
+test partition have no history of “yes” RSVPs. It is worth
+noticing that collaborative-filtering algorithms based solely
+on RSVP data will not work on these cases.
+
+
+
+
+                                                                                 Figure 4: Example train-test partition.
+
+                                                                           Since the top-n item recommendation problem is usually
+                                                                         related to personalized ranking (in our case, a ranked list of
+                                                                         events to which a user is likely to RSVP “yes”), we use the
+                                                                         well-known normalized discounted cumulative gain (NDCG)
+                                                                         ranking evaluation metric truncated to the top 10 recom-
+                                                                         mendations.
+
+                                                                         4.1.3    Recommendation Baselines
+                (a) Positive RSVPs per user.                               To assess the effectiveness of our MCLRE model, we com-
+                                                                         pare it to the following state-of-the-art event recommenders:
+
+                                                                            • MP: A standard “most popular” baseline, which ranks
+                                                                              events in descending order of the number of positive
+                                                                              RSVPs that they received.
+                                                                            • BPR-MF: The Bayesian Personalized Ranking [17] is
+                                                                              a state-of-the-art matrix factorization-based algorithm
+                                                                              for top-n item recommendations.
+                                                                            • BPR-NET: This approach refers to the event recom-
+                                                                              mender method proposed by [15]. The overall idea is to
+                                                                              use two kinds of social networks as regularization terms
+                                                                              of a BPR-MF model, namely, the social network based
+               (b) Positive RSVPs per event.                                  on the shared groups of users, and the social network
+                                                                              inferred from the co-attended events.
+Figure 3: Distribution of positive RSVPs per spar-
+                                                                           The parameters used for all models were defined by a
+sity level for (a) users and (b) events.
+                                                                         grid search on the validation sets. The following contex-
+                                                                         tual model parameters were defined to Chicago, Phoenix
+                                                                         and San Jose respectively: ŝT (Equation (13)) considered
+4.1.2    Evaluation Protocol                                             65, 50 and 100 neighbors; ŝD (Equation (11)) used band-
+  In order to simulate a realistic event recommendation sce-             width parameters h1 and h2 set to 0.001, 0.00075, 0.00075;
+nario in our evaluation, we select 12 timestamps equally                 and the time decay factor α of ŝC (Equation (7)) was set to
+spaced in time across the 52 months covered by our dataset.              0.005, 0.01 and 0.005. The following models had the same
+
+
+
+
+                                                                   127
+parameter values for all cities: the MRBPR (Equation (5))                to EBSNs. To further assess the robustness of our model
+and BPR-MF parameters were set to k = 300 (number of                     to data sparsity and hence address question Q2, we evaluate
+latent factors), learn rate 0.1 (step size of gradient descent),         the effectiveness of MCLRE compared to the aforementioned
+number of iterations 1500 (stop criterion); MRBPR relation               baselines for various user and event sparsity levels. Figure 6
+weights were defined as 0.1 to RU E , 0.22 to the RU G and               shows the result of this comparison in terms of NDCG@10
+0.68 to RGE ; BPR-NET was set with k = 200, learn rate                   for event recommendations in Phoenix.6 Each sparsity level
+0.1 and number of iterations 600.                                        on the x-axis denotes the number of RSVPs available for
+                                                                         events (resp. users) at that sparsity level.
+4.2     Results and Discussion                                              From Figure 6, we observe that MCLRE shows a higher
+  In this section, we assess the effectiveness of our proposed           resilience to data sparsity for both users and events com-
+MCLRE model for event recommendation. In particular, we                  pared to the other event recommenders. Even in the extreme
+aim to answer the following research questions:                          case, when users and events have absolutely no past RSVP
+Q1. How effective is MCLRE for event recommendation?                     (i.e., the sparsity level 0), our model is able to provide rec-
+                                                                         ommendations with reasonable accuracy. BPR-NET is the
+Q2. How robust is MCLRE to sparsity in the RSVP data?                    only approach, besides ours, that is able to recommend for
+Q3. Which contextual features are effective recommenders?                cold-start users, which is explained by its ability to exploit
+                                                                         user-user interactions in terms of the shared groups these
+  In the remainder of this section, we address each of these             users are affiliated to. On the other hand, MCLRE is the
+research questions in turn.                                              only method able to recommend for cold-start events, mainly
+4.2.1    Recommendation Effectiveness                                    due to the content, geographic, and time-aware methods
+                                                                         used as features. Notice that both BPR-NET and BPR-
+   To address Q1, we assess the effectiveness of MCLRE by
+                                                                         MF (and in fact any other recommendation algorithm that
+comparing it to three state-of-the-art event recommenders
+                                                                         relies on user-event interaction) are not able to recommend
+from the literature, as discussed in Section 4.1.3: MP, BPR-
+                                                                         cold-start events. Recalling question Q2, these results attest
+MF, and BPR-NET. Figure 5 shows the result of this com-
+                                                                         the robustness of our approach to sparse RSVP data.
+parison in terms of NDCG@10 for events recommended in
+the three cities comprised in our dataset (Chicago, Phoenix,             4.2.3    Contextual Feature Analysis
+and San Jose). In particular, the distribution of NDCG@10
+figures for the test users considered in each case is repre-                To address Q3, we further analyse the effectiveness of
+sented in a boxplot, highlighting the 25th, 50th (i.e., the              our proposed approach in terms of its constituent contex-
+median), and 75th percentiles inside the box, and possible               tual features. In particular, Figure 7 shows the NDCG@10
+outliers outside the box.                                                performance of our proposed context-aware recommenders
+                                                                         compared to MCLRE, which combines them for learning
+                                                                         to rank events. From the figure, we first note that MCLRE
+                                                                         outperforms all individual recommenders. Recalling Q3, the
+                                                                         social context appears as the most informative signal, with
+                                                                         the multi-relational model (Equation (5)) achieving the best
+                                                                         result followed by the simple but efficient group frequency
+                                                                         heuristic (Equation (3)). The content-aware recommender
+                                                                         (Equation (7)) also achieves good results, probably due to
+                                                                         its ability to recommend cold-start events. The least in-
+                                                                         formative contexts are the geographical and temporal ones
+                                                                         (Equations (11) and (13), respectively), which is somewhat
+                                                                         expected since they capture less specific aspects of the user
+                                                                         preferences for events. Notice however that they are still
+                                                                         better than the MP baseline.
+
+                                                                         5.   RELATED WORKS
+                                                                           In this section, we summarize the most relevant related
+                                                                         works on event recommendation. Minkov et al. [13] pro-
+                                                                         posed a hybrid approach for recommending future events.
+  Figure 5: Event recommendation effectiveness.                          Because no direct feedback exists for such events, users’ pref-
+                                                                         erences for an event were inferred based upon their prefer-
+  From Figure 5, we first observe that MCLRE consistently                ence for past events with similar content. In addition, they
+outperforms all baselines in all three cities. Indeed, MCLRE             proposed to distinguish content dimensions shared collabo-
+improves upon the strongest baseline (BPR-NET) by 64%                    ratively among users from dimensions unique to individual
+for Chicago, 72% for Phoenix, and 79% for San Jose in terms              users. In a small user study in the domain of academic
+of the median NDCG@10. Recalling question Q1, this at-                   events, they demonstrated the effectiveness of the proposed
+tests the effectiveness of our proposed model in contrast to             hybrid approach in contrast to a pure content-based rec-
+state-of-the-art recommenders from the literature.                       ommender. Additionally to using historical data of events
+4.2.2    Robustness to Data Sparsity                                     attendance and the content of events, we exploit other con-
+  One of the main reasons for the effective performance of               6
+                                                                           Results for Chicago and San Jose show similar trends and
+our proposed model is that it is able to mitigate the cold-              are omited due to space constraints.
+start problem for both users and events, which is intrinsic
+
+
+
+                                                                   128
+                      Figure 6: Recommendation effectiveness per sparsity level (Phoenix).
+
+
+                                                                     not make this assumption and leverage only the data di-
+                                                                     rectly available in the EBSN under consideration.
+                                                                        Liu et al. [9] proposed to exploit online and offline patterns
+                                                                     of interaction in EBSNs for recommending new events. By
+                                                                     exploiting only the topological structure of an EBSN, they
+                                                                     proposed different information flow models to infer a user’s
+                                                                     interest for a given event based upon the manifested inter-
+                                                                     est of other EBSN users for the same event. They demon-
+                                                                     strated that community-based diffusion models, which favor
+                                                                     the flow of information within (as opposed to across) com-
+                                                                     munities, are particularly effective signals for event recom-
+                                                                     mendation. This approach was later extended by Qiao et
+                                                                     al. [15], who proposed a Bayesian matrix factorization ap-
+                                                                     proach to event recommendation [16], by employing social
+                                                                     regularization factors inspired by users’ interactions in an
+                                                                     EBSN. Zhang et al. [20] showed that the proposed model
+                                                                     improves upon ordinary and non-regularized matrix factor-
+                                                                     ization models. Our work is complementary to these, by ex-
+                                                                     ploiting, additionally to RSVP and group information, other
+Figure 7: Per-feature recommendation effectiveness.                  contextual data. Furthermore, Zhang et al. [20] compared
+                                                                     their approach only against matrix factorization methods,
+                                                                     while some recent works (see [11]) have shown that pure
+                                                                     matrix factorization (based only on user-event interactions)
+texts, such as the groups of users, location and temporal            performs poorly on EBSN data in comparison to simpler
+preferences. Moreover, we conduct a large scale experiment           methods due to the high level of sparsity of these data sets.
+on data collected from a popular EBSN.                                  There is a large body of research on venue recommenda-
+   Another hybrid approach was proposed by Khrouf and                tion in location-based social networks (LBSNs) [2, 4, 5, 6,
+Troncy [7] for recommending music-related events. In par-            19, 10]. LBSNs share similar properties with EBSNs, e.g.,
+ticular, their approach leveraged an enriched content-based          location information of users and venues. However, LBSNs
+representation of events by exploiting category information          do not suffer from the new item cold-start problem as EBSNs
+from DBPedia about the artists associated with each event.           do, since venues usually do not have an expiration date.
+In addition, they modeled the cohesiveness of each user’s               In a previous study [11], we performed a large-scale anal-
+content-based profile in order to avoid drifting from the            ysis of several factors that impact a user’s propensity to
+user’s core preferences. Lastly, this enriched content-based         reply positively to future events in an EBSN. In particular,
+model was further combined with a collaborative model that           based upon two years worth of user, event, and RSVP (i.e.,
+exploited social interactions among users in an EBSN. Ex-            user-event interactions) data from three representative US
+periments on three music-oriented EBSNs demonstrated the             cities on Meetup.com, we found that users tend to provide
+effectiveness of the proposed extensions. Considering the            RSVPs close to the occurrence of the events. We also found
+multitude of domains found in general purpose EBSNs, such            that state-of-the-art matrix factorization algorithms for top-
+as Meetup.com, it may not be feasible to rely on DBPedia             n recommendation did not perform better than simpler col-
+since many of these domains may not be covered. We do
+
+
+
+
+                                                               129
+laborative filtering algorithms such as user-based k-NN. This                influence in location-based social networks. In Proc. of
+motivated us to try other approaches that consider explicit                  AAAI, pages 17–23, 2012.
+features instead of latent ones.                                         [5] H. Gao, J. Tang, X. Hu, and H. Liu. Exploring
+                                                                             temporal effects for location recommendation on
+6.    CONCLUSIONS AND OUTLOOK                                                location-based social networks. In Proc. of RecSys,
+                                                                             pages 93–100, 2013.
+   In this paper, we tackled the event recommendation prob-
+                                                                         [6] B. Hu and M. Ester. Spatial topic modeling in online
+lem through a learning to rank approach that takes sev-
+                                                                             social media for location recommendation. In Proc. of
+eral context-aware recommenders as input features. Besides
+                                                                             RecSys, pages 25–32, 2013.
+content-based signals based on the events’ description and
+collaborative signals derived from RSVPs, we exploited so-               [7] H. Khrouf and R. Troncy. Hybrid event
+cial, geographic, and temporal signals. We used Coordinate                   recommendation using linked data and user diversity.
+Ascent, a state-of-the-art learning to ranking algorithm that                In Proc. of RecSys, pages 185–192, 2013.
+learns a personalized ranking from the output scores of the              [8] A. Krohn-Grimberghe, L. Drumond, C. Freudenthaler,
+context-aware recommenders by optimizing NDCG@10 di-                         and L. Schmidt-Thieme. Multi-relational matrix
+rectly. To the best of our knowledge, this is the first attempt              factorization using bayesian personalized ranking for
+to leverage, collectively, the aforementioned contextual sig-                social network data. In Proc. of WSDM, pages
+nals for the event recommendation problem.                                   173–182, 2012.
+   In a thorough evaluation on a large crawl of Meetup.com,              [9] X. Liu, Q. He, Y. Tian, W.-C. Lee, J. McPherson, and
+we showed that our approach improves upon a state-of-the-                    J. Han. Event-based social networks: linking the
+art context-aware event recommender based on matrix fac-                     online and offline social worlds. In Proc. of SIGKDD,
+torization with social regularization by up to 79%. From our                 pages 1032–1040, 2012.
+results, we can draw many interesting conclusions, such as:             [10] X. Liu, Y. Liu, K. Aberer, and C. Miao. Personalized
+                                                                             point-of-interest recommendation by mining users’
+     • The use of multiple contexts pays off and can both lead               preference transition. In Proc. of CIKM, pages
+       to highly accurate recommendations and mitigate the                   733–738, 2013.
+       new user and new item cold-start problem on EBSNs;               [11] A. Q. Macedo and L. B. Marinho. Event
+     • In Meetup.com, events created by groups of which a                    recommendation in event-based social networks. In
+       user is a member are far more relevant than the content               Proc. of Int. Work. on Social Personalization, 2014.
+       of the events or collaborative RSVP data.                        [12] D. Metzler and W. Bruce Croft. Linear feature-based
+                                                                             models for information retrieval. Inf. Retr.,
+  We have several ideas to extend this work in the future.                   10(3):257–274, 2007.
+First, we will repeat the experiments with cities in different
+                                                                        [13] E. Minkov, B. Charrow, J. Ledlie, S. Teller, and
+countries. Second, we will exploit other contexts and ap-
+                                                                             T. Jaakkola. Collaborative future event recommenda-
+proaches to leverage these contexts. We also intend to ex-
+                                                                             tion. In Proc. of CIKM, pages 819–828, 2010.
+ploit other kinds of EBSNs such as, e.g., Facebook events.
+                                                                        [14] S.-T. Park and W. Chu. Pairwise preference regression
+                                                                             for cold-start recommendation. In Proc. of RecSys,
+7.    ACKNOWLEDGMENTS                                                        pages 21–28, 2009.
+   This work is partially supported by the National Institute           [15] Z. Qiao, P. Zhang, C. Zhou, Y. Cao, L. Guo, and
+of Science and Technology for Software Engineering (INES),                   Y. Zhang. Event recommendation in event-based social
+funded by CNPq and FACEPE, grants 573964/2008-4 and                          networks. In Proc. of AAAI, pages 3130–3131, 2014.
+APQ-1037-1.03/08; and Hewlett-Packard Brasil Ltda., through             [16] S. Rendle, C. Freudenthaler, Z. Gantner, and
+the FRH-Analytics 2013 project, and used incentives from                     L. Schmidt-Thieme. BPR: Bayesian personalized
+the Brazilian Informatics Law (n. 8.2.48/1991). We also                      ranking from implicit feedback. In Proc. of UAI, pages
+want to thank Lucas Drumond for generously sharing the                       452–461, 2009.
+implementation of his MRBPR method.                                     [17] S. Rendle, C. Freudenthaler, Z. Gantner, and
+                                                                             L. Schmidt-Thieme. Bpr: Bayesian personalized
+8.    REFERENCES                                                             ranking from implicit feedback. In Proc. of UAI, pages
+ [1] G. Adomavicius and A. Tuzhilin. Context-aware                           452–461, 2009.
+     recommender systems. In Proc. of RecSys, pages                     [18] T. Sandholm and H. Ung. Real-time, location-aware
+     335–336, 2008.                                                          collaborative filtering of web content. In Proc. of
+ [2] J. Bao, Y. Zheng, and M. F. Mokbel. Location-based                      CaRR, pages 14–18, 2011.
+     and preference-aware recommendation using sparse                   [19] M. Ye, P. Yin, W.-C. Lee, and D. L. Lee. Exploiting
+     geo-social networking data. In Proc. of                                 geographical influence for collaborative
+     SIGSPATIAL/GIS, pages 199–208, 2012.                                    point-of-interest recommendation. In Proc. of SIGIR,
+ [3] D. M. Blei, A. Y. Ng, and M. I. Jordan. Latent                          pages 325–334, 2011.
+     dirichlet allocation. J. Mach. Learn. Res., 3:993–1022,            [20] W. Zhang, J. Wang, and W. Feng. Combining latent
+     2003.                                                                   factor model with location features for event-based
+ [4] C. Cheng, H. Yang, I. King, and M. R. Lyu. Fused                        group recommendation. In Proc. of SIGKDD, pages
+     matrix factorization with geographical and social                       910–918, 2013.
+
+
+
+
+                                                                  130
+

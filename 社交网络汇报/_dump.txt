@@ -1,0 +1,449 @@
+TOTAL SLIDES: 25
+
+===== SLIDE 1 =====
+[TEXT] ACL 2026  ·  Long Paper  ·  CCF-A
+[TEXT] NL  ⇒  Schedule
+[TEXT] Evaluate Multitask Scheduling Capability / of Large Language Models
+[TEXT] 汇报人：黎贤栗        社交网络与舆情分析
+
+===== SLIDE 2 =====
+[TEXT] OVERVIEW
+[TEXT] 一条主线：提问题 → 找原因 → 解决方式
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 02
+[TEXT] 01
+[TEXT] 提问题
+[TEXT] 这个任务是什么？ / 现有方法为什么不行？
+[TEXT] 02
+[TEXT] 找原因
+[TEXT] LLM 做不好， / 究竟错在哪一层？
+[TEXT] 03
+[TEXT] 解决方式
+[TEXT] MANS：四个 agent / 各修一层错误
+
+===== SLIDE 3 =====
+[TEXT] TASK
+[TEXT] 任务定义：从自然语言描述，推出一个可行调度方案
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 03
+[PICTURE]
+[TEXT] Figure 1 | (a) 自然语言订单 vs 矩阵　(b) 最优调度
+[TEXT] 输入 / 一段自然语言订单
+[TEXT] 输出 / 一份可行调度方案
+[TEXT] 要的是 feasible，不是 optimal / 合法即可 —— 但最好的模型也只有 32.5%。
+[TEXT] 理解多目标 · 识别约束 · 多步推理
+
+===== SLIDE 4 =====
+[TEXT] TASK · 细节
+[TEXT] 任务矩阵
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 04
+[PICTURE]
+[TEXT] Figure 1(a) 矩阵放大：3 行 × 10 列
+[TEXT] 行 = 一个任务；两两一组 =（机器, 时长）
+[TABLE]
+    行 | 菜品 | 步骤1 | 步骤2 | 步骤3 | 步骤4 | 步骤5
+    1 | 汉堡 | M0,2 | M1,10 | M0,2 | M2,6 | M0,6
+    2 | 寿司卷 | M0,2 | M2,6 | M0,2 | M3,10 | M0,6
+    3 | 卷饼 | M0,2 | M3,10 | M0,2 | M1,10 | M0,6
+[TEXT] M0
+[TEXT] 机械臂
+[TEXT] M1
+[TEXT] 平底锅
+[TEXT] M2
+[TEXT] 砧板
+[TEXT] M3
+[TEXT] 灶具
+[TEXT] 三个任务都反复用 M0（机械臂）—— 它就是瓶颈 / 这也解释了 Cooking 的瓶颈负载为什么是 1.00。
+[TEXT] 矩阵里每个数字都是人替模型填好的 —— 这就是 research gap。
+
+===== SLIDE 5 =====
+[TEXT] MOTIVATION
+[TEXT] 现有工作的三个缺陷
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 05
+[TEXT] 缺口一
+[TEXT] 绕过语言
+[TEXT] 直接吃矩阵， / “理解”由人工代劳
+[TEXT] 缺口二
+[TEXT] 数据不真实
+[TEXT] 随机或规则生成， / 与真实车间不符
+[TEXT] 缺口三
+[TEXT] 流水线太脆
+[TEXT] 建模 → 代码 → 求解， / 任一环断就全崩
+[TEXT] RQ1　能不能端到端做好？
+[TEXT] RQ2　错在哪一层？
+[TEXT] RQ3　怎么补？
+[TEXT] 三块贡献：任务定义 · 数据集 · MANS 框架。
+
+===== SLIDE 6 =====
+[TEXT] BENCHMARK
+[TEXT] 造数据：五步，从公开资料到 240 个实例
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 06
+[PICTURE]
+[TEXT] Figure 2 | 数据爬取与形式化 → 调度实例组合 → 问题描述生成
+[TEXT] ①
+[TEXT] 数据来源
+[TEXT] 4 书 + 3 站 + 3 游戏
+[TEXT] ②
+[TEXT] 任务图
+[TEXT] 135 个
+[TEXT] ③
+[TEXT] Jaccard 聚类
+[TEXT] 13 个车间
+[TEXT] ④
+[TEXT] 组合实例
+[TEXT] 240 个 + 最优解
+[TEXT] ⑤
+[TEXT] 生成描述
+[TEXT] 240 段人话
+[TEXT] 顺序是反的：先有结构化的任务图，后有自然语言 —— 所以它是半合成的。
+
+===== SLIDE 7 =====
+[TEXT] ① 数据来源
+[TEXT] 一半是工程手册，一半是电子游戏
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 07
+[TEXT] 4 本专业书
+[TEXT] Pinedo《Scheduling》 / Singh《Systems Approach》 / Groover《Fundamentals》 / 《Automotive Handbook》
+[TEXT] 3 个工业网站
+[TEXT] SAE 学会 / DMG MORI 机床 / 丰田虚拟工厂
+[TEXT] 3 款电子游戏
+[TEXT] Overcooked! 2 → 烹饪 / Big Pharma → 制药 / Construction Simulator → 建筑
+
+===== SLIDE 8 =====
+[TEXT] ② 形式化
+[TEXT] 把资料变成图：135 个基础任务图
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 08
+[TEXT] 一个任务 = 一张有向无环图：节点是步骤（机器 + 时长），边是先后约束。
+[TABLE]
+    场景 | #Task | #Machine | #Avg Step
+    Manufacturing 制造 | 28 | 32 | 5.07
+    Construction 建筑 | 29 | 44 | 8.69
+    Pharmaceuticals 制药 | 32 | 12 | 4.12
+    Cooking 烹饪 | 46 | 20 | 7.42
+    合计 | 135 | — | —
+[TEXT] Table 1 | 28 + 29 + 32 + 46 = 135
+[TEXT] 只收结构化图，不收文本 / 公开资料里没有哪份文档会写到“这步用哪台机器、要多久”。 / 所以只能先有图，再反向生成文字。
+[TEXT] 同一张图的三种写法：图 · 矩阵 · JSON —— 三者等价。
+
+===== SLIDE 9 =====
+[TEXT] ③ Jaccard 聚类
+[TEXT] 聚成 13 个车间：让任务去抢同一批机器
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 09
+[TEXT] ① 把任务图变成“机器向量”
+[TABLE]
+    任务 | M0 | M1 | M2 | M3
+    汉堡 | 1 | 1 | 1 | 0
+    薯条 | 1 | 1 | 0 | 0
+    寿司 | 1 | 0 | 1 | 0
+[TEXT] ② 两两算 Jaccard：交集 ÷ 并集
+[TEXT] J = |a∩b| / |a∪b|
+[TEXT] 汉堡 vs 薯条 = 2/3 = 0.67 → 很像，放一起；薯条 vs 寿司只有 1/3。
+[TEXT] ③ 用 K-Medoids 聚成 13 个车间
+[TEXT] 一个簇 = 一个车间：里面的任务都在抢同一批机器。
+[TEXT] 聚类结果
+[TABLE]
+    场景 | 车间数
+    Manufacturing | 7
+    Construction | 4
+    Pharmaceuticals | 1
+    Cooking | 1
+    合计 | 13
+[TEXT] 为什么不用 K-Means？ / 二值向量的平均值是虚构的点；K-Medoids 的中心必须是真实样本。
+[TEXT] 难度不来自“任务多”，而来自“任务之间抢同一批资源”。
+
+===== SLIDE 10 =====
+[TEXT] ④ 组合实例
+[TEXT] 4 × 6 × 10 = 240，再用 OR-Tools 打最优解
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 10
+[TEXT] 4 场景 × 6 规模 × 10 实例 / = 240
+[TEXT] 13 个车间不进这个乘法 —— 它只决定“谁能和谁组合”。
+[TABLE]
+    #Task=10 的实例 | 份数
+    汉堡 burger | ×3
+    煎饼 pancake | ×4
+    披萨 pizza | ×3
+    合计 | 10
+[TEXT] n 是任务份数，含副本 —— 副本是“难度旋钮”，把资源竞争拉满。
+[TEXT] 最后一步：OR-Tools 打最优解
+[TEXT] The optimal schedules are annotated by OR-Tools / 它给出的解就是评测时的“标准答案”，RMD 拿它当分母。 / 保留：严格说是“时限内最优”。
+[TEXT] 一个实例 = 三件套
+[TEXT] 问题描述
+[TEXT] 任务图列表
+[TEXT] 最优调度
+[TEXT] 车间平均只有 4–7 个任务图，抽 10 个 unique 不可能 —— 副本正好化解。
+
+===== SLIDE 11 =====
+[TEXT] ⑤ 生成描述
+[TEXT] 自然语言任务表述生成
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 11
+[TEXT] 两步走
+[TEXT] 第 1 步　模板填充
+[TEXT] 保证信息一条不少、一个字不编
+[TEXT] 第 2 步　GPT-4 润色
+[TEXT] 只改语言，不改事实
+[TEXT] 为什么不直接让 GPT-4 写？ / 它会编造或漏掉关键信息。
+[TEXT] 描述的模板从哪来
+[TEXT] 20 个需求模板
+[TEXT] 合同与点单对话
+[TEXT] 每领域 10 个流程模板
+[TEXT] 工艺手册、菜谱（共 40 个）
+[TEXT] 描述是两段式 / ① 调度需求概述（提供约束与目标）　② 每个任务的流程（提供任务图信息）
+[TEXT] 这个分工有消融为证：拼接版 Accuracy 已 4.20，完整版提升最大的是简洁性。
+
+===== SLIDE 12 =====
+[TEXT] 数据质量
+[TEXT] 造出来的数据可信吗？
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 12
+[PICTURE]
+[TEXT] Figure 6 | 自动评测（事实保真）　｜　Figure 7 | 人工评测（完整版 vs 只拼接模板）
+[TEXT] 0.98
+[TEXT] ESA 动作覆盖
+[TEXT] 0.94
+[TEXT] FINE 无幻觉
+[TEXT] ≥ 0.75
+[TEXT] 专家评分 ICC
+
+===== SLIDE 13 =====
+[TEXT] 数据难度
+[TEXT] 四个场景 = 四种难度，各测一个方面
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 13
+[TABLE]
+    场景 | Overlap % | Max Load | 平均步数 | 共享度
+    Manufacturing | 80.49 % | 0.96 | 5.05 | 5.98
+    Construction | 54.98 % | 0.77 | 8.67 | 4.02
+    Pharmaceuticals | 64.06 % | 0.93 | 4.17 | 4.65
+    Cooking | 48.36 % | 1.00 | 7.19 | 2.98
+[TEXT] Table 8 | EmbSim 全局 0.4150，远低于各场景内部 —— 跨领域语言差异极大
+[TEXT] Manufacturing
+[TEXT] 竞争最激烈
+[TEXT] Construction
+[TEXT] 长链依赖
+[TEXT] Pharmaceuticals
+[TEXT] 高频短任务
+[TEXT] Cooking
+[TEXT] 零空闲
+[TEXT] 四个场景不是凑数，而是刻意覆盖四种难度来源。
+
+===== SLIDE 14 =====
+[TEXT] METRICS
+[TEXT] 三层指标：为什么是三层
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 14
+[TEXT] SER
+[TEXT] 步骤执行率
+[TEXT] 对的步数 ÷ 总步数
+[TEXT] TCR
+[TEXT] 任务完成率
+[TEXT] 全对的任务数 ÷ 任务总数
+[TEXT] SFR
+[TEXT] 方案可行率
+[TEXT] 全部任务都对吗？
+[TEXT] 手算一个例子
+[TABLE]
+    任务 | 步数 | 做对
+    汉堡 | 2 | 2
+    寿司 | 2 | 1
+    合计 | 4 | 3
+[TEXT] SER
+[TEXT] 3/4 = 0.75
+[TEXT] TCR
+[TEXT] 1/2 = 0.50
+[TEXT] SFR
+[TEXT] 0
+[TEXT] SER 0.75，但 SFR 是 0 / 调度是“全对才算交付”。
+[TEXT] 另两个指标：RMD（可比最优慢多少）· WRT（最坏运行时间）—— 都是越低越好。
+
+===== SLIDE 15 =====
+[TEXT] RQ1
+[TEXT] 九个模型，全都做不出可行方案
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 16
+[TABLE]
+    模型 | 类型 | SER | TCR | SFR | #10 SFR
+    Gemini-2.5-Pro | 推理 · 闭源 | 0.634 | 0.490 | 0.325 | 0.175
+    o4-mini | 推理 · 闭源 | 0.614 | 0.495 | 0.325 | 0.125
+    DeepSeek-R1 | 推理 · 开源 | 0.612 | 0.455 | 0.250 | 0.050
+    Gemini-2.5-Flash | 非推理 · 闭源 | 0.547 | 0.410 | 0.200 | 0.075
+    GPT-4.1 | 非推理 · 闭源 | 0.422 | 0.315 | 0.050 | 0.025
+    Qwen3-thinking | 推理 · 开源 | 0.279 | 0.195 | 0.000 | 0.000
+    Qwen3-nothinking | 非推理 · 开源 | 0.298 | 0.215 | 0.000 | 0.000
+[TEXT] Table 2 | #Task=5（左四列）与 #Task=10（右一列）
+[TEXT] ≤ 0.325
+[TEXT] 最好的可行率
+[TEXT] 0
+[TEXT] Qwen3 两个模式
+[TEXT] 31 个点
+[TEXT] SER 与 SFR 的落差
+[TEXT] 端到端这条路整体走不通 —— 不是某几个模型不行。
+
+===== SLIDE 16 =====
+[TEXT] RQ2 · 失败分析
+[TEXT] 错在哪一层？
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 17
+[PICTURE]
+[TEXT] Figure 3 | 三个模型的错误分布（方案 / 任务 / 步骤 / 约束）
+[TEXT] ① 方案级
+[TEXT] Qwen3 漏 78.7% 的任务
+[TEXT] ② 任务级
+[TEXT] Gemini 仍缺 41.5% 步骤
+[TEXT] ③ 步骤级
+[TEXT] 机器错配 58.9%
+[TEXT] ④ 约束级
+[TEXT] 完美步骤仅 69.8%
+[TEXT] 弱模型死在第一关，强模型输在细节。
+
+===== SLIDE 17 =====
+[TEXT] RQ2 · 潜力分析
+[TEXT] 能交出来的方案，质量其实很高
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 18
+[PICTURE]
+[TEXT] Figure 4 | 相对 makespan 偏差（越低越好）
+[TEXT] 0.085
+[TEXT] 只比最优慢 8.5%，与最好的启发式规则持平
+[TEXT] 而最差的规则是 0.32 —— 说明它在动态挑规则，不是死守一条。
+[TEXT] “We note that the RA [Robot Arm] is heavily used.”
+[TEXT] 全局规划
+[TEXT] “This is a conflict! … We must fix this.”
+[TEXT] 自我纠错
+[TEXT] 这两句也印证：M0 就是机械臂。
+
+===== SLIDE 18 =====
+[TEXT] RQ3
+[TEXT] MANS：四个各管一件事的智能体
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 20
+[PICTURE]
+[TEXT] Figure 5 | 四个阶段（a → d）
+[TEXT] 从 LLM-as-Translator 到 LLM-as-Solver
+[TEXT] 旧范式把 LLM 当翻译器，生成的代码一错就全崩；MANS 把算法推理放回模型内部。
+[TEXT] Seeker
+[TEXT] 只认任务
+[TEXT] Weaver
+[TEXT] 只拆步骤
+[TEXT] Verifier
+[TEXT] 只做校验
+[TEXT] Architect
+[TEXT] 只排程
+[TEXT] 把任务切窄，每个 agent 只想一件事。
+
+===== SLIDE 19 =====
+[TEXT] RQ3 · 提示词
+[TEXT] 提示词里，每个 agent 只做一件事
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 21
+[TABLE]
+    agent | 提示词原文（节选）
+    Seeker | “Your sole task is to … identify the complete and accurate set of all tasks.”
+    Weaver | “… extract its sequence of steps … the specific machine … and its processing duration.”
+    Verifier | “Verify Attribute Accuracy … Correct any discrepancies.”
+    Architect | “… create an optimal, conflict-free schedule.”
+[TEXT] Architect 的“策略指南” —— 这三条是全文的闭环
+[TEXT] Identify Bottlenecks
+[TEXT] 先找最拥挤的机器
+[TEXT] Think Ahead
+[TEXT] 别做纯贪心
+[TEXT] Allow Strategic Idling
+[TEXT] 允许策略性空转
+[TEXT] 它们逐条来自 Figure 4 里模型自己冒出来的推理 —— 观察到策略，写成提示词。
+
+===== SLIDE 20 =====
+[TEXT] RQ3 · 设计
+[TEXT] 四个 agent，正好对着四级错误
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 22
+[TABLE]
+    错误层级（RQ2） | 对应 agent | 它在修什么
+    ① 方案级：任务认全没 | Seeker | identify the complete set of all tasks
+    ② 任务级：步骤全不全 | Weaver | extract its sequence of steps
+    ③ 步骤级：机器对不对 | Verifier | confirm machine and duration are accurate
+    ④ 约束级：抢不抢机器 | Architect | create an optimal, conflict-free schedule
+[TEXT] 所以它不是四个模块，是四个补丁：删掉哪个，对应的那一层错误就复活。
+[TEXT] 删掉 Seeker 最致命 —— 10 任务时可行率从 27.5% 掉到 7.5%。
+
+===== SLIDE 21 =====
+[TEXT] RQ3 · 结果
+[TEXT] 赢了多数格子，但赢在“更快更稳”
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 23
+[TABLE]
+    方法 | #5 SER | #10 SER | #10 SFR
+    CoE + MOPNR | 0.691 | 0.587 | 0.225
+    OptiMUS + OR-Tools | 0.602 | 0.535 | 0.225
+    MANS（本文） | 0.702 | 0.682 | 0.275
+[TEXT] Table 3 | 完整性与可行性
+[TABLE]
+    方法 | WRT 秒 | RMD
+    CoE + OR-Tools | 154.44 | 0.023
+    OptiMUS + OR-Tools | 133.70 | 0.022
+    MANS（本文） | 79.59 | 0.085
+[TEXT] Table 4 | 运行时间与调度质量
+[TEXT] 赢
+[TEXT] SER 4/6 档、TCR 5/6 档领先
+[TEXT] 快
+[TEXT] 79.59 秒，快 35–48%
+[TEXT] 输
+[TEXT] 质量 0.085 vs 0.022
+[TEXT] 所以作者只说 comparable + more stable，不说 better。
+
+===== SLIDE 22 =====
+[TEXT] RQ3 · 稳健性
+[TEXT] 换个骨干，收益差 5.6 倍
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 24
+[TABLE]
+    骨干 | #Task=5 | #Task=7 | #Task=10
+    Qwen3-nothinking | 0.346 | 0.234 | 0.121
+    DeepSeek-V3 | 0.597 | 0.400 | 0.216
+    GPT-4.1 | 0.638 | 0.596 | 0.352
+    Gemini-2.5-Flash | 0.702 | 0.608 | 0.682
+[TEXT] Table 11 | 同一框架换骨干的 SER
+[TEXT] 5.6×
+[TEXT] Qwen3 0.121 vs Gemini 0.682（#Task=10）
+[TEXT] 四个 agent 放大的是底模已有的能力，不是凭空创造能力。
+[TEXT] 这也解释了为什么正文只报一个骨干 —— 换骨干的结论会更保守。
+
+===== SLIDE 23 =====
+[TEXT] EVAL · 输出格式
+[TEXT] 模型交出的是一张“排班表”，5 个字段
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 25
+[TEXT] [ {"task_id": 0, "step_id": 1, /    "machine": "robot_arm", /    "start_time": 0, "end_time": 2}, … ]
+[TABLE]
+    字段 | 含义
+    task_id / step_id | 第几个任务 / 第几步
+    machine | 机器名（字符串）
+    start_time / end_time | 起止时间点
+[TEXT] 模型不给 duration，只给起止时间 —— 时长由评测器算。
+[TEXT] 判分四步
+[TEXT] ① 对号入座
+[TEXT] ② 逐格判错
+[TEXT] ③ 级联标记
+[TEXT] ④ 汇总指标
+[TEXT] “输出什么”决定了“指标怎么算”—— 这也是最容易被问的一点。
+
+===== SLIDE 24 =====
+[TEXT] LIMITATIONS
+[TEXT] 三条局限，恰好对应三块贡献
+[TEXT] NL ⇒ Schedule  ·  ACL 2026  ·  黎贤栗
+[TEXT] 27
+[TABLE]
+    贡献 | 局限
+    ① 数据集：240 个实例 | 半合成 —— 语言是从任务图反向生成的
+    ② 任务定义：NL ⇒ Schedule | 规模偏小 —— 5–10 任务、时长确定、无并行分支
+    ③ 评测范式：5 个指标 | 未标准化 —— 未覆盖鲁棒性与公平性
+[TEXT] 另外几处可追问：SER 口径不一致 · 对齐靠时长指纹 · 每格仅 10 个实例 · 两个基线被削弱。
+[TEXT] 作者对自己每块贡献的天花板都很清楚。
+
+===== SLIDE 25 =====
+[TEXT] 谢谢聆听

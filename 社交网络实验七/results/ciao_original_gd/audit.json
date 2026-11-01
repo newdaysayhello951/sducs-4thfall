@@ -1,0 +1,23 @@
+{
+  "checked_fits": 100,
+  "errors": [],
+  "missing_tasks": [],
+  "unexpected_tasks": [],
+  "complete_for_available": true,
+  "complete_for_entire_paper": false,
+  "versions": {
+    "numpy": "1.26.4",
+    "scipy": "1.13.1",
+    "numba": "0.60.0"
+  },
+  "source_sha256": {
+    "trustsvd_repro\\audit.py": "dc67f348169dce282fe880ae189012f8cb560d619fa6992214900bb1799e9a5e",
+    "trustsvd_repro\\data.py": "9af72c8606f5d6fbfeb01eeaad5d350d44b3d6973eca14e00ec2cb652c538d90",
+    "trustsvd_repro\\experiment.py": "c2a65eba570fecbc9da570ea1650a1e1b82a36822bc01f9a7748c15faf730dc1",
+    "trustsvd_repro\\objectives.py": "8bc8bc428621cbe1e6d6135560d96be40caa008d5eb7e58db1ddd98c71642fd9",
+    "trustsvd_repro\\optimizers.py": "c0ab9188823c55a224f1b74075beea0b89181dc0443aab56f4d3aee10bb05e2c",
+    "trustsvd_repro\\paper_reference.py": "862c4a3abc178a21436982313321a77a331bda4fa1d57e28d31e18b4baa7de50",
+    "trustsvd_repro\\report.py": "ee596524ea17ab30ad13daf50e4477a82cf8acbbd88ec61ab631d023703a03f2",
+    "trustsvd_repro\\__init__.py": "f343aa5d5841afc082d6309aaa1c8776f7abd80e38494b927a30a7fb1a53ad9c"
+  }
+}

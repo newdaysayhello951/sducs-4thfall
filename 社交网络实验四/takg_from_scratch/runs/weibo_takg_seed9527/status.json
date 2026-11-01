@@ -1,0 +1,23 @@
+{
+  "schedule": {
+    "topic_epochs": 100,
+    "generator_epochs": 1,
+    "joint_epochs": 6,
+    "best_validation_nll": 1.3123271147741442,
+    "stale_epochs": 3,
+    "finished": true
+  },
+  "latest": {
+    "phase": "joint_training",
+    "epoch": 6,
+    "generation_nll": 0.3713962115074613,
+    "topic_loss": 125.3138440248856,
+    "validation": {
+      "generation_nll": 1.4557574875022847,
+      "perplexity": 4.2877301377826145,
+      "topic_loss": 123.02499207453941
+    },
+    "best": false,
+    "seconds": 1194.1720000000005
+  }
+}

@@ -1,0 +1,2 @@
+import scipy.io,numpy as np,pathlib,json
+p=pathlib.Path('dataset_check/retry/third_pass');a=scipy.io.loadmat(p/'ciao_informs.mat')['rating'];b=scipy.io.loadmat('dataset_check/retry/ciao_original/rating.mat')['rating'];r={'first_five_columns_identical':bool(np.array_equal(a[:,:5],b)),'timestamp_zero':int((a[:,5]<=0).sum()),'rating_values':dict(zip(*[x.tolist() for x in np.unique(a[:,3],return_counts=True)]))};(p/'timestamp_comparison.json').write_text(json.dumps(r,indent=2));print(r)

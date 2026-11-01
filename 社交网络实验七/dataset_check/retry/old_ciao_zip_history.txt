@@ -1,0 +1,2 @@
+[["urlkey","timestamp","original","mimetype","statuscode","digest","length"],
+["edu,msu,cse)/~tangjili/datasetcode/ciao.zip","20220714012422","https://www.cse.msu.edu/~tangjili/datasetcode/ciao.zip","application/zip","200","JTICMSPVNVMGILS2JRRGYLG34PAUHIGM","1276588"]]

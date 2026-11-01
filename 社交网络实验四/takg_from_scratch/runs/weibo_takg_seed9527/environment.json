@@ -1,0 +1,6 @@
+{
+  "device": "cpu",
+  "torch": "2.5.0",
+  "training_pairs": 39188,
+  "validation_pairs": 4891
+}

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="475" height="170" preserveAspectRatio="xMinYMin meet" viewBox="0 0 475 170" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="475" height="170"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-170)" style="clip-path: url(#clip)">
+		<g transform="">
+			<text x="0" y="157" style="font-family: SimHei; font-size: 11px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,314) scale(1,-1)">图2 常规信息查询频率</text>
+			<text x="42.499999999999986" y="126" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,252) scale(1,-1)">出发前查课表 n=10</text>
+			<rect x="130.0" y="123" width="30.0" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(83%,54%,42%); fill-rule: evenodd;"/>
+			<text x="142.75" y="127" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,254) scale(1,-1)">1</text>
+			<rect x="160.0" y="123" width="120.0" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(49%,67%,79%); fill-rule: evenodd;"/>
+			<text x="217.75" y="127" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,254) scale(1,-1)">4</text>
+			<rect x="280.0" y="123" width="150.0" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="352.75" y="127" style="font-family: SimSun; font-size: 9px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,254) scale(1,-1)">5</text>
+			<text x="42.499999999999986" y="92" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,184) scale(1,-1)">就餐前查信息 n=11</text>
+			<rect x="130.0" y="89" width="27.27272727272728" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(78%,80%,83%); fill-rule: evenodd;"/>
+			<text x="141.38636363636363" y="93" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,186) scale(1,-1)">1</text>
+			<rect x="157.27272727272728" y="89" width="54.54545454545453" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(49%,67%,79%); fill-rule: evenodd;"/>
+			<text x="182.29545454545456" y="93" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,186) scale(1,-1)">2</text>
+			<rect x="211.8181818181818" y="89" width="218.1818181818182" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="318.6590909090909" y="93" style="font-family: SimSun; font-size: 9px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,186) scale(1,-1)">8</text>
+			<text x="42.499999999999986" y="58" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,116) scale(1,-1)">出发前查空间 n=11</text>
+			<rect x="130.0" y="55" width="54.54545454545456" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(78%,80%,83%); fill-rule: evenodd;"/>
+			<text x="155.02272727272728" y="59" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,118) scale(1,-1)">2</text>
+			<rect x="184.54545454545456" y="55" width="109.09090909090907" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(49%,67%,79%); fill-rule: evenodd;"/>
+			<text x="236.84090909090912" y="59" style="font-family: SimSun; font-size: 9px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,118) scale(1,-1)">4</text>
+			<rect x="293.6363636363636" y="55" width="136.36363636363637" height="17" style="stroke: rgb(100%,100%,100%); stroke-linecap: butt; stroke-width: 0.5; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="359.5681818181818" y="59" style="font-family: SimSun; font-size: 9px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,118) scale(1,-1)">5</text>
+			<rect x="0" y="9" width="9" height="9" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(68%,31%,24%); fill-rule: evenodd;"/>
+			<text x="12" y="9" style="font-family: SimSun; font-size: 8px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,18) scale(1,-1)">从不</text>
+			<rect x="95" y="9" width="9" height="9" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(83%,54%,42%); fill-rule: evenodd;"/>
+			<text x="107" y="9" style="font-family: SimSun; font-size: 8px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,18) scale(1,-1)">很少</text>
+			<rect x="190" y="9" width="9" height="9" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(78%,80%,83%); fill-rule: evenodd;"/>
+			<text x="202" y="9" style="font-family: SimSun; font-size: 8px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,18) scale(1,-1)">有时</text>
+			<rect x="285" y="9" width="9" height="9" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(49%,67%,79%); fill-rule: evenodd;"/>
+			<text x="297" y="9" style="font-family: SimSun; font-size: 8px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,18) scale(1,-1)">经常</text>
+			<rect x="380" y="9" width="9" height="9" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(20%,40%,60%); fill-rule: evenodd;"/>
+			<text x="392" y="9" style="font-family: SimSun; font-size: 8px;fill: rgb(12%,20%,29%); stroke:none;" transform="translate(0,18) scale(1,-1)">总是</text>
+		</g>
+	</g>
+</svg>

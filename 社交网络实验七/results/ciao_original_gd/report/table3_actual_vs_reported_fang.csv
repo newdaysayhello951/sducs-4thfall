@@ -1,0 +1,3 @@
+﻿dataset,dim,fang_mae_reported_only,fang_rmse_reported_only,trustsvd_actual_mae,trustsvd_actual_rmse,fang_executed
+ciao,5,0.737,0.972,0.7321920718584705,0.9655977121609102,False
+ciao,10,0.745,0.985,0.7324899065533523,0.9660413904071111,False

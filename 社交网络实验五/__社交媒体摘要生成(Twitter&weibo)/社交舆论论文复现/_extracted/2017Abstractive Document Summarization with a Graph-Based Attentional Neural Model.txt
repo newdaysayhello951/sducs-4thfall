@@ -1,0 +1,784 @@
+          Abstractive Document Summarization with a Graph-Based
+                          Attentional Neural Model
+
+                          Jiwei Tan, Xiaojun Wan and Jianguo Xiao
+               Institute of Computer Science and Technology, Peking University
+           The MOE Key Laboratory of Computational Linguistics, Peking University
+               {tanjiwei,wanxiaojun,xiaojianguo}@pku.edu.cn
+
+
+
+                     Abstract                                preserving the meaning of original documents, but
+                                                             also inevitably face the drawbacks of information
+    Abstractive summarization is the ultimate                redundancy and incoherence between sentences.
+    goal of document summarization research,                 Moreover, extraction is far from the way humans
+    but previously it is less investigated due               write summaries.
+    to the immaturity of text generation tech-                  On the contrary, abstractive methods are able
+    niques. Recently impressive progress has                 to generate better summaries with the use of ar-
+    been made to abstractive sentence sum-                   bitrary words and expressions, but generating ab-
+    marization using neural models. Unfor-                   stractive summaries is much more difficult in prac-
+    tunately, attempts on abstractive docu-                  tice. Abstractive summarization involves sophis-
+    ment summarization are still in a primi-                 ticated techniques including meaning representa-
+    tive stage, and the evaluation results are               tion, content organization, and surface realization.
+    worse than extractive methods on bench-                  Each of these techniques has large space to be im-
+    mark datasets. In this paper, we review                  proved (Yao et al., 2017). Due to the immaturity of
+    the difficulties of neural abstractive docu-             natural language generation techniques, fully ab-
+    ment summarization, and propose a novel                  stractive approaches are still at the beginning and
+    graph-based attention mechanism in the                   cannot always ensure grammatical abstracts.
+    sequence-to-sequence framework. The in-                     Recent neural networks enable an end-to-end
+    tuition is to address the saliency factor                framework for natural language generation. Suc-
+    of summarization, which has been over-                   cess has been witnessed on tasks like machine
+    looked by prior works. Experimental re-                  translation and image captioning, together with
+    sults demonstrate our model is able to                   the abstractive sentence summarization (Rush
+    achieve considerable improvement over                    et al., 2015). Unfortunately, the extension of sen-
+    previous neural abstractive models. The                  tence abstractive methods to the document sum-
+    data-driven neural abstractive method is                 marization task is not straightforward. Encoding
+    also competitive with state-of-the-art ex-               and decoding for a long sequence of multiple sen-
+    tractive methods.                                        tences, currently still lack satisfactory solutions
+                                                             (Yao et al., 2017). Recent abstractive document
+1   Introduction
+                                                             summarization models are yet not able to achieve
+Document summarization is a task to generate a               convincing performance, with a considerable gap
+fluent, condensed summary for a document, and                from extractive methods.
+keep important information. As a useful tech-                   In this paper, we review the key factors of doc-
+nique to alleviate the information overload peo-             ument summarization, i.e., the saliency, fluency,
+ple are facing today, document summarization has             coherence, and novelty requirements of the gener-
+been extensively investigated. Efforts on docu-              ated summary. Fluency is what neural generation
+ment summarization can be categorized to extrac-             models are naturally good at, but the other factors
+tive and abstractive methods. Extractive methods             are less considered in previous neural abstractive
+produce the summary of a document by extracting              models. A recent study (Chen et al., 2016) starts
+sentences from the original document. They have              to consider the factor of novelty, using a distrac-
+the advantage of producing fluent sentences and              tion mechanism to avoid redundancy. As far as we
+
+                                                        1171
+       Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics, pages 1171–1181
+            Vancouver, Canada, July 30 - August 4, 2017. c 2017 Association for Computational Linguistics
+                                        https://doi.org/10.18653/v1/P17-1108
+know, however, saliency has not been addressed        lapati et al. (2017) propose a recurrent neural net-
+by existing neural abstractive models, despite its    work (RNN)-based sequence model for extractive
+importance for summary generation.                    summarization of documents. Neural sentence ex-
+   In this work, we study how neural summariza-       tractive models are able to leverage large-scale
+tion models can discover the salient information of   training data and achieve performance better than
+a document. Inspired by the graph-based extrac-       traditional extractive summarization methods.
+tive summarization methods, we introduce a novel
+graph-based attention mechanism in the encoder-       2.2    Abstractive Summarization Methods
+decoder framework. Moreover, we investigate the       Abstractive summarization aims at generating the
+challenges of accepting and generating long se-       summary based on understanding the input text.
+quences for sequence-to-sequence (seq2seq) mod-       It involves multiple subproblems like simplifica-
+els, and propose a new hierarchical decoding al-      tion, paraphrasing, and fusion. Previous research
+gorithm with a reference mechanism to generate        is mostly restricted in one or a few of the subprob-
+the abstractive summaries. The proposed method        lems or specific domains (Woodsend and Lapata,
+is able to tackle the constraints of saliency, non-   2012; Thadani and McKeown, 2013; Cheung and
+redundancy, information correctness, and fluency      Penn, 2014; Pighin et al., 2014; Sun et al., 2015).
+under a unified framework.                               As for neural network models, success is
+   We conduct experiments on two large-scale cor-     achieved on sentence abstractive summarization.
+pora with human generated summaries. Experi-          Rush et al. (2015) train a neural attention model
+mental results demonstrate that our approach con-     on a large corpus of news documents and their
+sistently outperforms previous neural abstractive     headlines, and later Chopra et al. (2016) extend
+summarization models, and is also competitive         their work with an attentive recurrent neural net-
+with state-of-the-art extractive methods.             work framework. Nallapati et al. (2016) introduce
+   We organize the paper as follows. Section 2        various effective techniques in the RNN seq2seq
+introduces related work. Section 3 describes our      framework. These neural sentence abstraction
+method. In Section 4 we present the experiments       models are able to achieve state-of-the-art results
+and have discussion. Finally in Section 5 we con-     on the DUC competition of generating headline-
+clude this paper.                                     level summaries for news documents.
+                                                         Some recent works investigate neural abstrac-
+2     Related Work                                    tive models on the document summarization task.
+2.1    Extractive Summarization Methods               Cheng and Lapata (2016) also adopt a word ex-
+                                                      traction model, which is restricted to use the words
+Document summarization can be categorized to          of the source document to generate a summary, al-
+extractive methods and abstractive methods. Ex-       though the performance is much worse than the
+tractive methods extract sentences from the orig-     sentence extractive model. Nallapati et al. (2016)
+inal document to form the summary. Notable            extend the sentence summarization model by try-
+early works include (Edmundson, 1969; Carbonell       ing a hierarchical attention architecture and a lim-
+and Goldstein, 1998; McDonald, 2007). In recent       ited vocabulary during the decoding phase. How-
+years much progress has also been made under          ever these models still investigate few properties
+traditional extractive frameworks (Li et al., 2013;   of the document summarization task. Chen et al.
+Dasgupta et al., 2013; Nishikawa et al., 2014).       (2016) first attempt to explore the novelty factor
+   Neural networks have also been widely investi-     of summarization, and propose a distraction-based
+gated on the extractive summarization task. Ear-      attentional model. Unfortunately these state-of-
+lier works explore to use deep learning techniques    the-art neural abstractive summarization models
+in the traditional framework (Kobayashi et al.,       are still not competitive to extractive methods, and
+2015; Yin and Pei, 2015; Cao et al., 2015a,b).        there are several problems remain to be solved.
+More recent works predict the extraction of sen-
+tences in a more data-driven way. Cheng and La-       3     Our Method
+pata (2016) propose an encoder-decoder approach
+where the encoder learns the representation of sen-   3.1    Overview
+tences and documents while the decoder classifies     In this section we introduce our method. We
+each sentence using an attention mechanism. Nal-      adopt an encoder-decoder framework, which is
+
+                                                  1172
+widely used in machine translation (Bahdanau           sentences. We also use an LSTM-based hierarchi-
+et al., 2014) and dialog systems (Mou et al., 2016),   cal decoder framework to generate the summary,
+etc. In particular, we use a hierarchical encoder-     because the summary typically comprises several
+decoder framework similar to (Li et al., 2015), as     sentences. The sentence decoder decsent receives
+shown in Figure 1. The main distinction of this        the document representation c as the initial state
+                                                         0
+work is that we introduce a graph-based attention      h0 = c, and predicts the sentence representa-
+                                                                                  0              0      0
+mechanism which is illustrated in Figure 1b, and       tions sequentially, by hj = decsent (hj−1 , xj−1 ),
+we propose a hierarchical decoding algorithm with                0
+                                                       where xj−1 is the encoded representation of the
+a reference mechanism to tackle the difficulty of                                         0
+                                                       previously generated sentence sj−1 . The word de-
+abstractive summary generation. In the following       coder decword receives a sentence representation
+parts, we will first introduce the encoder-decoder       0                          0        0
+                                                       hj as the initial state hj,0 = hj , and predicts
+framework, and then describe the graph-based at-                                                      0
+                                                       the word representations sequentially, by hj,k =
+tention and the hierarchical decoding algorithm.                   0
+                                                       decword (hj,k−1 , ej,k−1 ), where ej,k−1 is the em-
+3.2   Encoder                                          bedding of the previously generated word. The
+The goal of the encoder is to map the input doc-       predicted word representations are mapped to vec-
+ument to a vector representation. A document d         tors of the vocabulary size dimension, and then
+is a sequence of sentences d = {si }, and a sen-       normalized by a softmax layer as the probability
+tence si is a sequence of words si = {wi,k }. Each     distribution of generating the words in the vocab-
+word wi,k is represented by its distributed repre-     ulary. A word decoder stops when it generates the
+sentation ei,k , which is mapped by a word embed-      “<eos>” token and similarly the sentence decoder
+ding matrix Ev . We adopt a hierarchical encoder       stops when it generates the “<eod>” token.
+framework, where we use a word encoder encword             In primitive decoder models, c is the same for
+to encode the words of a sentence si into the sen-     generating all the output words, which requires c
+tence representation, and use a sentence encoder       to be a sufficient representation for the whole input
+encsent to encode the sentences of a document d        sequence. The attention mechanism (Bahdanau
+into the document representation. The input to         et al., 2014) is usually introduced to alleviate the
+the word encoder is the word sequence of a sen-        burden of remembering the whole input sequence,
+tence, appended with an “<eos>” token indicat-         and to allow the decoder to pay different attention
+ing the end of a sentence. The word encoder se-        to different parts of input at different generation
+quentially updates its hidden state after receiving    states. The attention mechanism sets aP     different
+each word, as hi,k = encword (hi,k−1 , ei,k ). The     cj when generating sentence j, by cj = i αij hi .
+last hidden state (after the word encoder receives     αij indicates how much the i-th original sentence
+“<eos>”) is denoted as hi,−1 , and used as the em-     si contributes to generating the j-th sentence. αij
+bedding representation of the sentence si , denoted    is usually computed as:
+as xi . A sentence encoder is used to sequentially                                      0
+                                                                                           
+                                                                                  η hi ,hj
+receive the embeddings of the sentences, given by                             e
+hi = encsent (hi−1 , xi ). A pseudo sentence of                        αij = P                          (1)
+                                                                                   η (hl ,hj )
+                                                                                           0
+
+an “<eod>” token is appended at the end of the                                  le
+
+document to indicate the end of the whole docu-        where η is the function modeling the relation be-
+                                                                       0
+ment. The hidden state after the sentence encoder      tween hi and hj . η can be defined using various
+receives “<eod>” is treated as the representation      functions including η (a, b) = aT b, η (a, b) =
+of the input document c = h−1 .                        aT M b, and even a non-linear function achieved
+   We use the Long Short-Term Memory (LSTM)            by a multi-layer neural network. In this paper we
+(Hochreiter and Schmidhuber, 1997) as both             use η (a, b) = aT M b where M is a parameter
+the word encoder encword and sentence encoder          matrix.
+encsent . In particular, we adopt the variant of
+                                                       3.4   Graph-based Attention Mechanism
+LSTM structure in (Graves, 2013).
+                                                       Traditional attention computes the importance
+3.3   Decoder with Attention                           score of a sentence si , when generating sentence
+                                                        0
+The decoder is used to generate output sentences       sj , according to the relation between the hidden
+  0                                                                                          0
+{sj } according to the representation of the input     state hi and current decoding state hj , as shown
+
+                                                   1173
+                                                                                                                          graph ranking model
+                 sentence encoder                          sentence decoder                                       sentence encoder                            sentence decoder
+
+               h1         h2        h3     c                    h1'     h '2    h   '
+                                                                                    3
+                                                                                                                h1         h2        h3         c                  h1'     h '2    h 3'
+
+                                         <eod>                                 <eod>                                                        <eod>                                 <eod>
+               h1,1                                            h1,1'                                           h1,1                                              h1,1'
+word encoder
+
+
+
+
+                                                 word decoder
+
+
+
+
+                                                                                                 word encoder
+
+
+
+
+                                                                                                                                                    word decoder
+               h1,2                                             h1,2
+                                                                 '
+                                                                                                                h1,2                                               h1,2
+                                                                                                                                                                    '
+
+
+
+
+               h1,1                                             h1,3
+                                                                 '
+                                                                                                                h1,1                                               h1,3
+                                                                                                                                                                    '
+
+
+
+
+                               (a) Traditional attention.                                                                       (b) Graph-based attention.
+
+               Figure 1: Hierarchical encoder-decoder framework and comparison of the attention mechanisms.
+
+
+in Figure 1a. This attention mechanism is use-                                                factor. y ∈ Rn with all elements equal to 1/n. The
+ful in scenarios like machine translation and im-                                             solution of f can be calculated using the closed-
+age captioning, because the model is able to learn                                            form:
+a relevance mapping between the input and out-
+put. However, for document summarization, it is                                                                         f = (1 − λ)(I − λW D−1 )−1 y                                      (3)
+not easy for the model to learn how to summarize
+                                                                                                 In the graph model, the importance score of a
+the salient information of a document, i.e., which
+                                                                                              sentence si is determined by the relation between
+sentences are more important to a document.
+                                                                                              hi and the {hl } of all other sentences. Rela-
+   To tackle this challenge, we learn from graph-
+                                                                                              tively, in traditional attention mechanisms, the im-
+based extractive summarization models TextRank
+                                                                                              portance (attention) score αij is determined by the
+(Mihalcea and Tarau, 2004) and LexRank (Erkan                                                                                0
+                                                                                              relation between hi and hj , regardless of other
+and Radev, 2004), which are based on the PageR-
+                                                                                              original sentences. In our model we hope to com-
+ank (Page et al., 1999) algorithm. These unsu-
+                                                                                              bine the two effects, and compute the rank scores
+pervised graph-based models show good ability to                                                                                     0
+                                                                                              of the original sentences regarding hj , so that the
+identify important sentences in a document. The
+                                                                                              importance scores of original sentences are dif-
+underlying idea is that a sentence is important in a                                                                                     0
+                                                                                              ferent when decoding different state hj , denoted
+document if it is heavily linked with many impor-
+                                                                                              by f j . In our model we use the scores f j to
+tant sentences (Wan, 2010).                                                                                                            0
+                                                                                              compute the attention. Therefore, hj should be
+   In graph-based extractive summarization, a
+                                                                                              considered in the graph model. Inspired by the
+graph G is constructed to rank the original sen-
+                                                                                              query-focused graph-based extractive summariza-
+tences. The vertices V are the set of n sentences
+                                                                                              tion model (Wan et al., 2007), we realize this
+to be considered, and the edges E are the rela-
+                                                                                              by applying the idea of topic-sensitive PageRank
+tions between the sentences, which are typically
+                                                                                              (Haveliwala, 2002), which is to rank the sentences
+modeled by the similarity of sentences. Let W ∈
+                                                                                              with the concern of their relevance to the topic. We
+Rn×n be the adjacent matrix. Then the saliency                                                                                    0
+                                                                                              treat the current decoding state hj as the topic and
+scores of the sentences are determined by making
+                                                                                              add it into the graph as the 0-th pseudo-sentence.
+use of the global information on the graph recur-
+                                                                                              Given a topic T , the topic-sensitive PageRank is
+sively, as:
+                                                                                              similar to Eq. 3 except that y becomes:
+                                                                                                                      (
+                                                                                                                          1
+                       f (t + 1) = λW D−1 f (t) + (1 − λ)y                              (2)                                    i∈T
+                                                                                                                yT = |T |                       (4)
+                                                                                                                         0     i∈
+                                                                                                                                /T
+where f = [f1 , . . . , fn ] ∈ Rn denotes the rank
+scores of the n sentences. f (t) denotes the rank                                                 Therefore yT is always a one hot vector and
+                                                                                                                                               0
+scores at the t-th iteration. D is a diagonal matrix                                          only y0 = 1, indicating the 0-th sentence is sj .
+with its (i, i)-element equal to the sum of the i-th                                          Denote W j as the new adjacent matrix added with
+                                                                                                0
+column of W . Assume we use hi as the represen-                                               hj , and Dj as the new diagonal matrix corre-
+tation of si , and W (i, j) = hTi M hj , where M is                                           sponding to W j . Then the convergence score vec-
+a parameter matrix to be learned. λ is a damping                                              tor f j contains the importance scores for all the
+
+                                                                                          1174
+                                                      0
+input sentences when generating sentence sj , as:                  optimization method to optimize the model pa-
+                                                                   rameters θ.
+                                          −1
+        f j = (1 − λ)(I − λW j Dj )−1 yT                  (5)      3.6    Decoding Algorithm
+
+   The new scores f j can be used to compute the                         We find there are several problems during the gen-
+                                            0
+graph-based attention when decoding hj , to find                         eration of summary, including out-of-vocabulary
+the sentences which are both globally important                          (OOV) words, information incorrectness, error ac-
+                                              0
+and relevant to current decoding state hj . In-                          cumulation and repetition. These problems make
+spired by (Chen et al., 2016) we adopt a distraction                     the generated abstractive summaries far from sat-
+mechanism to compute the final attention value                           isfactory. In this work, we propose a hierarchical
+αij , which subtracts the rank scores of the previous                    decoding algorithm with a reference mechanism
+step, to penalize the model from attending to pre-                       to tackle these difficulties, which effectively im-
+viously attended sentences, and also help to nor-                        proves the quality of generated summaries.
+malize the ranked scores f j . The graph-based at-                          As OOV words frequently occur in name enti-
+tention is finally computed as:                                          ties, we can first identify the entities of a docu-
+                                                                         ment using NLP toolkit like Stanford CoreNLP1 .
+                         max(fij − fij−1 , 0)                            Then we prefix every entity with an “@entity” to-
+              αij = P                                         (6)      ken and a number indicating how many words the
+                                        j     j−1
+                        l max(fl − fl             , 0)
+                                                                         entity has. We hope the entity prefixes can help
+where f is initialized with all elements equal to
+             0                                                           better deal with entities which have more than one
+1/n. The graph-based attention will only focus                           word, and help improve the accuracy of recovering
+on those sentences ranked higher over the previ-                         OOV words in entities. After decoding we recover
+ous decoding step, so that it concentrates more on                       the OOV words by matching entities in the origi-
+the sentences which are both salient and novel.                          nal document according to the contexts.
+Both Eq. 5 and Eq. 6 are differentiable; thus we                            For the hierarchical decoder, a major challenge
+can use the graph-based attention function Eq. 6                         is that same sentences or phrases are often re-
+to replace the traditional attention function Eq. 1,                     peated in the output. A beam search strategy may
+and the neural model using the graph-based atten-                        help to alleviate the repetition in a sentence, but
+tion can also be trained using traditional gradient-                     the repetition in the whole generated summary is
+based methods.                                                           remained a problem. The word-level beam search
+                                                                         is not easy to be extended to the sentence level.
+3.5 Model Training                                                       The reason is that the K-best sentences generated
+The loss function L of the model is the negative                         by a word decoder will mostly be similar to each
+log likelihood of generating summaries over the                          other, which is also noticed by Li et al. (2016).
+training set D:                                                             In this paper we propose a hierarchical beam
+                       X                                                 search      algorithm with a reference mechanism.
+                L=               − log p(Y |X; θ)               (7)      The hierarchical algorithm comprises K-best
+                     (Y,X)∈D                                             word-level beam search and N -best sentence-
+                                                                        level beam search.              At the word level, the
+where
+            X =              x1 , . . . , x|X| and Y             =
+                                                                         only difference to vanilla beam search is that
+  y1 , . . . , y|Y | denote the word sequences of a
+                                                                         we add an additional term to the score p̃(yτ )
+document and its summary respectively, including
+                                                                         of generating word yτ , and now score(yτ ) =
+the “<eos>” and “<eod>” tokens for structure
+                                                                         p̃(yτ ) + γ (ref (Yτ −1 + yτ , s∗ ) − ref (Yτ −1 , s∗ )),
+information. Then
+                                                                         where Yτ −1 = {y1 , . . . , yτ −1 } and p̃(yτ ) =
+                                                                         log p (yτ |Yτ −1 , c; θ). s∗ is an original sentence to
+                         X|Y |                                           refer to. ref is a function which calculates the
+ log p(Y |X; θ) =              log p (yτ | {y1 , . . . , yτ −1 } , c; θ) ratio of bigram overlap between two texts. The
+                         τ =1                                            added term aims to favor the generated word yτ
+                                                                (8)
+                                                                         with improving the bigram overlap between cur-
+and log p (yτ | {y1 , . . . , yτ −1 } , c; θ) is modeled by
+                                                                         rent generated summary Yτ −1 and the target orig-
+the LSTM encoder and decoder. We use the
+Adamax (Kingma and Ba, 2014) gradient-based                                  1
+                                                                               http://stanfordnlp.github.io/CoreNLP/
+
+                                                             1175
+    Dataset   Train Valid Test D.L. S. L.                  We use Theano2 for implementation. For the
+    CNN       83568 1220 1093 29.8 3.54                 word encoder and decoder we use three layers of
+    DailyMail 196557 12147 10396 26.0 3.84              LSTM, and for the sentence encoder and decoder
+                                                        we use one layer of LSTM. The dimension of hid-
+Table 1: The statistics of the two datasets. D.L.       den vectors are all 512. We use pre-trained GloVe
+and S.L. indicate the average number of sentences       (Pennington et al., 2014) vectors3 for the initializa-
+in the document and summary, respectively.              tion of word vectors, which will be further trained
+                                                        in the model. The dimension of word vectors is
+                                                        100. λ is set to 0.9. The parameters of Adamax are
+inal sentence s∗ . At the word decoder level, the
+                                                        set to those provided in (Kingma and Ba, 2014).
+reference mechanism helps to both improve the in-
+                                                        The batch size is set to 8 documents, and an epoch
+formation correctness and avoid redundancy. Be-
+                                                        is set containing 10,000 randomly sampled docu-
+cause the reference score is based on the bigram
+                                                        ments. Convergence is reached within 200 epochs
+overlap improvement to the whole generated sum-
+                                                        on the DailyMail dataset and 120 epochs on the
+mary Yτ −1 , the awareness of previously gener-
+                                                        CNN dataset. It takes about one day for every 30
+ated sentences also helps alleviate sentence-level
+                                                        epochs on a GTX-1080 GPU card. γ is tuned on
+redundancy. A factor γ is introduced to control
+                                                        the validation set and the best choice is 300. The
+the influence of the reference mechanism. Note
+                                                        beam sizes for word decoder and sentence decoder
+that because of the non-optimal search, the gener-
+                                                        are 15 and 2, respectively.
+ated sentence will still be different to the original
+sentence even with an extremely large γ.
+                                                        4.3      Evaluation
+   At the sentence level, N -best sentence beam is
+to keep the N generated sentences by referring          We adopt the widely used ROUGE (Lin, 2004)
+to N different original sentences, which have the       toolkit for evaluation. We first compare with
+highest attention scores and have not been used         the reported results in (Chen et al., 2016) in-
+as a reference. With referring to N different sen-      cluding various traditional extractive methods and
+tences, the N candidate sentences are guaranteed        a state-of-the-art abstractive model (Distraction-
+diverse. Sentence-level beam search is realized by      M3) on the CNN dataset, as shown in Table 2.
+maximizing the accumulated score of all the sen-        Uni-GRU is a non-hierarchical seq2seq baseline
+tences generated.                                       model. In Table 3 we compare our method with
+                                                        the results of state-of-the-art neural summariza-
+4     Experiments                                       tion methods reported in recent papers. Extractive
+                                                        models include NN-SE (Cheng and Lapata, 2016)
+4.1    Dataset                                          and SummaRuNNer (Nallapati et al., 2017), while
+We conduct experiments on two large-scale cor-          SummaRuNNer-abs is also an extractive model
+pora of CNN and DailyMail, which have been              similar to SummaRuNNer but is trained directly
+widely used in neural document summarization            on the abstractive summaries. Moreover, we in-
+tasks. The corpora are originally constructed in        clude several baselines for comparison, includ-
+(Hermann et al., 2015) by collecting human gen-         ing the baselines reported in (Cheng and Lapata,
+erated abstractive highlights from the news stories     2016) although they are tested on 500 samples of
+in the CNN and DailyMail website. The statistics        the test set. LREG is a feature based method us-
+and split of the two datasets are listed in Table 1.    ing linear regression. NN-ABS is a neural abstrac-
+                                                        tive baseline which is a simple hierarchical exten-
+4.2    Implementation                                   sion of (Rush et al., 2015). NN-WE is the abstrac-
+                                                        tive model which restricts the generation of words
+We use the corpora which are already provided
+                                                        from the original document. Lead-3 is a strong ex-
+with labeled entities (Nallapati et al., 2016). The
+                                                        tractive baseline that uses the lead three sentences
+documents and summaries are first lowercased and
+                                                        as the summary.
+tokenized, and all digit characters are replaced
+with the “#” symbol, similar to (Nallapati et al.,         In Table 4 we compare our model with the
+2016, 2017). We keep the 40,000 most frequently         abstractive attentional encoder-decoder models in
+occurring words and other words are replaced with          2
+                                                               https://github.com/Theano/Theano
+the “<OOV>” token.                                         3
+                                                               http://nlp.stanford.edu/projects/glove
+
+                                                    1176
+ Method             Rouge-1     Rouge-2     Rouge-L        Method             Rouge-1 Rouge-2 Rouge-L
+ Lead-3              26.1         9.6        17.8          words-lvt2k         32.5    11.8    29.5
+ Luhn                23.2         7.2        15.5          words-lvt2k-ptr     32.1    11.7    29.2
+ Edmundson           24.5         8.2        16.7          words-lvt2k-hieratt 31.8    11.6    28.7
+ LSA                 21.2         6.2        14.0          Our Method          38.1    13.9    34.0
+ LexRank             26.1         9.6        17.7
+ TextRank            23.3         7.7        15.8       Table 4: Comparison results on the merged
+ Sum-basic           22.9         5.5        14.8       CNN/DailyMail test set using full-length F1
+ KL-sum              20.7         5.9        13.7       metric.
+ Uni-GRU             18.4         4.8        14.3
+ Distraction-M3      27.1         8.2        18.7          Method      Informative Concise Coherent Fluent
+ Our Method          30.3         9.8        20.0
+                                                           Lead-3           3.60    3.75     4.16    3.85
+Table 2: Comparison results on the CNN test set            NN-SE            3.85    3.70     3.48    3.78
+using the full-length F1 variants of Rouge.                Distraction      3.03    3.25     2.93    3.65
+                                                           Our Method 3.93          3.82     3.53    3.80
+ Method          Rouge-1 Rouge-2 Rouge-L                        Table 5: Human evaluation results.
+ LREG(500)         18.5    6.9    10.2
+ NN-ABS(500)        7.8    1.7     7.1
+ NN-WE(500)        15.7    6.4     9.8                  Lapata, 2016) and Distraction (Chen et al., 2016).
+ Lead-3            21.9    7.2    11.6                  The output summaries of NN-SE are provided by
+ NN-SE             22.7    8.5    12.5                  the authors, and the output summaries of Distrac-
+ SummaRuNNer-abs   23.8    9.6    13.3                  tion are achieved by running the code provided
+ SummaRuNNer       26.2    10.8   14.4                  by the authors on the DailyMail dataset. Three
+ Our Method        27.4    11.3   15.1                  participants were asked to compare the generated
+                                                        summaries with the human summaries, and as-
+Table 3: Comparison results on the DailyMail test
+                                                        sess each summary from four independent per-
+set using Rouge recall at 75 bytes.
+                                                        spectives: (1) How informative the summary is?
+                                                        (2) How concise the summary is? (3) How co-
+(Nallapati et al., 2016), which leverage several ef-    herent (between sentences) the summary is? (4)
+fective techniques and achieve state-of-the-art per-    How fluent, grammatical the sentences of a sum-
+formance on sentence abstractive summarization          mary are? Each property is assessed with a score
+tasks. The words-lvt2k and words-lvt2k-ptr are          from 1 (worst) to 5 (best). The average results are
+flat models and words-lvt2k-hieratt is a hierarchi-     presented in Table 5.
+cal extension.                                             As shown in Table 5, our method consistently
+   Results in Table 2 show our abstractive method       outperforms the previous state-of-the-art abstrac-
+is able to outperform traditional extractive meth-      tive method Distraction. Compared with extrac-
+ods and the distraction-based abstractive model.        tive methods, our method is able to generate more
+The results in Tables 3 and 4 show that our method      informative and concise summaries, which shows
+has considerable improvement over neural ab-            the advantage of abstractive methods. The Dis-
+stractive baselines, and is able to outperform state-   traction method in fact usually produces the short-
+of-the-art neural extractive methods. An interest-      est summaries, but the conciseness score is low
+ing observation is the results of the hierarchical      mainly because sometimes it generates repeated
+model in Table 4 are lower than the flat models,        sentences. The repetition also causes Distrac-
+which may demonstrate the difficulty for a tradi-       tion to achieve a low coherence score. Concern-
+tional attention model to identify the important in-    ing coherence and fluency, our abstractive method
+formation in a document.                                achieves slightly better scores than NN-SE, while
+   We also conducted human evaluation on 20 ran-        not surprisingly Lead-3 gets the best scores. The
+dom samples from the DailyMail test set and com-        fluency scores show the good ability of the ab-
+pared the summaries generated by our method             stractive model to generate fluent and grammatical
+with the outputs of Lead-3, NN-SE (Cheng and            sentences.
+
+                                                    1177
+                  14.5
+                                                                                                                                          Framework         Rouge-1 Rouge-2 Rouge-L
+                                                                                                                                          Our Method         30.3     9.8    20.0
+                  14.0                                                                 14
+
+                  13.5
+Rouge-2 F-score
+
+
+
+
+                                                                     Rouge-2 F-score
+                                                                                                                                           w/o GraphAtt      29.2     9.0    19.0
+                                                                                       12
+                  13.0
+                  12.5
+                                                                                       10
+                  12.0
+                  11.5
+                                                                                                                                           w/o SentenceBeam  29.6     9.3    19.1
+                                                                                       8
+                  11.0
+                  10.5                           within 200 epochs
+                                                                                                                                           w/o BeamSearch    25.1     6.7    17.9
+                                                                                       6
+                                                 within 300 epochs
+                  10.0
+                     0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 0.99                       0   1   10   100 200 300 400 500 1e3 1e4
+                                          ¸                                                                °
+                                                                                                                                      Table 6: Results of removing different compo-
+                  (a) Rouge-2 F1 score vs. λ.                            (b) Rouge-2 F1 score vs. γ.
+                                                                                                                                      nents of our method on the CNN test set using
+ Figure 2: Results of different setting of hyper-                                                                                     the full-length F1 variants of Rouge. Two-tailed
+ parameters tested on 500 samples from the Dai-                                                                                       t-tests demonstrate the difference between Our
+ lyMail test set.                                                                                                                     Method and other frameworks are all statistically
+                                                                                                                                      significant (p < 0.01).
+
+ 4.4                       Model Validation
+                                                                                                                                      the graph-based attention by a traditional attention
+ We conduct experiments to see how the model’s                                                                                        function. “w/o SentenceBeam” is to remove the
+ performance is affected by the choice of the hyper-                                                                                  sentence-level beam search. “w/o BeamSearch” is
+ parameters. For efficiency we test on 500 ran-                                                                                       to remove both the sentence-level and word-level
+ dom samples from the DailyMail test set. Figure                                                                                      beam search, and use a greedy decoding algorithm
+ 2a shows the maximum average Rouge-2 F1-score                                                                                        with the reference mechanism. As seen from Ta-
+ achieved when the model is trained using different                                                                                   ble 6, the graph-based attention mechanism is sig-
+ λ values within 200 and 300 epochs. When using                                                                                       nificantly better than traditional attention mecha-
+ a larger λ, the performance is better and the con-                                                                                   nism for the document summarization task. Beam
+ vergence is faster. When λ = 1.0 the model fails                                                                                     search helps significantly improve the generated
+ to train because of running into a singular matrix.                                                                                  summaries. Our proposed decoding algorithm en-
+    Figure 2b shows the results achieved when us-                                                                                     ables a sentence-level beam search, which helps
+ ing different γ values in the hierarchical decod-                                                                                    improve the generated summaries with multiple
+ ing algorithm. γ = 0 is the baseline of the tradi-                                                                                   sentences.
+ tional decoding algorithm which does not refer to
+ the original document. The poor results indicate                                                                                     4.5      Case Study
+ that even the model is able to learn to identify the                                                                                 We show the case study of a sample4 from the Dai-
+ salient information in the original document, the                                                                                    lyMail test set in Figure 3. We show the “@entity”
+ performance is limited by the model’s ability of                                                                                     and number here although they are removed in the
+ generating a long output sequence. That may be                                                                                       evaluation. We compare our result with the output
+ a reason why simple extensions of seq2seq mod-                                                                                       by a model using traditional attention as Baseline
+ els fail on the abstractive document summarization                                                                                   Attention. We also show the output generated by a
+ task. The performance is significantly improved                                                                                      Baseline Decoder, which sets γ = 0 and does not
+ using a reasonable γ, and the optimal γ value is                                                                                     use the sentence-level beam search, to study the
+ consistent with the one chosen on the validation                                                                                     difficulty for a traditional decoder to generate mul-
+ set. When using an extremely large γ, the perma-                                                                                     tiple sentences. Many observations can be found
+ nence begins to decrease, because the model will                                                                                     in Figure 3. The lead three sentences mainly fo-
+ copy too much from the original document, and at                                                                                     cus on the money information and are not suffi-
+ this time the generated text also becomes less flu-                                                                                  cient. As for the Baseline Decoder, first it usu-
+ ent. Results show that introducing the reference                                                                                     ally ends the generation too early. The “<eod>”
+ mechanism in the hierarchical beam search is very                                                                                    token indicates where the original output stops.
+ effective. The γ factor significantly affects the re-                                                                                When we force the decoder not to end here, the
+ sults, but the optimal value is easy to be decided                                                                                   model shows the ability to continue producing the
+ on a validation set.                                                                                                                 important information. However, two flaws are
+    We also conduct ablation experiments on the                                                                                       presented. First is the repetition of “## - year -
+ CNN dataset to verify the effectiveness of the pro-                                                                                       4
+                                                                                                                                           The original story and highlights can be found at
+ posed model. Results on the CNN test set are                                                                                         http://www.dailymail.co.uk/news/article-3041766/Benefits-
+ shown in Table 6. “w/o GraphAtt” is to replace                                                                                       cheat-pocketed-17-000-taxpayers-money.html
+
+                                                                                                                                   1178
+                                                                                            I1   I2   I3   I4   I5   I6   I7   I8   I9 I10 I11 I12 I13 I14 I15 I16 I17 I18 I19<eod>
+Gold Summary:
+@entity 2 mary day , ## , claimed over £ ##,### in benefits despite not being          O1
+eligible .
+she had £ ##,### savings in the bank which meant she was not entitled .                O2
+day used taxpayers ’ money to go on luxury holidays to @entity 1 indian
+resort of @entity 1 goa .                                                              O3
+pleaded guilty to dishonestly claiming benefits and has paid back money .
+                                                                                   <eod>
+Lead3:
+a benefits cheat who pocketed almost £ ##,### of taxpayers ’ money and
+spent it on a string of luxury holidays despite having £ ##,### in the bank
+has avoided jail .                                                                 Figure 4: Attention heatmap when generating the
+@entity 2 mary day , ## , of @entity 1 swanage in @entity 1 dorset , used
+taxpayers ’ money to go on luxury holidays to the @entity 1 indian resort of       example summary. Ii and Oi indicate the i-th sen-
+@entity 1 goa for up to a month each time .
+day fraudulently claimed £ ##,### of income support and disability al-             tence of the input and output, respectively.
+lowance despite having £ ##,### of her own savings in the bank .
+
+Baseline Decoder:
+## - month - old @entity 2 mary day , ## , was given £ ##,### in money .           is shown in Figure 4. It seems that the graph-based
+the ## - year - old claimed £ ##,### in disability allowance . <eod>
+the ## - year - old was given a six - month prison sentence .                      attention mechanism is able to find the important
+## - year - old pleaded guilty to two counts of fraud .                            sentences in the input document, and the distrac-
+Baseline Attention:                                                                tion mechanism makes the decoder focus on dif-
+@entity 2 mary day , ## , used taxpayers ’ money to go on luxury holidays .
+claimed £ ##,### of income support and disability allowance despite having         ferent sentences during decoding. Gradually the
+savings in the bank . <eod>
+benefits of taxpayers £ ##,### in disability handouts .
+                                                                                   decoder attends to “<eod>” until it stops.
+Our Method:
+@entity 2 mary day , ## , used taxpayers ’ money to go on luxury holidays          5        Conclusion and Future Work
+to the @entity 1 indian resort of @entity 1 goa .
+despite having £ ##,### of her own savings in the bank , she claimed £
+##,### of income support and disability allowance .
+                                                                                   In this paper we tackle the challenging task of ab-
+she pleaded guilty and had given the sentence for three months in prison ,         stractive document summarization, which is still
+but suspended the sentence for ## months .
+                                                                                   less investigated to date. We study the difficulty of
+  Figure 3: Examples of generated summaries.                                       the abstractive document summarization task, and
+                                                                                   address the need of finding salient content from
+                                                                                   the original document, which is overlooked by
+old”. Because the word decoder is unaware of the                                   previous studies. We propose a novel graph-based
+history generated sentences, it repeats generating                                 attention mechanism in a hierarchical encoder-
+the sequence as the subject all the time. Second,                                  decoder framework, and propose a hierarchical
+more importantly, is the information incorrectness.                                beam search algorithm to generate multi-sentence
+The “## - month - old” is not appropriate to de-                                   summary. Extensive experiments verify the effec-
+scribe the heroine, and the “six - month prison sen-                               tiveness of the proposed method. Experimental re-
+tence” is in fact “three months”. Information in-                                  sults on two large-scale datasets demonstrate our
+correctness occurs because, for a decoder, it aims                                 method achieves state-of-the-art abstractive docu-
+at generating a fluent sentence according to the                                   ment summarization performance. It is also able
+input representation. However, no favor of con-                                    to achieve competitive results with state-of-the-art
+sistent with the original input is concerned. The                                  neural extractive summarization models.
+proposed hierarchical decoding algorithm helps to                                     There is lots of future work we can do. An ap-
+alleviate the two problems. The awareness of all                                   pealing direction is to investigate the neural ab-
+the generated sentences helps prevent from always                                  stractive method on the multi-document summa-
+generating some important information. The fa-                                     rization task, which is more challenging and lacks
+vor of bigram overlapping with the original sen-                                   training data. Further endeavor may be needed.
+tences helps generate more correct sentences. For
+example the model is able to correctly distinguish
+                                                                                   Acknowledgments
+between the “three-month sentence” and the “##-                                    This work was supported by 863 Program of China
+month suspend”. In conclusion, our method is able                                  (2015AA015403), NSFC (61331011), and Key
+to identify the most important information in the                                  Laboratory of Science, Technology and Standard
+original document, and the decoding algorithm we                                   in Press Industry (Key Laboratory of Intelligent
+propose is able to generate a more discourse-fluent                                Press Media Technology). We thank the anony-
+and information-correct abstractive summary.                                       mous reviewers for helpful comments and Xinjie
+   The visualization of the graph-based attention                                  Zhou, Jianmin Zhang for doing human evaluation.
+when our method generates the presented example                                    Xiaojun Wan is the corresponding author.
+
+                                                                                1179
+References                                                 Meeting of the Association for Computational Lin-
+                                                           guistics (Volume 1: Long Papers). Association
+Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Ben-           for Computational Linguistics, pages 1014–1022.
+  gio. 2014. Neural machine translation by jointly         http://aclweb.org/anthology/P13-1100.
+  learning to align and translate. arXiv preprint
+  arXiv:1409.0473 .                                     Harold P Edmundson. 1969. New methods in au-
+                                                          tomatic extracting. Journal of the ACM (JACM)
+Ziqiang Cao, Furu Wei, Li Dong, Sujian Li, and Ming
+                                                          16(2):264–285.
+  Zhou. 2015a. Ranking with recursive neural net-
+  works and its application to multi-document summa-    Günes Erkan and Dragomir R. Radev. 2004. Lexrank:
+  rization. In Proceedings of the Twenty-Ninth AAAI       Graph-based lexical centrality as salience in text
+  Conference on Artificial Intelligence, January 25-      summarization. J. Artif. Intell. Res. (JAIR) 22:457–
+  30, 2015, Austin, Texas, USA.. pages 2153–2159.         479.
+Ziqiang Cao, Furu Wei, Sujian Li, Wenjie Li, Ming
+                                                        Alex Graves. 2013.    Generating sequences with
+  Zhou, and Houfeng Wang. 2015b. Learning sum-
+                                                          recurrent neural networks.     arXiv preprint
+  mary prior representation for extractive summariza-
+                                                          arXiv:1308.0850 .
+  tion. In Proceedings of the 53rd Annual Meeting of
+  the Association for Computational Linguistics and     Taher H. Haveliwala. 2002. Topic-sensitive pagerank.
+  the 7th International Joint Conference on Natural       In Proceedings of the Eleventh International World
+  Language Processing (Volume 2: Short Papers). As-       Wide Web Conference, WWW 2002, May 7-11, 2002,
+  sociation for Computational Linguistics, pages 829–     Honolulu, Hawaii. pages 517–526.
+  833. https://doi.org/10.3115/v1/P15-2136.
+                                                        Karl Moritz Hermann, Tomás Kociský, Edward
+Jaime G. Carbonell and Jade Goldstein. 1998. The
+                                                          Grefenstette, Lasse Espeholt, Will Kay, Mustafa Su-
+   use of mmr, diversity-based reranking for reorder-
+                                                          leyman, and Phil Blunsom. 2015. Teaching ma-
+   ing documents and producing summaries. In SIGIR
+                                                          chines to read and comprehend. In Advances in
+   ’98: Proceedings of the 21st Annual International
+                                                          Neural Information Processing Systems 28: Annual
+   ACM SIGIR Conference on Research and Develop-
+                                                          Conference on Neural Information Processing Sys-
+   ment in Information Retrieval, August 24-28 1998,
+                                                          tems 2015, December 7-12, 2015, Montreal, Que-
+   Melbourne, Australia. pages 335–336.
+                                                          bec, Canada. pages 1693–1701.
+Qian Chen, Xiaodan Zhu, Zhen-Hua Ling, Si Wei, and
+  Hui Jiang. 2016. Distraction-based neural networks    Sepp Hochreiter and Jürgen Schmidhuber. 1997.
+  for document summarization. In Proceedings of the       Long short-term memory. Neural Computation
+  Twenty-Fifth International Joint Conference on Ar-      9(8):1735–1780.
+  tificial Intelligence (IJCAI-16). pages 2754–2760.
+                                                        Diederik Kingma and Jimmy Ba. 2014. Adam: A
+Jianpeng Cheng and Mirella Lapata. 2016. Neu-             method for stochastic optimization. arXiv preprint
+   ral summarization by extracting sentences and          arXiv:1412.6980 .
+   words. In Proceedings of the 54th Annual Meet-
+   ing of the Association for Computational Lin-        Hayato Kobayashi, Masaki Noguchi, and Taichi
+   guistics (Volume 1: Long Papers). Association          Yatsuka. 2015.       Summarization based on em-
+   for Computational Linguistics, pages 484–494.          bedding distributions.     In Proceedings of the
+   https://doi.org/10.18653/v1/P16-1046.                  2015 Conference on Empirical Methods in
+                                                          Natural Language Processing. Association for
+Kit Jackie Chi Cheung and Gerald Penn. 2014.              Computational Linguistics, pages 1984–1989.
+  Unsupervised sentence enhancement for auto-             https://doi.org/10.18653/v1/D15-1232.
+  matic summarization.       In Proceedings of the
+  2014 Conference on Empirical Methods in Nat-          Chen Li, Xian Qian, and Yang Liu. 2013. Us-
+  ural Language Processing (EMNLP). Association           ing supervised bigram-based ilp for extractive sum-
+  for Computational Linguistics, pages 775–786.           marization. In Proceedings of the 51st Annual
+  https://doi.org/10.3115/v1/D14-1085.                    Meeting of the Association for Computational Lin-
+                                                          guistics (Volume 1: Long Papers). Association
+Sumit Chopra, Michael Auli, and M. Alexander Rush.        for Computational Linguistics, pages 1004–1013.
+  2016. Abstractive sentence summarization with           http://aclweb.org/anthology/P13-1099.
+  attentive recurrent neural networks. In Proceed-
+  ings of the 2016 Conference of the North Ameri-       Jiwei Li, Thang Luong, and Dan Jurafsky. 2015. A
+  can Chapter of the Association for Computational         hierarchical neural autoencoder for paragraphs and
+  Linguistics: Human Language Technologies. Asso-          documents. In Proceedings of the 53rd Annual
+  ciation for Computational Linguistics, pages 93–98.      Meeting of the Association for Computational Lin-
+  https://doi.org/10.18653/v1/N16-1012.                    guistics and the 7th International Joint Conference
+                                                           on Natural Language Processing (Volume 1: Long
+Anirban Dasgupta, Ravi Kumar, and Sujith Ravi.             Papers). Association for Computational Linguistics,
+  2013. Summarization through submodularity and            pages 1106–1115. https://doi.org/10.3115/v1/P15-
+  dispersion. In Proceedings of the 51st Annual            1107.
+
+                                                    1180
+Jiwei Li, Will Monroe, and Dan Jurafsky. 2016. A sim-     Daniele Pighin, Marco Cornolti, Enrique Alfonseca,
+   ple, fast diverse decoding algorithm for neural gen-     and Katja Filippova. 2014.       Modelling events
+   eration. arXiv preprint arXiv:1611.08562 .               through memory-based, open-ie patterns for abstrac-
+                                                            tive summarization. In Proceedings of the 52nd
+Chin-Yew Lin. 2004. Rouge: A package for automatic          Annual Meeting of the Association for Computa-
+  evaluation of summaries. In Text Summarization            tional Linguistics (Volume 1: Long Papers). Associ-
+  Branches Out: Proceedings of the ACL-04 work-             ation for Computational Linguistics, pages 892–901.
+  shop. Barcelona, Spain, volume 8.                         https://doi.org/10.3115/v1/P14-1084.
+Ryan T. McDonald. 2007. A study of global infer-          M. Alexander Rush, Sumit Chopra, and Jason We-
+  ence algorithms in multi-document summarization.          ston. 2015. A neural attention model for ab-
+  In Advances in Information Retrieval, 29th Euro-          stractive sentence summarization.      In Proceed-
+  pean Conference on IR Research, ECIR 2007, Rome,          ings of the 2015 Conference on Empirical Meth-
+  Italy, April 2-5, 2007, Proceedings. pages 557–564.       ods in Natural Language Processing. Associa-
+                                                            tion for Computational Linguistics, pages 379–389.
+Rada Mihalcea and Paul Tarau. 2004. Textrank: Bring-        https://doi.org/10.18653/v1/D15-1044.
+  ing order into text. In Proceedings of the 2004 Con-
+  ference on Empirical Methods in Natural Language        Rui Sun, Yue Zhang, Meishan Zhang, and Donghong
+  Processing. pages 404–411.                                Ji. 2015. Event-driven headline generation. In
+                                                            Proceedings of the 53rd Annual Meeting of the
+Lili Mou, Yiping Song, Rui Yan, Ge Li, Lu Zhang, and        Association for Computational Linguistics and the
+   Zhi Jin. 2016. Sequence to backward and forward          7th International Joint Conference on Natural Lan-
+   sequences: A content-introducing approach to gen-        guage Processing (Volume 1: Long Papers). Associ-
+   erative short-text conversation. In Proceedings of       ation for Computational Linguistics, pages 462–472.
+   COLING 2016, the 26th International Conference           https://doi.org/10.3115/v1/P15-1045.
+   on Computational Linguistics: Technical Papers.
+   The COLING 2016 Organizing Committee, pages            Kapil Thadani and Kathleen McKeown. 2013. Super-
+   3349–3358. http://aclweb.org/anthology/C16-1316.         vised sentence fusion with single-stage inference. In
+                                                            Proceedings of the Sixth International Joint Confer-
+Ramesh Nallapati, Feifei Zhai, and Bowen Zhou. 2017.        ence on Natural Language Processing. Asian Feder-
+  Summarunner: A recurrent neural network based se-         ation of Natural Language Processing, pages 1410–
+  quence model for extractive summarization of doc-         1418.
+  uments. In Proceedings of the Thirty-First AAAI
+  Conference on Artificial Intelligence, February 4-9,    Xiaojun Wan. 2010. Towards a unified approach to
+  2017, San Francisco, California, USA.. pages 3075–        simultaneous single-document and multi-document
+  3081.                                                     summarizations. In Proceedings of the 23rd Inter-
+                                                            national Conference on Computational Linguistics
+Ramesh Nallapati, Bowen Zhou, Cicero dos San-               (Coling 2010). Coling 2010 Organizing Committee,
+  tos, Caglar Gulcehre, and Bing Xiang. 2016.               pages 1137–1145.
+  Abstractive text summarization using sequence-
+  to-sequence rnns and beyond. In Proceedings             Xiaojun Wan, Jianwu Yang, and Jianguo Xiao.
+  of The 20th SIGNLL Conference on Computa-                 2007. Manifold-ranking based topic-focused multi-
+  tional Natural Language Learning. Association             document summarization. In IJCAI 2007, Proceed-
+  for Computational Linguistics, pages 280–290.             ings of the 20th International Joint Conference on
+  https://doi.org/10.18653/v1/K16-1028.                     Artificial Intelligence, Hyderabad, India, January 6-
+                                                            12, 2007. pages 2903–2908.
+Hitoshi Nishikawa, Kazuho Arita, Katsumi Tanaka,
+  Tsutomu Hirao, Toshiro Makino, and Yoshihiro            Kristian Woodsend and Mirella Lapata. 2012. Multi-
+  Matsuo. 2014.      Learning to generate coherent          ple aspect summarization using integer linear pro-
+  summary with discriminative hidden semi-markov            gramming. In Proceedings of the 2012 Joint Con-
+  model. In Proceedings of COLING 2014. Dublin              ference on Empirical Methods in Natural Language
+  City University and Association for Computational         Processing and Computational Natural Language
+  Linguistics, pages 1648–1659.                             Learning. Association for Computational Linguis-
+                                                            tics, pages 233–243.
+Lawrence Page, Sergey Brin, Rajeev Motwani, and
+  Terry Winograd. 1999. The pagerank citation rank-       Jin-ge Yao, Xiaojun Wan, and Jianguo Xiao. 2017. Re-
+  ing: Bringing order to the web. Technical report,          cent advances in document summarization. Knowl-
+  Stanford InfoLab.                                          edge and Information Systems .
+Jeffrey Pennington, Richard Socher, and Christo-          Wenpeng Yin and Yulong Pei. 2015. Optimizing sen-
+   pher Manning. 2014.        Glove: Global vectors         tence modeling and selection for document summa-
+   for word representation. In Proceedings of the           rization. In Proceedings of the Twenty-Fourth Inter-
+   2014 Conference on Empirical Methods in Nat-             national Joint Conference on Artificial Intelligence,
+   ural Language Processing (EMNLP). Association            IJCAI 2015, Buenos Aires, Argentina, July 25-31,
+   for Computational Linguistics, pages 1532–1543.          2015. pages 1383–1389.
+   https://doi.org/10.3115/v1/D14-1162.
+
+                                                      1181
+
